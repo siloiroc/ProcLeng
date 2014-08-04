@@ -6,10 +6,11 @@ procedure testCase01 () is
 	
 begin
 
-	if (a or False) then
-		Put_line("cierto");	
-	else 
-		Put_line("falso");
-	end if;
-			
+-- uso de else
+if esCierto then
+	valor:=true;
+else
+	valor:=false;
+end if;
+
 end testCase01;
