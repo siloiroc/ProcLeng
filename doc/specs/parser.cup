@@ -113,7 +113,7 @@ non terminal			seccionVarGlobales;
 non terminal			seccionSubprogramas;
 non terminal 			declaracionConstante;
 non terminal			declaracionConstantes;
-non terminal			listaConstantes;
+non terminal			listaIdentificadores;
 non terminal			valorConstante;
 
 non terminal 			declaracionTipoGlobal;
@@ -176,10 +176,11 @@ axiom ::= PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET IS declaraciones BEGIN l
 
 declaraciones ::= seccionConstantes | seccionTiposGlobales | seccionVarGlobales | seccionSubprogramas | empty;
 
+listaIdentificadores	::= listaIdentificadores COMMA IDENTIFIER | IDENTIFIER; 
+
 // Declaración de constantes simbólicas 
 seccionConstantes		::= declaracionConstante | declaracionConstantes declaracionConstante;
-declaracionConstante 	::= listaConstantes ASSIGN valorConstante SEMICOLON;
-listaConstantes			::= listaConstantes COMMA IDENTIFIER | IDENTIFIER;
+declaracionConstante 	::= listaIdentificadores ASSIGN valorConstante SEMICOLON;
 valorConstante			::= TRUE | FALSE | NUMBER;  
 
 // Declaración de tipos globales
