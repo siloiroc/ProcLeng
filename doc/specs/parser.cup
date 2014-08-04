@@ -106,7 +106,7 @@ terminal Token POINT;
 non terminal program;
 non terminal Axiom axiom;
 non terminal declaraciones;
-non terminal listasentencias;
+non terminal bloqueSentencias;
 non terminal seccionConstantes;
 non terminal seccionTiposGlobales;
 non terminal seccionVarGlobales;
@@ -123,15 +123,12 @@ non terminal sentenciaIO;
 non terminal listaCamposRegistro;
 non terminal campoRegistro;
 
-non terminal listaexpresiones;
-non terminal parteexpresion;
 non terminal expresionAccesoRegistro;
 non terminal expresionInvocaFuncion;
 non terminal declaracionSubprograma;
 non terminal listaParametros;
 non terminal tipoRetorno;
 non terminal declaracionesSubprograma;
-non terminal bloqueSentencias;
 non terminal sentenciaAsignacion;
 non terminal sentenciaIf;
 non terminal sentenciaWhile;
@@ -179,7 +176,7 @@ program ::=
 
 axiom ::= ;
 
-axiom ::= PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET IS declaraciones BEGIN listasentencias END IDENTIFIER SEMICOLON;
+axiom ::= PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET IS declaraciones BEGIN bloqueSentencias END IDENTIFIER SEMICOLON;
 
 declaraciones ::= seccionConstantes | seccionTiposGlobales | seccionVarGlobales | seccionSubprogramas | empty;
 
@@ -201,27 +198,23 @@ seccionVarGlobales		::= declaracionVarGlobal | seccionVarGlobales declaracionVar
 declaracionVarGlobal	::= listaIdentificadores COLON tipoPrimitivo SEMICOLON;
 tipoPrimitivo 			::= INTEGER | BOOLEAN; 
 
-// Lista de sentencias
-listasentencias ::= sentencia SEMICOLON | listasentencias sentencia SEMICOLON;
+// Bloque de sentencias
+bloqueSentencias::= sentencia SEMICOLON bloqueSentencias | empty;
 //sentencia		::= sentenciaAsignacion | sentenciaIf | sentenciaWhile | sentenciaFor | sentenciaInvocaProc	| sentenciaIO | empty;
-sentencia		::= sentenciaAsignacion | sentenciaIO | empty;
+
+sentencia		::= sentenciaAsignacion | sentenciaIf | sentenciaIO;
 
 
 // Expresiones
-//listaexpresiones	::= listaexpresiones parteexpresion | parteexpresion;
-//expresion		::=	expresionAritmetica | expresionLogica | expresionAccesoRegistro | expresionInvocaFuncion;
+expresion	::= expresionAritmetica | expresionLogica | LEFTBRACKET expresion RIGHTBRACKET | IDENTIFIER;
 
-expresion	::= expresionAritmetica | expresionLogica;
-expresionAritmetica ::= LEFTBRACKET expresionAritmetica RIGHTBRACKET 
-						|expresionAritmetica PLUS expresionAritmetica 
-						| NUMBER
-						 | IDENTIFIER; 
+expresionAritmetica ::= expresion PLUS expresion 
+						| NUMBER; 
 						
 
-expresionLogica		::= LEFTBRACKET expresionLogica RIGHTBRACKET 
-						| expresionLogica OR expresionLogica 
-						| expresionAritmetica GREATTHAN expresionAritmetica
-						| expresionAritmetica EQUAL expresionAritmetica
+expresionLogica		::= expresion OR expresion 
+						| expresion GREATTHAN expresion
+						| expresion EQUAL expresion
 						| TRUE 
 						| FALSE;
 						
@@ -230,9 +223,10 @@ expresionLogica		::= LEFTBRACKET expresionLogica RIGHTBRACKET
 // Sentencia IO
 sentenciaIO 	::= PUTLINE LEFTBRACKET parametro RIGHTBRACKET;
 parametro		::= expresionAritmetica | expresionLogica | STRING;
+
 //Sentencia Asignacion
 sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica | IDENTIFIER ASSIGN expresionLogica;  
 
 //Sentencia If
-sentenciaIf			::= IF expresionLogica THEN listasentencias ELSE listasentencias END IF;
+sentenciaIf			::= IF expresionLogica THEN bloqueSentencias END IF;
 empty ::= ;
