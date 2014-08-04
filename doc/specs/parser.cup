@@ -222,7 +222,7 @@ expresionLogica		::= expresion OR expresion
  
 // Sentencia IO
 sentenciaIO 	::= PUTLINE LEFTBRACKET parametro RIGHTBRACKET;
-parametro		::= expresionAritmetica | expresionLogica | STRING;
+parametro		::= expresion | STRING;
 
 //Sentencia Asignacion
 sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica | IDENTIFIER ASSIGN expresionLogica;  
