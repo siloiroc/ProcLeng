@@ -214,7 +214,7 @@ tipoPrimitivo 			::= INTEGER | BOOLEAN | IDENTIFIER;
 bloqueSentencias::= sentencia SEMICOLON bloqueSentencias | empty;
 //sentencia		::= sentenciaAsignacion | sentenciaIf | sentenciaWhile | sentenciaFor | sentenciaInvocaProc	| sentenciaIO | empty;
 
-sentencia		::= sentenciaAsignacion | sentenciaIf | sentenciaIO;
+sentencia		::= expresion | sentenciaAsignacion | sentenciaIf | sentenciaIO ;
 
 
 // Expresiones
@@ -237,7 +237,7 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET parametro RIGHTBRACKET;
 parametro		::= expresion | STRING;
 
 //Sentencia Asignacion
-sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica | IDENTIFIER ASSIGN expresionLogica | IDENTIFIER ASSIGN expresionAccesoRegistro;  
+sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica | IDENTIFIER ASSIGN expresionLogica | expresionAccesoRegistro ASSIGN expresion;  
 
 //Sentencia If
 //sentenciaIf				::= sentenciaIfEmparejada | sentenciaIfNoEmparejada;
