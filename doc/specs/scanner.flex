@@ -88,26 +88,26 @@ IDENTIFIER							=	{ALPHA} ({ALPHA} | {DIGIT} | "_" )*
 	
 	//Delimitadores. Sección 2.1.5 documento especificación lenguaje HAda
 	
-	"\\"					{	return createToken (sym.BACKSLASH);		}
+	"\\"					{	return createToken (sym.BACKSLASH);			}
 	"("						{	return createToken (sym.LEFTBRACKET);		}
 	")"						{	return createToken (sym.RIGHTBRACKET);		}
 	".."					{	return createToken (sym.DOUBLEPOINT);		}
-	","						{	return createToken (sym.COMMA);		}
-	";"						{	return createToken (sym.SEMICOLON);		}
-	":"						{	return createToken (sym.COLON);		}
+	","						{	return createToken (sym.COMMA);				}
+	";"						{	return createToken (sym.SEMICOLON);			}
+	":"						{	return createToken (sym.COLON);				}
 		                         
 	//Operadores. Sección 2.1.6 documento especificación lenguaje HAda
-	"+"					{	return createToken (sym.PLUS);			}
+	"+"					{	return createToken (sym.PLUS);					}
 // "-" --> No implementado por pertenecer a grupo A. 
-//	"-"					{	return createToken (sym.MINUS);			}
+//	"-"					{	return createToken (sym.MINUS);					}
 // "<" --> No implementado por pertenecer a grupo A.
-//	"<"					{	return createToken (sym.LESSTHAN);		}
-	">"					{	return createToken (sym.GREATTHAN);		}
-	"="					{	return createToken (sym.EQUAL);			}
+//	"<"					{	return createToken (sym.LESSTHAN);				}
+	">"					{	return createToken (sym.GREATTHAN);				}
+	"="					{	return createToken (sym.EQUAL);					}
 // 	"/=" --> No implementado por pertenecer a grupo A.
-//	"/="				{	return createToken (sym.NOTEQUAL);		}
-	":="				{	return createToken (sym.ASSIGN);		}
-	"."					{	return createToken (sym.ACCESS);		}
+//	"/="				{	return createToken (sym.NOTEQUAL);				}
+	":="				{	return createToken (sym.ASSIGN);				}
+	"."					{	return createToken (sym.POINT);				}
                                
  
  

@@ -96,7 +96,7 @@ terminal Token GREATTHAN;
 terminal Token EQUAL;
 	//terminal Token NOTEQUAL;// No implementado: grupo A
 terminal Token ASSIGN;
-terminal Token ACCESS;
+terminal Token POINT;
 
 
 
@@ -107,13 +107,20 @@ non terminal  			program;
 non terminal Axiom		axiom;
 non terminal			declaraciones;
 non terminal			listasentencias;
-non terminal			declaracionConstantes;
+non terminal			seccionConstantes;
+non terminal			seccionTiposGlobales;
+non terminal			seccionVarGlobales;
+non terminal			seccionSubprogramas;
 non terminal 			declaracionConstante;
-non terminal			declaracionTiposGlobales;
+non terminal			declaracionConstantes;
+non terminal			listaConstantes;
+non terminal			valorConstante;
+
 non terminal 			declaracionTipoGlobal;
-non terminal			declaracionVarGlobales;
+non terminal			declaracionTiposGlobales;
+non terminal			listaTiposGlobales;
+
 non terminal 			declaracionVarGlobal;
-non terminal			declaracionSubprogramas;
 non terminal 			declaracionSubprograma;
 non terminal 			listaParametros;
 non terminal			tipoRetorno;
@@ -126,8 +133,6 @@ non terminal			sentenciaFor;
 non terminal			sentenciaIO;
 non terminal			invocaProcedimiento;
 non terminal			sentencia;
-non terminal			listaDeclaracionConstantes;
-non terminal			listaDeclaracionVariables;
 non terminal			parametro;
 non terminal			expresion;
 non terminal			expresionAritmetica;
@@ -138,9 +143,11 @@ non terminal			tipoPrimitivo;
 
 
 // Declaración de relaciones de precedencia
-precedence left     PLUS,
-                    MINUS;
-// ...
+precedence left		POINT, LEFTBRACKET, RIGHTBRACKET;
+precedence left     PLUS;
+precedence left 	GREATTHAN;
+precedence left		EQUAL;
+precedence left		OR;
 
 // Declaración de reglas de producción
 
@@ -167,36 +174,19 @@ axiom ::= ;
 
 axiom ::= PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET IS declaraciones BEGIN listasentencias END IDENTIFIER SEMICOLON;
 
-declaraciones ::= declaracionConstantes | declaracionTiposGlobales | declaracionVarGlobales | empty;
+declaraciones ::= seccionConstantes | seccionTiposGlobales | seccionVarGlobales | seccionSubprogramas | empty;
 
-declaracionConstantes		::= listaDeclaracionConstantes;
-listaDeclaracionConstantes  ::= declaracionConstante | listaDeclaracionConstantes declaracionConstante;
-declaracionVarGlobales		::= listaDeclaracionVariables;
-listaDeclaracionVariables	::= declaracionVarGlobal | listaDeclaracionVariables declaracionVarGlobal;
-//declaracionTiposGlobales 	::= declaracionTipoGlobal | declaracionTiposGlobales declaracionTipoGlobal;
-//declaracionSubprogramas 	::= declaracionSubprograma | declaracionSubprogramas declaracionSubprograma;
+// Declaración de constantes simbólicas 
+seccionConstantes		::= declaracionConstante | declaracionConstantes declaracionConstante;
+declaracionConstante 	::= listaConstantes ASSIGN valorConstante SEMICOLON;
+listaConstantes			::= listaConstantes COMMA IDENTIFIER | IDENTIFIER;
+valorConstante			::= TRUE | FALSE | NUMBER;  
 
-declaracionConstante ::= IDENTIFIER COLON CONSTANT ASSIGN NUM SEMICOLON 
-							| IDENTIFIER COLON CONSTANT ASSIGN TRUE SEMICOLON 
-							| IDENTIFIER COLON CONSTANT ASSIGN FALSE SEMICOLON;
-declaracionVarGlobal ::= IDENTIFIER COLON tipoPrimitivo SEMICOLON;
-tipoPrimitivo			::= INTEGER | BOOLEAN;
-listasentencias ::= sentenciaIO listasentencias | sentenciaAsignacion listasentencias| sentenciaIf listasentencias| sentenciaWhile listasentencias| empty;
-sentenciaAsignacion	::= IDENTIFIER ASSIGN expresion SEMICOLON;
-sentenciaIf			::= IF expresion THEN listasentencias END IF SEMICOLON 
-						| IF expresion THEN listasentencias ELSE listasentencias END IF SEMICOLON;
+// Declaración de tipos globales
+//tipoPrimitivo				::= INTEGER | BOOLEAN;
 
-empty ::= ;
+//seccionTiposGlobales	::=	declaracionTipoGlobal | declaracionTiposGlobales declaracionTipoGlobal;
+//declaracionTipoGlobal		::= listaTiposGlobales COLON tipoPrimitivo SEMICOLON;
+//listaTiposGlobales			::= listaTiposGlobales COMMA IDENTIFIER | IDENTIFIER;
 
-//expresion	::= expresionAritmetica | expresionLogica | IDENTIFIER;
-expresion ::= expresionLogica;
-//expresionAritmetica ::= expresionAritmetica PLUS expresionAritmetica
-//						| LEFTBRACKET expresionAritmetica RIGHTBRACKET
-//						| NUM ; 
-expresionLogica 	::= expresionLogica OR expresionLogica | 
-						| LEFTBRACKET expresionAritmetica RIGHTBRACKET 
-						|TRUE | FALSE;  
-
-sentenciaIO ::= PUTLINE LEFTBRACKET parametro RIGHTBRACKET SEMICOLON;
-//parametro	::= STRING | expresion;
-
+ 
