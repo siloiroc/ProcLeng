@@ -117,9 +117,14 @@ non terminal valorConstante;
 non terminal declaracionTipoGlobal;
 non terminal tipoPrimitivo;
 non terminal listaIdentificadores;
-
-
 non terminal declaracionVarGlobal;
+non terminal sentencia;
+non terminal sentenciaIO;
+
+non terminal listaexpresiones;
+non terminal parteexpresion;
+non terminal expresionAccesoRegistro;
+non terminal expresionInvocaFuncion;
 non terminal declaracionSubprograma;
 non terminal listaParametros;
 non terminal tipoRetorno;
@@ -129,15 +134,16 @@ non terminal sentenciaAsignacion;
 non terminal sentenciaIf;
 non terminal sentenciaWhile;
 non terminal sentenciaFor;
-non terminal sentenciaIO;
+non terminal sentenciaInvocaProc;
+
 non terminal invocaProcedimiento;
-non terminal sentencia;
 non terminal parametro;
 non terminal expresion;
 non terminal expresionAritmetica;
 non terminal expresionLogica;
 non terminal expresionRegistro;
 non terminal empty;
+
 
 
 
@@ -183,9 +189,34 @@ declaracionConstante ::= listaIdentificadores COLON CONSTANT ASSIGN valorConstan
 valorConstante ::= TRUE | FALSE | NUMBER;
 
 // Declaración de tipos globales
-seccionTiposGlobales 	::= declaracionTipoGlobal | seccionTiposGlobales declaracionTipoGlobal;
-declaracionTipoGlobal 	::= listaIdentificadores COLON tipoPrimitivo SEMICOLON;
-tipoPrimitivo ::= INTEGER | BOOLEAN;
+//seccionTiposGlobales 	::= declaracionTipoGlobal | seccionTiposGlobales declaracionTipoGlobal;
+//declaracionTipoGlobal 	::= listaIdentificadores COLON tipoPrimitivo SEMICOLON;
+
+
+// Declaración de variables globales
+seccionVarGlobales		::= declaracionVarGlobal | seccionVarGlobales declaracionVarGlobal;
+declaracionVarGlobal	::= listaIdentificadores COLON tipoPrimitivo SEMICOLON;
+tipoPrimitivo 			::= INTEGER | BOOLEAN; 
+
+// Lista de sentencias
+listasentencias ::= sentencia | listasentencias sentencia;
+//sentencia		::= sentenciaAsignacion | sentenciaIf | sentenciaWhile | sentenciaFor | sentenciaInvocaProc	| sentenciaIO | empty;
+sentencia		::= sentenciaIO;
+
+
+// Expresiones
+//listaexpresiones	::= listaexpresiones parteexpresion | parteexpresion;
+//expresion		::=	expresionAritmetica | expresionLogica | expresionAccesoRegistro | expresionInvocaFuncion;
+//expresionAritmetica	::= expresion PLUS expresion | LEFTBRACKET expresion RIGHTBRACKET | NUMBER;
+
+//expresionLogica		::= expresionLogica OR expresionLogica 
+//						| expresionAritmetica GREATTHAN expresionAritmetica 
+//						| expresionAritmetica EQUAL expresionAritmetica 
+//						;
+
+
+// Sentencia IO
+sentenciaIO 	::= PUTLINE LEFTBRACKET STRING RIGHTBRACKET SEMICOLON;
+
 
 empty ::= ;
-listasentencias ::= ;
