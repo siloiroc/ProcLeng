@@ -111,6 +111,7 @@ non terminal seccionConstantes;
 non terminal seccionTiposGlobales;
 non terminal seccionVarGlobales;
 non terminal seccionSubprogramas;
+non terminal seccionCuerpoPrograma;
 non terminal declaracionConstante;
 non terminal declaracionConstantes;
 non terminal valorConstante;
@@ -120,27 +121,32 @@ non terminal listaIdentificadores;
 non terminal declaracionVarGlobal;
 non terminal sentencia;
 non terminal sentenciaIO;
-non terminal listaCamposRegistro;
+non terminal bloqueCamposRegistro;
 non terminal campoRegistro;
-
 non terminal expresionAccesoRegistro;
+
+non terminal parametro;
+non terminal expresion;
+non terminal expresionAritmetica;
+non terminal expresionLogica;
+non terminal sentenciaAsignacion;
+non terminal sentenciaIf;
+
+
+
+
 non terminal expresionInvocaFuncion;
 non terminal declaracionSubprograma;
 non terminal listaParametros;
 non terminal tipoRetorno;
 non terminal declaracionesSubprograma;
-non terminal sentenciaAsignacion;
-non terminal sentenciaIf;
+
 non terminal sentenciaWhile;
 non terminal sentenciaFor;
 non terminal sentenciaInvocaProc;
-
 non terminal invocaProcedimiento;
-non terminal parametro;
-non terminal expresion;
-non terminal expresionAritmetica;
-non terminal expresionLogica;
-non terminal expresionRegistro;
+
+
 non terminal empty;
 
 
@@ -176,27 +182,33 @@ program ::=
 
 axiom ::= ;
 
-axiom ::= PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET IS declaraciones BEGIN bloqueSentencias END IDENTIFIER SEMICOLON;
+axiom ::= PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET IS declaraciones;
 
-declaraciones ::= seccionConstantes | seccionTiposGlobales | seccionVarGlobales | seccionSubprogramas | empty;
+//declaraciones ::= seccionConstantes seccionTiposGlobales seccionVarGlobales | empty;
+declaraciones				::=	seccionConstantes;
+seccionConstantes 			::= declaracionConstante seccionConstantes | seccionTiposGlobales;
+seccionTiposGlobales		::= declaracionTipoGlobal seccionTiposGlobales | seccionVarGlobales;
+seccionVarGlobales			::= declaracionVarGlobal seccionVarGlobales | seccionCuerpoPrograma;
+seccionCuerpoPrograma		::= BEGIN bloqueSentencias END IDENTIFIER SEMICOLON;
 
 listaIdentificadores ::= listaIdentificadores COMMA IDENTIFIER | IDENTIFIER;
 
 // Declaración de constantes simbólicas
-seccionConstantes ::= declaracionConstante | seccionConstantes declaracionConstante;
+//seccionConstantes ::= declaracionConstante | seccionConstantes declaracionConstante | ;
 declaracionConstante ::= listaIdentificadores COLON CONSTANT ASSIGN valorConstante SEMICOLON;
 valorConstante ::= TRUE | FALSE | NUMBER;
 
 // Declaración de tipos globales
-//seccionTiposGlobales 	::= declaracionTipoGlobal | seccionTiposGlobales declaracionTipoGlobal;
-//declaracionTipoGlobal 	::= TYPE IDENTIFIER IS RECORD listaCamposRegistro END RECORD SEMICOLON;
-//listaCamposRegistro		::= campoRegistro SEMICOLON| listaCamposRegistro campoRegistro SEMICOLON;
-//campoRegistro			::= IDENTIFIER COLON tipoPrimitivo;
+//seccionTiposGlobales 	::= declaracionTipoGlobal | seccionTiposGlobales declaracionTipoGlobal | ;
+declaracionTipoGlobal 	::= TYPE IDENTIFIER IS RECORD bloqueCamposRegistro END RECORD SEMICOLON;
+bloqueCamposRegistro	::= campoRegistro SEMICOLON| bloqueCamposRegistro campoRegistro SEMICOLON;
+campoRegistro			::= IDENTIFIER COLON tipoPrimitivo;
+//ERROR: El tipo de un registro también puede ser otro registro, no sólo Integer y Boolean
 
 // Declaración de variables globales
-seccionVarGlobales		::= declaracionVarGlobal | seccionVarGlobales declaracionVarGlobal;
+//seccionVarGlobales		::= declaracionVarGlobal | seccionVarGlobales declaracionVarGlobal | ;
 declaracionVarGlobal	::= listaIdentificadores COLON tipoPrimitivo SEMICOLON;
-tipoPrimitivo 			::= INTEGER | BOOLEAN; 
+tipoPrimitivo 			::= INTEGER | BOOLEAN | IDENTIFIER; 
 
 // Bloque de sentencias
 bloqueSentencias::= sentencia SEMICOLON bloqueSentencias | empty;
@@ -206,7 +218,7 @@ sentencia		::= sentenciaAsignacion | sentenciaIf | sentenciaIO;
 
 
 // Expresiones
-expresion	::= expresionAritmetica | expresionLogica | LEFTBRACKET expresion RIGHTBRACKET | IDENTIFIER;
+expresion	::= expresionAritmetica | expresionLogica | expresionAccesoRegistro | LEFTBRACKET expresion RIGHTBRACKET | IDENTIFIER;
 
 expresionAritmetica ::= expresion PLUS expresion 
 						| NUMBER; 
@@ -218,14 +230,14 @@ expresionLogica		::= expresion OR expresion
 						| TRUE 
 						| FALSE;
 						
-						
+expresionAccesoRegistro ::=	IDENTIFIER POINT IDENTIFIER;				
  
 // Sentencia IO
 sentenciaIO 	::= PUTLINE LEFTBRACKET parametro RIGHTBRACKET;
 parametro		::= expresion | STRING;
 
 //Sentencia Asignacion
-sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica | IDENTIFIER ASSIGN expresionLogica;  
+sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica | IDENTIFIER ASSIGN expresionLogica | IDENTIFIER ASSIGN expresionAccesoRegistro;  
 
 //Sentencia If
 //sentenciaIf				::= sentenciaIfEmparejada | sentenciaIfNoEmparejada;
