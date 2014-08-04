@@ -5,9 +5,11 @@ procedure testCase01 () is
 
 	
 begin
-	if x > 1 then
-		Put_line("cierto");
+
+	if (a or False) then
+		Put_line("cierto");	
+	else 
+		Put_line("falso");
 	end if;
-	
 			
 end testCase01;
