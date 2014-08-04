@@ -214,14 +214,17 @@ sentencia		::= sentenciaAsignacion | sentenciaIO | empty;
 expresion	::= expresionAritmetica | expresionLogica;
 expresionAritmetica ::= LEFTBRACKET expresionAritmetica RIGHTBRACKET 
 						|expresionAritmetica PLUS expresionAritmetica 
-						| NUMBER 
-						| IDENTIFIER;
+						| NUMBER
+						 | IDENTIFIER; 
+						
 
-expresionLogica		::= expresionLogica OR expresionLogica 
+expresionLogica		::= LEFTBRACKET expresionLogica RIGHTBRACKET 
+						| expresionLogica OR expresionLogica 
 						| expresionAritmetica GREATTHAN expresionAritmetica
 						| expresionAritmetica EQUAL expresionAritmetica
 						| TRUE 
 						| FALSE;
+						
 						
  
 // Sentencia IO
@@ -230,4 +233,6 @@ parametro		::= expresionAritmetica | expresionLogica | STRING;
 //Sentencia Asignacion
 sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica | IDENTIFIER ASSIGN expresionLogica;  
 
+//Sentencia If
+sentenciaIf			::= IF expresionLogica THEN listasentencias ELSE listasentencias END IF;
 empty ::= ;
