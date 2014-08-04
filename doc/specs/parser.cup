@@ -120,6 +120,8 @@ non terminal listaIdentificadores;
 non terminal declaracionVarGlobal;
 non terminal sentencia;
 non terminal sentenciaIO;
+non terminal listaCamposRegistro;
+non terminal campoRegistro;
 
 non terminal listaexpresiones;
 non terminal parteexpresion;
@@ -190,8 +192,9 @@ valorConstante ::= TRUE | FALSE | NUMBER;
 
 // Declaración de tipos globales
 //seccionTiposGlobales 	::= declaracionTipoGlobal | seccionTiposGlobales declaracionTipoGlobal;
-//declaracionTipoGlobal 	::= listaIdentificadores COLON tipoPrimitivo SEMICOLON;
-
+//declaracionTipoGlobal 	::= TYPE IDENTIFIER IS RECORD listaCamposRegistro END RECORD SEMICOLON;
+//listaCamposRegistro		::= campoRegistro SEMICOLON| listaCamposRegistro campoRegistro SEMICOLON;
+//campoRegistro			::= IDENTIFIER COLON tipoPrimitivo;
 
 // Declaración de variables globales
 seccionVarGlobales		::= declaracionVarGlobal | seccionVarGlobales declaracionVarGlobal;
@@ -199,24 +202,32 @@ declaracionVarGlobal	::= listaIdentificadores COLON tipoPrimitivo SEMICOLON;
 tipoPrimitivo 			::= INTEGER | BOOLEAN; 
 
 // Lista de sentencias
-listasentencias ::= sentencia | listasentencias SEMICOLON sentencia;
+listasentencias ::= sentencia SEMICOLON | listasentencias sentencia SEMICOLON;
 //sentencia		::= sentenciaAsignacion | sentenciaIf | sentenciaWhile | sentenciaFor | sentenciaInvocaProc	| sentenciaIO | empty;
-sentencia		::= sentenciaIO | empty;
+sentencia		::= sentenciaAsignacion | sentenciaIO | empty;
 
 
 // Expresiones
 //listaexpresiones	::= listaexpresiones parteexpresion | parteexpresion;
 //expresion		::=	expresionAritmetica | expresionLogica | expresionAccesoRegistro | expresionInvocaFuncion;
-//expresionAritmetica	::= expresion PLUS expresion | LEFTBRACKET expresion RIGHTBRACKET | NUMBER;
 
-//expresionLogica		::= expresionLogica OR expresionLogica 
-//						| expresionAritmetica GREATTHAN expresionAritmetica 
-//						| expresionAritmetica EQUAL expresionAritmetica 
-//						;
+expresion	::= expresionAritmetica | expresionLogica;
+expresionAritmetica ::= LEFTBRACKET expresionAritmetica RIGHTBRACKET 
+						|expresionAritmetica PLUS expresionAritmetica 
+						| NUMBER 
+						| IDENTIFIER;
 
-
+expresionLogica		::= expresionLogica OR expresionLogica 
+						| expresionAritmetica GREATTHAN expresionAritmetica
+						| expresionAritmetica EQUAL expresionAritmetica
+						| TRUE 
+						| FALSE;
+						
+ 
 // Sentencia IO
-sentenciaIO 	::= PUTLINE LEFTBRACKET STRING RIGHTBRACKET;
-
+sentenciaIO 	::= PUTLINE LEFTBRACKET parametro RIGHTBRACKET;
+parametro		::= expresionAritmetica | expresionLogica | STRING;
+//Sentencia Asignacion
+sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica | IDENTIFIER ASSIGN expresionLogica;  
 
 empty ::= ;
