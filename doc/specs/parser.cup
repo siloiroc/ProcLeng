@@ -1,6 +1,6 @@
 package compiler.syntax;
 
-// Declaración de importaciones 
+// Declaración de importaciones
 //(No modificar las proporcionadas. Se pueden agregar mas)
 
 import java_cup.runtime.Symbol;
@@ -26,28 +26,28 @@ import compiler.code.*;
 // Declaración del código de usuario
 
 action code {:
-	
-	SyntaxErrorManager   syntaxErrorManager   = CompilerContext.getSyntaxErrorManager();
-	SemanticErrorManager semanticErrorManager = CompilerContext.getSemanticErrorManager ();
-	ScopeManagerIF       scopeManager         = CompilerContext.getScopeManager ();
-	FinalCodeFactoryIF   finalCodeFactory     = CompilerContext.getFinalCodeFactory ();
 
-:}	
+SyntaxErrorManager syntaxErrorManager = CompilerContext.getSyntaxErrorManager();
+SemanticErrorManager semanticErrorManager = CompilerContext.getSemanticErrorManager ();
+ScopeManagerIF scopeManager = CompilerContext.getScopeManager ();
+FinalCodeFactoryIF finalCodeFactory = CompilerContext.getFinalCodeFactory ();
+
+:}
 
 parser code {:
-	SyntaxErrorManager syntaxErrorManager = CompilerContext.getSyntaxErrorManager();
-	
-	public void syntax_error(Symbol symbol)
-	{ 
-	    Token token = (Token) symbol.value;
-	    syntaxErrorManager.syntaxError ("Error sintactico, lexema:" + token.getLexema(), token);	    
-	}
-		
-	public void unrecovered_syntax_error(java_cup.runtime.Symbol symbol)
-	{	
-		Token token = (Token) symbol.value;
-	    syntaxErrorManager.syntaxFatalError ("Error fatal", token);
-	}
+SyntaxErrorManager syntaxErrorManager = CompilerContext.getSyntaxErrorManager();
+
+public void syntax_error(Symbol symbol)
+{
+Token token = (Token) symbol.value;
+syntaxErrorManager.syntaxError ("Error sintactico, lexema:" + token.getLexema(), token);
+}
+
+public void unrecovered_syntax_error(java_cup.runtime.Symbol symbol)
+{
+Token token = (Token) symbol.value;
+syntaxErrorManager.syntaxFatalError ("Error fatal", token);
+}
 :}
 
 
@@ -56,7 +56,7 @@ parser code {:
 terminal Token IDENTIFIER;
 terminal Token NUMBER;
 terminal Token STRING;
-	//terminal Token AND;// No implementado: grupo A
+//terminal Token AND;// No implementado: grupo A
 terminal Token ARRAY;
 terminal Token BEGIN;
 terminal Token BOOLEAN;
@@ -73,7 +73,7 @@ terminal Token IS;
 terminal Token LOOP;
 terminal Token OF;
 terminal Token OR;
-	//terminal Token OUT;// No implementado: grupo A
+//terminal Token OUT;// No implementado: grupo A
 terminal Token PROCEDURE;
 terminal Token PUTLINE;
 terminal Token RECORD;
@@ -81,7 +81,7 @@ terminal Token RETURN;
 terminal Token THEN;
 terminal Token TRUE;
 terminal Token TYPE;
-	//terminal Token WHILE; // No implementado: grupo A 
+//terminal Token WHILE; // No implementado: grupo A
 terminal Token BACKSLASH;
 terminal Token LEFTBRACKET;
 terminal Token RIGHTBRACKET;
@@ -90,11 +90,11 @@ terminal Token COMMA;
 terminal Token SEMICOLON;
 terminal Token COLON;
 terminal Token PLUS;
-	//terminal Token MINUS;	// No implementado: grupo A
-	//terminal Token LESSTHAN;// No implementado: grupo A
+//terminal Token MINUS; // No implementado: grupo A
+//terminal Token LESSTHAN;// No implementado: grupo A
 terminal Token GREATTHAN;
 terminal Token EQUAL;
-	//terminal Token NOTEQUAL;// No implementado: grupo A
+//terminal Token NOTEQUAL;// No implementado: grupo A
 terminal Token ASSIGN;
 terminal Token POINT;
 
@@ -103,70 +103,69 @@ terminal Token POINT;
 // Declaración de no terminales
 // no modificar los propuestos
 
-non terminal  			program;
-non terminal Axiom		axiom;
-non terminal			declaraciones;
-non terminal			listasentencias;
-non terminal			seccionConstantes;
-non terminal			seccionTiposGlobales;
-non terminal			seccionVarGlobales;
-non terminal			seccionSubprogramas;
-non terminal 			declaracionConstante;
-non terminal			declaracionConstantes;
-non terminal			listaIdentificadores;
-non terminal			valorConstante;
+non terminal program;
+non terminal Axiom axiom;
+non terminal declaraciones;
+non terminal listasentencias;
+non terminal seccionConstantes;
+non terminal seccionTiposGlobales;
+non terminal seccionVarGlobales;
+non terminal seccionSubprogramas;
+non terminal declaracionConstante;
+non terminal declaracionConstantes;
+non terminal valorConstante;
+non terminal declaracionTipoGlobal;
+non terminal tipoPrimitivo;
+non terminal listaIdentificadores;
 
-non terminal 			declaracionTipoGlobal;
-non terminal			declaracionTiposGlobales;
-non terminal			listaTiposGlobales;
 
-non terminal 			declaracionVarGlobal;
-non terminal 			declaracionSubprograma;
-non terminal 			listaParametros;
-non terminal			tipoRetorno;
-non terminal 			declaracionesSubprograma;
-non terminal 			bloqueSentencias;
-non terminal			sentenciaAsignacion;
-non terminal			sentenciaIf;
-non terminal			sentenciaWhile;
-non terminal			sentenciaFor;
-non terminal			sentenciaIO;
-non terminal			invocaProcedimiento;
-non terminal			sentencia;
-non terminal			parametro;
-non terminal			expresion;
-non terminal			expresionAritmetica;
-non terminal			expresionLogica;
-non terminal			expresionRegistro;
-non terminal			empty;
-non terminal			tipoPrimitivo;
+non terminal declaracionVarGlobal;
+non terminal declaracionSubprograma;
+non terminal listaParametros;
+non terminal tipoRetorno;
+non terminal declaracionesSubprograma;
+non terminal bloqueSentencias;
+non terminal sentenciaAsignacion;
+non terminal sentenciaIf;
+non terminal sentenciaWhile;
+non terminal sentenciaFor;
+non terminal sentenciaIO;
+non terminal invocaProcedimiento;
+non terminal sentencia;
+non terminal parametro;
+non terminal expresion;
+non terminal expresionAritmetica;
+non terminal expresionLogica;
+non terminal expresionRegistro;
+non terminal empty;
+
 
 
 // Declaración de relaciones de precedencia
-precedence left		POINT, LEFTBRACKET, RIGHTBRACKET;
-precedence left     PLUS;
-precedence left 	GREATTHAN;
-precedence left		EQUAL;
-precedence left		OR;
+precedence left POINT, LEFTBRACKET, RIGHTBRACKET;
+precedence left PLUS;
+precedence left GREATTHAN;
+precedence left EQUAL;
+precedence left OR;
 
 // Declaración de reglas de producción
 
 
 start with program;
 
-program ::= 
-  {: 
-        syntaxErrorManager.syntaxInfo ("Starting parsing..."); 
+program ::=
+  {:
+        syntaxErrorManager.syntaxInfo ("Starting parsing...");
    :}
   axiom:ax
-  {: 
-  		// No modificar esta estructura, aunque se pueden añadir más acciones semánticas
-  		
-  		//List intermediateCode = ax.getIntermediateCode ();
-  		//finalCodeFactory.create (intermediateCode);
+  {:
+   // No modificar esta estructura, aunque se pueden añadir más acciones semánticas
+  
+   //List intermediateCode = ax.getIntermediateCode ();
+   //finalCodeFactory.create (intermediateCode);
 
-  		
-  		syntaxErrorManager.syntaxInfo ("Parsing process ended.");
+  
+   syntaxErrorManager.syntaxInfo ("Parsing process ended.");
    :};
 
 
@@ -176,17 +175,17 @@ axiom ::= PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET IS declaraciones BEGIN l
 
 declaraciones ::= seccionConstantes | seccionTiposGlobales | seccionVarGlobales | seccionSubprogramas | empty;
 
-listaIdentificadores	::= listaIdentificadores COMMA IDENTIFIER | IDENTIFIER; 
+listaIdentificadores ::= listaIdentificadores COMMA IDENTIFIER | IDENTIFIER;
 
-// Declaración de constantes simbólicas 
-seccionConstantes		::= declaracionConstante | declaracionConstantes declaracionConstante;
-declaracionConstante 	::= listaIdentificadores COLON CONSTANT ASSIGN valorConstante SEMICOLON;
-valorConstante			::= TRUE | FALSE | NUMBER;
+// Declaración de constantes simbólicas
+seccionConstantes ::= declaracionConstante | seccionConstantes declaracionConstante;
+declaracionConstante ::= listaIdentificadores COLON CONSTANT ASSIGN valorConstante SEMICOLON;
+valorConstante ::= TRUE | FALSE | NUMBER;
 
 // Declaración de tipos globales
-seccionTiposGlobales	::=	declaracionTipoGlobal | declaracionTiposGlobales declaracionTipoGlobal;
-declaracionTipoGlobal	::= listaIdentificadores COLON tipoPrimitivo SEMICOLON;
-tipoPrimitivo			::= INTEGER | BOOLEAN;
+seccionTiposGlobales 	::= declaracionTipoGlobal | seccionTiposGlobales declaracionTipoGlobal;
+declaracionTipoGlobal 	::= listaIdentificadores COLON tipoPrimitivo SEMICOLON;
+tipoPrimitivo ::= INTEGER | BOOLEAN;
 
-empty					::= ;
-listasentencias			::= ;
+empty ::= ;
+listasentencias ::= ;
