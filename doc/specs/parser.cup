@@ -180,14 +180,13 @@ listaIdentificadores	::= listaIdentificadores COMMA IDENTIFIER | IDENTIFIER;
 
 // Declaración de constantes simbólicas 
 seccionConstantes		::= declaracionConstante | declaracionConstantes declaracionConstante;
-declaracionConstante 	::= listaIdentificadores ASSIGN valorConstante SEMICOLON;
-valorConstante			::= TRUE | FALSE | NUMBER;  
+declaracionConstante 	::= listaIdentificadores COLON CONSTANT ASSIGN valorConstante SEMICOLON;
+valorConstante			::= TRUE | FALSE | NUMBER;
 
 // Declaración de tipos globales
-//tipoPrimitivo				::= INTEGER | BOOLEAN;
+seccionTiposGlobales	::=	declaracionTipoGlobal | declaracionTiposGlobales declaracionTipoGlobal;
+declaracionTipoGlobal	::= listaIdentificadores COLON tipoPrimitivo SEMICOLON;
+tipoPrimitivo			::= INTEGER | BOOLEAN;
 
-//seccionTiposGlobales	::=	declaracionTipoGlobal | declaracionTiposGlobales declaracionTipoGlobal;
-//declaracionTipoGlobal		::= listaTiposGlobales COLON tipoPrimitivo SEMICOLON;
-//listaTiposGlobales			::= listaTiposGlobales COMMA IDENTIFIER | IDENTIFIER;
-
- 
+empty					::= ;
+listasentencias			::= ;
