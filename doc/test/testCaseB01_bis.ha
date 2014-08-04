@@ -2,13 +2,12 @@
 
 procedure testCase01 () is
 
+	a: CONSTANT := true;	
 	
-	x : Integer;
-	x,y : Integer;
 
-
-	
 	
 begin
+	Put_line("Hola");
+	Put_line("Mundo");
 
 end testCase01;

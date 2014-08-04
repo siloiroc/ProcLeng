@@ -199,9 +199,9 @@ declaracionVarGlobal	::= listaIdentificadores COLON tipoPrimitivo SEMICOLON;
 tipoPrimitivo 			::= INTEGER | BOOLEAN; 
 
 // Lista de sentencias
-listasentencias ::= sentencia | listasentencias sentencia;
+listasentencias ::= sentencia | listasentencias SEMICOLON sentencia;
 //sentencia		::= sentenciaAsignacion | sentenciaIf | sentenciaWhile | sentenciaFor | sentenciaInvocaProc	| sentenciaIO | empty;
-sentencia		::= sentenciaIO;
+sentencia		::= sentenciaIO | empty;
 
 
 // Expresiones
@@ -216,7 +216,7 @@ sentencia		::= sentenciaIO;
 
 
 // Sentencia IO
-sentenciaIO 	::= PUTLINE LEFTBRACKET STRING RIGHTBRACKET SEMICOLON;
+sentenciaIO 	::= PUTLINE LEFTBRACKET STRING RIGHTBRACKET;
 
 
 empty ::= ;
