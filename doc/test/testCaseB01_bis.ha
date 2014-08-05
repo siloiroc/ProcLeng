@@ -1,26 +1,25 @@
--- procedimientos paso por referencia
+procedure testB() is 
 
-procedure testCase09 () is
+-- constantes y variables globales
+A: constant := 1;
 
+d: Integer;
+e: Integer;
+f: Integer;
 
-a,b: Integer;
-
-procedure imprimeSuma (x,y: Integer) is
-	w: Integer;
-begin
-	w:=x+y;		
-	Put_line("w(8):");
-	Put_line(w);
-
-end resta;
-
+function suma (a : Integer; b: Integer) return Integer is
 
 begin
 
-	Put_line ("SUBPROGRAMAS PROCEDIMIENTO");
-	a:= 5;
-	b:= 3;
-	imprimeSuma (a,b);
-	
-			
-end testCase09;
+  return a+b;	
+
+end suma;
+
+-- procedimiento principal
+
+begin
+
+ 
+
+end testB;
+
