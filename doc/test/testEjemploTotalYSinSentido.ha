@@ -234,5 +234,15 @@ end if;
 for i in a..b+1 loop
 	Put_line(a);
 end loop;
+
+Put_line (1); -- Muestra 1
+Put_line (x); -- Muestra el valor de la variable x
+Put_line (x+1);
+Put_line (cita1.usuario.edad);
+Put_line (True); -- Muestra el texto true
+Put_line (1>2); -- Muestra el texto false
+Put_line ("Hola mundo"); -- Muestra el texto Hola mundo
+--Put_line (a,b); -- ERROR. Sólo se admite un parámetro
+--Put_line (cita1); -- ERROR. No se muestran tipos compuestos
 	
 end ejemplo;
