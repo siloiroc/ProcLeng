@@ -138,6 +138,32 @@ begin
 	return 1;
 end devuelve;
 
+
+procedure padre(a:Integer; b:Integer)is
+	x: Integer;
+	-- procedimiento anidado
+	procedure hijo (x: Integer) is
+		z: Integer;
+	begin
+		-- variable x es no local a procedimento hijo
+		-- variable z es local a procedimiento hijo
+		z:=x;
+	end hijo;
+begin -- de padre
+	x:=z; -- ERROR. Variable z no alcanzable por padre
+end padre;
+
+-- Ejemplo complete. Muestra por pantalla 1 2 3 4 5
+procedure procedimiento () is
+	a:Integer;
+begin
+	a:= 10;
+	for a in 1..5 loop -- a empieza en 1 aunque fuera 10
+		Put_line(a);
+	end loop;
+end procedimiento;
+
+
 -- procedimiento principal
 begin
 	x:=x+2; -- Comentario despues de una sentencia
@@ -168,5 +194,45 @@ a := funcion1();
 b := suma (r.campo1, r.campo2); -- r es de tipo registro
 
 --funcion2(z) := 3; -- ERROR.
+	
+i := 3 + 7;
+
+distinto := 3/=4; -- distinto es variable lógica
+cita1.usuario.edad := 30;
+a := 2 + suma(2,2);	
+--suma(2,3) := 5; -- ERROR. La llamada a una función no puede
+-- aparecer en la parte izquierda de una
+-- asignación
+	
+	
+-- if simple sin parte else
+if a=b then
+	a:=a+1;
+end if;
+
+-- expresión lógica más compleja
+if a=b or x>y then
+	a:=a+1;
+	b:=b+1;
+end if;
+
+-- expresión lógica con paréntesis
+if a=b or (x>y or x>z) then
+	a:=a+1;
+	b:=b+1;
+end if;
+
+-- uso de else
+if esCierto then
+	valor:=true;
+else
+	valor:=false;
+end if;	
+	
+-- Ejemplo con expresiones númericas. La variable i debe
+-- haber sido declarada previamente
+for i in a..b+1 loop
+	Put_line(a);
+end loop;
 	
 end ejemplo;

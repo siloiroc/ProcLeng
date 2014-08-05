@@ -269,6 +269,6 @@ listaParametros				::= listaParametros COMMA expresion | expresion | empty;
 
 
 // Sentencia For
-sentenciaFor	::=	FOR IDENTIFIER IN expresionAritmetica DOUBLEPOINT expresionAritmetica LOOP bloqueSentencias END LOOP;
+sentenciaFor	::=	FOR IDENTIFIER IN expresion DOUBLEPOINT expresion LOOP bloqueSentencias END LOOP;
 
 empty ::= ;
