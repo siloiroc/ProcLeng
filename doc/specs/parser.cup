@@ -226,7 +226,7 @@ sentencia		::= expresion | sentenciaAsignacion | sentenciaIf | sentenciaIO | sen
 
 
 // Expresiones
-expresion	::= expresionAritmetica | expresionLogica | expresionAccesoRegistro | LEFTBRACKET expresion RIGHTBRACKET | IDENTIFIER;
+expresion	::= expresionAritmetica | expresionLogica | expresionAccesoRegistro | LEFTBRACKET expresion RIGHTBRACKET | listaIdentificadores;
 
 expresionAritmetica ::= expresion PLUS expresion 
 						| NUMBER; 
@@ -249,7 +249,9 @@ parametro		::= expresion | STRING;
 //						| IDENTIFIER ASSIGN expresionLogica
 //						| IDENTIFIER ASSIGN sentenciaLlamadaSubprograma
 //						| expresionAccesoRegistro ASSIGN expresion;
-sentenciaAsignacion		::= IDENTIFIER ASSIGN expresion;  
+sentenciaAsignacion		::= IDENTIFIER ASSIGN expresion
+							| expresionAccesoRegistro ASSIGN expresion
+							| IDENTIFIER ASSIGN sentenciaLlamadaSubprograma;  
 						
 
 //Sentencia If
