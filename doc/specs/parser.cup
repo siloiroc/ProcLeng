@@ -215,11 +215,15 @@ bloqueParamSubprograma		::= bloqueParamSubprograma SEMICOLON listaIdentificadore
 // Bloque de sentencias
 bloqueSentencias			::= sentencia SEMICOLON bloqueSentencias | empty;
 
-sentencia		::= expresion | sentenciaAsignacion | sentenciaIf | sentenciaIO | sentenciaReturn | sentenciaLlamadaSubprograma | sentenciaFor;
+sentencia		::= expresion | sentenciaAsignacion | sentenciaIf | sentenciaIO | sentenciaReturn |sentenciaFor;
 
 
 // Expresiones
-expresion	::= expresionAritmetica | expresionLogica | expresionAccesoRegistro | LEFTBRACKET expresion RIGHTBRACKET | listaIdentificadores;
+expresion	::= expresionAritmetica 
+				| expresionLogica 
+				| expresionAccesoRegistro 
+				| LEFTBRACKET expresion RIGHTBRACKET 
+				| listaIdentificadores;
 
 expresionAritmetica ::= expresion PLUS expresion 
 						| NUMBER; 
@@ -227,10 +231,13 @@ expresionAritmetica ::= expresion PLUS expresion
 expresionLogica		::= expresion OR expresion 
 						| expresion GREATTHAN expresion
 						| expresion EQUAL expresion
+						| sentenciaLlamadaSubprograma
 						| TRUE 
 						| FALSE;
 						
-expresionAccesoRegistro ::=	IDENTIFIER POINT IDENTIFIER;				
+//expresionAccesoRegistro ::=	IDENTIFIER POINT IDENTIFIER;
+expresionAccesoRegistro		::= IDENTIFIER POINT expresionAccesoRegistro | IDENTIFIER POINT IDENTIFIER;  
+			
  
 // Sentencia IO
 sentenciaIO 	::= PUTLINE LEFTBRACKET parametro RIGHTBRACKET;
@@ -242,8 +249,7 @@ parametro		::= expresion | STRING;
 //						| IDENTIFIER ASSIGN sentenciaLlamadaSubprograma
 //						| expresionAccesoRegistro ASSIGN expresion;
 sentenciaAsignacion		::= IDENTIFIER ASSIGN expresion
-							| expresionAccesoRegistro ASSIGN expresion
-							| IDENTIFIER ASSIGN sentenciaLlamadaSubprograma;  
+							| expresionAccesoRegistro ASSIGN expresion;  
 						
 
 //Sentencia If
