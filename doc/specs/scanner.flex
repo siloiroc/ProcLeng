@@ -58,7 +58,7 @@ IDENTIFIER							=	{ALPHA} ({ALPHA} | {DIGIT} | "_" )*
   	//Palabras reservadas. Sección 2.1.4 documento especificación lenguaje HAda
 // "and" --> No implementado por pertenecer a grupo A.  
 //	"and"				{	return createToken (sym.AND);		}
-	"array"				{	return createToken (sym.ARRAY);		}
+//	"array" --> No implementado por pertenecer a grupo A.
 	"begin"				{	return createToken (sym.BEGIN);		}
 	"Boolean"			{	return createToken (sym.BOOLEAN);	}
 	"constant"			{	return createToken (sym.CONSTANT);	}
@@ -72,7 +72,7 @@ IDENTIFIER							=	{ALPHA} ({ALPHA} | {DIGIT} | "_" )*
 	"Integer"			{	return createToken (sym.INTEGER);	}
 	"is"				{	return createToken (sym.IS);		}
 	"loop"				{	return createToken (sym.LOOP);		}
-	"of"				{	return createToken (sym.OF);		}
+//	"of"  No implementado por pertenecer a grupo A.
 	"or"				{	return createToken (sym.OR);		}
 // 	"out" No implementado por pertenecer a grupo A.
 //	"out"				{	return createToken (sym.OUT);		}

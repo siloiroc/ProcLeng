@@ -56,8 +56,8 @@ syntaxErrorManager.syntaxFatalError ("Error fatal", token);
 terminal Token IDENTIFIER;
 terminal Token NUMBER;
 terminal Token STRING;
-//terminal Token AND;// No implementado: grupo A
-terminal Token ARRAY;
+//terminal Token AND;		// No implementado: grupo A
+//terminal Token ARRAY;		// No implementado: grupo A
 terminal Token BEGIN;
 terminal Token BOOLEAN;
 terminal Token CONSTANT;
@@ -71,9 +71,9 @@ terminal Token IN;
 terminal Token INTEGER;
 terminal Token IS;
 terminal Token LOOP;
-terminal Token OF;
+//terminal Token OF;		// No implementado: grupo A
 terminal Token OR;
-//terminal Token OUT;// No implementado: grupo A
+//terminal Token OUT;		// No implementado: grupo A
 terminal Token PROCEDURE;
 terminal Token PUTLINE;
 terminal Token RECORD;
@@ -81,8 +81,10 @@ terminal Token RETURN;
 terminal Token THEN;
 terminal Token TRUE;
 terminal Token TYPE;
-//terminal Token WHILE; // No implementado: grupo A
-terminal Token BACKSLASH;
+//terminal Token WHILE; 	// No implementado: grupo A
+ terminal Token BACKSLASH; 
+// ?¿?¿?¿?¿?¿?¿? backslash ¿?¿?¿ 
+
 terminal Token LEFTBRACKET;
 terminal Token RIGHTBRACKET;
 terminal Token DOUBLEPOINT;
@@ -113,16 +115,14 @@ non terminal seccionVarGlobales;
 non terminal seccionSubprogramas;
 non terminal seccionCuerpoPrograma;
 non terminal declaracionConstante;
-non terminal declaracionConstantes;
+
 non terminal declaracionTipos;
 non terminal declaracionVariables;
 non terminal declaracionSubprogramas;
 
 non terminal seccionSubprTiposLocales;
 non terminal seccionSubprVariables;
-non terminal seccionCuerpoSubprograma;
 non terminal bloqueCamposSubprograma;
-non terminal bloqueSentenciasSubprograma;
 
 
 non terminal valorConstante;
@@ -134,7 +134,7 @@ non terminal sentenciaIO;
 non terminal sentenciaAsignacion;
 non terminal sentenciaIf;
 non terminal sentenciaReturn;
-non terminal sentenciaLlamadaFuncion;
+non terminal sentenciaLlamadaSubprograma;
 non terminal sentenciaFor;
 non terminal bloqueCamposRegistro;
 non terminal campoRegistro;
@@ -213,15 +213,16 @@ tipoPrimitivo 			::= INTEGER | BOOLEAN | IDENTIFIER;
 declaracionSubprogramas		::= FUNCTION IDENTIFIER LEFTBRACKET bloqueCamposSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS seccionSubprTiposLocales 
 								| PROCEDURE IDENTIFIER LEFTBRACKET bloqueCamposSubprograma RIGHTBRACKET IS seccionSubprTiposLocales;
 seccionSubprTiposLocales 	::= declaracionTipos seccionSubprTiposLocales | seccionSubprVariables;
-seccionSubprVariables		::= declaracionVariables seccionSubprVariables | seccionCuerpoSubprograma;
-seccionCuerpoSubprograma	::= BEGIN bloqueSentencias END IDENTIFIER SEMICOLON;
+seccionSubprVariables		::= declaracionVariables seccionSubprVariables | seccionSubprogramas;
+
+//seccionCuerpoSubprograma	::= BEGIN bloqueSentencias END IDENTIFIER SEMICOLON;
 
 bloqueCamposSubprograma		::= listaIdentificadores COLON tipoPrimitivo bloqueCamposSubprograma | empty;
 
 // Bloque de sentencias
 bloqueSentencias			::= sentencia SEMICOLON bloqueSentencias | empty;
 
-sentencia		::= expresion | sentenciaAsignacion | sentenciaIf | sentenciaIO | sentenciaReturn | sentenciaLlamadaFuncion | sentenciaFor;
+sentencia		::= expresion | sentenciaAsignacion | sentenciaIf | sentenciaIO | sentenciaReturn | sentenciaLlamadaSubprograma | sentenciaFor;
 
 
 // Expresiones
@@ -246,7 +247,7 @@ parametro		::= expresion | STRING;
 //Sentencia Asignacion
 sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica 
 						| IDENTIFIER ASSIGN expresionLogica
-						| IDENTIFIER ASSIGN sentenciaLlamadaFuncion
+						| IDENTIFIER ASSIGN sentenciaLlamadaSubprograma
 						| expresionAccesoRegistro ASSIGN expresion;
 //sentenciaAsignacion		::= IDENTIFIER ASSIGN expresion;  
 						
@@ -261,8 +262,9 @@ sentenciaIf			::= IF expresion THEN bloqueSentencias END IF | IF expresion THEN 
 // Sentencia de retorno de función
 sentenciaReturn	::= RETURN expresion SEMICOLON;
 
-// Sentencia de llamada a función
-sentenciaLlamadaFuncion	::= IDENTIFIER LEFTBRACKET listaIdentificadores RIGHTBRACKET;
+// Sentencia de llamada a subprograma
+sentenciaLlamadaSubprograma	::= IDENTIFIER LEFTBRACKET expresion RIGHTBRACKET;
+
 
 // Sentencia For
 sentenciaFor	::=	FOR IDENTIFIER IN expresionAritmetica DOUBLEPOINT expresionAritmetica LOOP bloqueSentencias END LOOP;
