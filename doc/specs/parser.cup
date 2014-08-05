@@ -245,11 +245,11 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET parametro RIGHTBRACKET;
 parametro		::= expresion | STRING;
 
 //Sentencia Asignacion
-sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica 
-						| IDENTIFIER ASSIGN expresionLogica
-						| IDENTIFIER ASSIGN sentenciaLlamadaSubprograma
-						| expresionAccesoRegistro ASSIGN expresion;
-//sentenciaAsignacion		::= IDENTIFIER ASSIGN expresion;  
+//sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica 
+//						| IDENTIFIER ASSIGN expresionLogica
+//						| IDENTIFIER ASSIGN sentenciaLlamadaSubprograma
+//						| expresionAccesoRegistro ASSIGN expresion;
+sentenciaAsignacion		::= IDENTIFIER ASSIGN expresion;  
 						
 
 //Sentencia If
