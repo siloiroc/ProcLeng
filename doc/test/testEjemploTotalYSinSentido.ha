@@ -15,7 +15,22 @@ UNO: constant := 1;
 --CINCO: constant : =5 -- ERROR, falta punto y coma
 
 -- tipos globales
-x : Integer;
+type Tpersona is record
+	dni: Integer;
+	edad : Integer;
+	casado : Boolean;
+end record;
+
+type Tfecha is record
+	dia: Integer;
+	mes : Integer;
+	anyo : Integer;
+end record;
+
+type Tcita is record
+	usuario:Tpersona;
+	fecha:Tfecha;
+end record;
 
 
 
@@ -145,5 +160,13 @@ x := c1.usuario.edad;
 mayorEdad := c1.usuario.edad > 18;
 -- En este último ejemplo se compara un campo de un registro.
 -- Esto es correcto. Lo que no es posible es comparar registros
+
+
+x := resta(a, b);
+y := suma(a, resta(b, c));
+a := funcion1();
+b := suma (r.campo1, r.campo2); -- r es de tipo registro
+
+--funcion2(z) := 3; -- ERROR.
 	
 end ejemplo;

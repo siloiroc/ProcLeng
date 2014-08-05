@@ -141,7 +141,7 @@ non terminal parametro;
 non terminal expresion;
 non terminal expresionAritmetica;
 non terminal expresionLogica;
-
+non terminal listaParametros;
 non terminal empty;
 
 
@@ -222,8 +222,8 @@ sentencia		::= expresion | sentenciaAsignacion | sentenciaIf | sentenciaIO | sen
 expresion	::= expresionAritmetica 
 				| expresionLogica 
 				| expresionAccesoRegistro 
-				| LEFTBRACKET expresion RIGHTBRACKET 
-				| listaIdentificadores;
+				| LEFTBRACKET expresion RIGHTBRACKET
+				| IDENTIFIER;
 
 expresionAritmetica ::= expresion PLUS expresion 
 						| NUMBER; 
@@ -263,7 +263,9 @@ sentenciaIf			::= IF expresion THEN bloqueSentencias END IF | IF expresion THEN 
 sentenciaReturn	::= RETURN expresion;
 
 // Sentencia de llamada a subprograma
-sentenciaLlamadaSubprograma	::= IDENTIFIER LEFTBRACKET expresion RIGHTBRACKET;
+//sentenciaLlamadaSubprograma	::= IDENTIFIER LEFTBRACKET expresion RIGHTBRACKET;
+sentenciaLlamadaSubprograma	::= IDENTIFIER LEFTBRACKET listaParametros RIGHTBRACKET;
+listaParametros				::= listaParametros COMMA expresion | expresion | empty;
 
 
 // Sentencia For
