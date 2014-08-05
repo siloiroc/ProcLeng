@@ -10,7 +10,7 @@ a,b: Integer;
 function suma (x,y: Integer) return Integer is
 begin
 		
-	return x+y;	
+	
 
 end resta;
 

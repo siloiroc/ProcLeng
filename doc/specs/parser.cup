@@ -114,13 +114,28 @@ non terminal seccionSubprogramas;
 non terminal seccionCuerpoPrograma;
 non terminal declaracionConstante;
 non terminal declaracionConstantes;
+non terminal declaracionTipos;
+non terminal declaracionVariables;
+non terminal declaracionSubprogramas;
+
+non terminal seccionSubprTiposLocales;
+non terminal seccionSubprVariables;
+non terminal seccionCuerpoSubprograma;
+non terminal bloqueCamposSubprograma;
+non terminal bloqueSentenciasSubprograma;
+
+
 non terminal valorConstante;
-non terminal declaracionTipoGlobal;
 non terminal tipoPrimitivo;
 non terminal listaIdentificadores;
-non terminal declaracionVarGlobal;
+
 non terminal sentencia;
 non terminal sentenciaIO;
+non terminal sentenciaAsignacion;
+non terminal sentenciaIf;
+non terminal sentenciaReturn;
+non terminal sentenciaLlamadaFuncion;
+non terminal sentenciaFor;
 non terminal bloqueCamposRegistro;
 non terminal campoRegistro;
 non terminal expresionAccesoRegistro;
@@ -129,23 +144,6 @@ non terminal parametro;
 non terminal expresion;
 non terminal expresionAritmetica;
 non terminal expresionLogica;
-non terminal sentenciaAsignacion;
-non terminal sentenciaIf;
-
-
-
-
-non terminal expresionInvocaFuncion;
-non terminal declaracionSubprograma;
-non terminal listaParametros;
-non terminal tipoRetorno;
-non terminal declaracionesSubprograma;
-
-non terminal sentenciaWhile;
-non terminal sentenciaFor;
-non terminal sentenciaInvocaProc;
-non terminal invocaProcedimiento;
-
 
 non terminal empty;
 
@@ -187,8 +185,9 @@ axiom ::= PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET IS declaraciones;
 //declaraciones ::= seccionConstantes seccionTiposGlobales seccionVarGlobales | empty;
 declaraciones				::=	seccionConstantes;
 seccionConstantes 			::= declaracionConstante seccionConstantes | seccionTiposGlobales;
-seccionTiposGlobales		::= declaracionTipoGlobal seccionTiposGlobales | seccionVarGlobales;
-seccionVarGlobales			::= declaracionVarGlobal seccionVarGlobales | seccionCuerpoPrograma;
+seccionTiposGlobales		::= declaracionTipos seccionTiposGlobales | seccionVarGlobales;
+seccionVarGlobales			::= declaracionVariables seccionVarGlobales | seccionSubprogramas;
+seccionSubprogramas			::= declaracionSubprogramas seccionSubprogramas | seccionCuerpoPrograma;
 seccionCuerpoPrograma		::= BEGIN bloqueSentencias END IDENTIFIER SEMICOLON;
 
 listaIdentificadores ::= listaIdentificadores COMMA IDENTIFIER | IDENTIFIER;
@@ -200,21 +199,29 @@ valorConstante ::= TRUE | FALSE | NUMBER;
 
 // Declaración de tipos globales
 //seccionTiposGlobales 	::= declaracionTipoGlobal | seccionTiposGlobales declaracionTipoGlobal | ;
-declaracionTipoGlobal 	::= TYPE IDENTIFIER IS RECORD bloqueCamposRegistro END RECORD SEMICOLON;
+declaracionTipos 		::= TYPE IDENTIFIER IS RECORD bloqueCamposRegistro END RECORD SEMICOLON;
 bloqueCamposRegistro	::= campoRegistro SEMICOLON| bloqueCamposRegistro campoRegistro SEMICOLON;
 campoRegistro			::= IDENTIFIER COLON tipoPrimitivo;
 //ERROR: El tipo de un registro también puede ser otro registro, no sólo Integer y Boolean
 
 // Declaración de variables globales
-//seccionVarGlobales		::= declaracionVarGlobal | seccionVarGlobales declaracionVarGlobal | ;
-declaracionVarGlobal	::= listaIdentificadores COLON tipoPrimitivo SEMICOLON;
+//seccionVarGlobales	::= declaracionVarGlobal | seccionVarGlobales declaracionVarGlobal | ;
+declaracionVariables	::= listaIdentificadores COLON tipoPrimitivo SEMICOLON;
 tipoPrimitivo 			::= INTEGER | BOOLEAN | IDENTIFIER; 
 
-// Bloque de sentencias
-bloqueSentencias::= sentencia SEMICOLON bloqueSentencias | empty;
-//sentencia		::= sentenciaAsignacion | sentenciaIf | sentenciaWhile | sentenciaFor | sentenciaInvocaProc	| sentenciaIO | empty;
+// Declaración de subprogramas
+declaracionSubprogramas		::= FUNCTION IDENTIFIER LEFTBRACKET bloqueCamposSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS seccionSubprTiposLocales 
+								| PROCEDURE IDENTIFIER LEFTBRACKET bloqueCamposSubprograma RIGHTBRACKET IS seccionSubprTiposLocales;
+seccionSubprTiposLocales 	::= declaracionTipos seccionSubprTiposLocales | seccionSubprVariables;
+seccionSubprVariables		::= declaracionVariables seccionSubprVariables | seccionCuerpoSubprograma;
+seccionCuerpoSubprograma	::= BEGIN bloqueSentencias END IDENTIFIER SEMICOLON;
 
-sentencia		::= expresion | sentenciaAsignacion | sentenciaIf | sentenciaIO ;
+bloqueCamposSubprograma		::= listaIdentificadores COLON tipoPrimitivo bloqueCamposSubprograma | empty;
+
+// Bloque de sentencias
+bloqueSentencias			::= sentencia SEMICOLON bloqueSentencias | empty;
+
+sentencia		::= expresion | sentenciaAsignacion | sentenciaIf | sentenciaIO | sentenciaReturn | sentenciaLlamadaFuncion | sentenciaFor;
 
 
 // Expresiones
@@ -237,7 +244,12 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET parametro RIGHTBRACKET;
 parametro		::= expresion | STRING;
 
 //Sentencia Asignacion
-sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica | IDENTIFIER ASSIGN expresionLogica | expresionAccesoRegistro ASSIGN expresion;  
+sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica 
+						| IDENTIFIER ASSIGN expresionLogica
+						| IDENTIFIER ASSIGN sentenciaLlamadaFuncion
+						| expresionAccesoRegistro ASSIGN expresion;
+//sentenciaAsignacion		::= IDENTIFIER ASSIGN expresion;  
+						
 
 //Sentencia If
 //sentenciaIf				::= sentenciaIfEmparejada | sentenciaIfNoEmparejada;
@@ -245,5 +257,14 @@ sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica | IDENTIFIER ASSIG
 //sentenciaIfNoEmparejada ::= IF (expresionLogica) bloqueSentencias | IF (expresionLogica) sentenciaIfEmparejada ELSE sentenciaIfNoEmparejada;
 
 sentenciaIf			::= IF expresion THEN bloqueSentencias END IF | IF expresion THEN bloqueSentencias ELSE bloqueSentencias END IF;
+
+// Sentencia de retorno de función
+sentenciaReturn	::= RETURN expresion SEMICOLON;
+
+// Sentencia de llamada a función
+sentenciaLlamadaFuncion	::= IDENTIFIER LEFTBRACKET listaIdentificadores RIGHTBRACKET;
+
+// Sentencia For
+sentenciaFor	::=	FOR IDENTIFIER IN expresionAritmetica DOUBLEPOINT expresionAritmetica LOOP bloqueSentencias END LOOP;
 
 empty ::= ;
