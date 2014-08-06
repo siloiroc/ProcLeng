@@ -1,25 +1,33 @@
-procedure testB() is 
+-- funciones paso por valor
 
--- constantes y variables globales
-A: constant := 1;
 
-d: Integer;
-e: Integer;
-f: Integer;
+procedure testCase08 () is
 
-function suma (a : Integer; b: Integer) return Integer is
+x: CONSTANT := a;
+Y: CONSTANT := 2;
+z: CONSTANT := 5;
+a: CONSTANT := 9;
+
+j: Integer;
+
+a,b: Integer;
+
+function suma (x,y: Integer) return Integer is
+begin
+		
+	
+
+end resta;
+
 
 begin
 
-  return a+b;	
+	Put_line ("SUBPROGRAMAS FUNCIONES");
+	a:= 5;
+	b:= 3;
+	z:= suma (a,b);
+	Put_line("z(8):");
+	Put_line(z);
+			
 
-end suma;
-
--- procedimiento principal
-
-begin
-
- 
-
-end testB;
-
+end testCase08;

@@ -177,7 +177,10 @@ program ::=
 
 axiom ::= ;
 
-axiom ::= PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET IS declaraciones;
+axiom ::= PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET IS declaraciones
+		  | PROCEDURE IDENTIFIER LEFTBRACKET error RIGHTBRACKET IS declaraciones{:syntaxErrorManager.syntaxInfo("ERROR 00x: Estructura programa - Procedimiento principal no puede tener parámetros");:}
+		  | PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET error declaraciones {:syntaxErrorManager.syntaxInfo("ERROR 001: Estructura programa, falta IS");:};
+//		  | error {:syntaxErrorManager.syntaxInfo("ERROR 00X: Error general estructura programa");:};
 
 //declaraciones ::= seccionConstantes seccionTiposGlobales seccionVarGlobales | empty;
 declaraciones				::=	seccionConstantes;
@@ -185,12 +188,20 @@ seccionConstantes 			::= declaracionConstante seccionConstantes | seccionTipos;
 seccionTipos				::= declaracionTipos seccionTipos | seccionVariables;
 seccionVariables			::= declaracionVariables seccionVariables | seccionSubprogramas;
 seccionSubprogramas			::= declaracionSubprogramas seccionSubprogramas | seccionCuerpoPrograma;
-seccionCuerpoPrograma		::= BEGIN bloqueSentencias END IDENTIFIER SEMICOLON;
+seccionCuerpoPrograma		::= BEGIN bloqueSentencias END IDENTIFIER SEMICOLON
+								|BEGIN bloqueSentencias END error SEMICOLON {:syntaxErrorManager.syntaxInfo("ERROR 002: Estructura programa, falta NOMBRE_PROGRAMA en sentencia END");:}
+								| error {:syntaxErrorManager.syntaxInfo("ERROR 003: Estructura programa");:};
+								
 
 listaIdentificadores ::= listaIdentificadores COMMA IDENTIFIER | IDENTIFIER;
 
 // Declaración de constantes simbólicas
-declaracionConstante ::= listaIdentificadores COLON CONSTANT ASSIGN valorConstante SEMICOLON;
+declaracionConstante ::= listaIdentificadores COLON CONSTANT ASSIGN valorConstante SEMICOLON {:syntaxErrorManager.syntaxDebug("En declaración constante");:}
+						 | listaIdentificadores COLON CONSTANT error valorConstante {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, operador asignación");:}
+						 | listaIdentificadores COLON CONSTANT ASSIGN error {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, valor incorrecto");:}
+						 | listaIdentificadores COLON CONSTANT ASSIGN valorConstante error SEMICOLON{:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, falta punto y coma");:};
+						 				 
+						 
 valorConstante ::= TRUE | FALSE | NUMBER;
 
 // Declaración de tipos globales
@@ -198,14 +209,15 @@ declaracionTipos 		::= TYPE IDENTIFIER IS RECORD bloqueCamposRegistro END RECORD
 bloqueCamposRegistro	::= campoRegistro SEMICOLON| bloqueCamposRegistro campoRegistro SEMICOLON;
 campoRegistro			::= IDENTIFIER COLON tipoPrimitivo;
 //ERROR: El tipo de un registro también puede ser otro registro, no sólo Integer y Boolean
-
+ 
 // Declaración de variables globales
 declaracionVariables	::= listaIdentificadores COLON tipoPrimitivo SEMICOLON;
 tipoPrimitivo 			::= INTEGER | BOOLEAN | IDENTIFIER; 
 
 // Declaración de subprogramas
 declaracionSubprogramas		::= FUNCTION IDENTIFIER LEFTBRACKET bloqueParamSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS seccionTipos 
-								| PROCEDURE IDENTIFIER LEFTBRACKET bloqueParamSubprograma RIGHTBRACKET IS seccionTipos;
+								| PROCEDURE IDENTIFIER LEFTBRACKET bloqueParamSubprograma RIGHTBRACKET IS seccionTipos
+								| FUNCTION IDENTIFIER LEFTBRACKET bloqueParamSubprograma RIGHTBRACKET error IS {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error definición función, falta return");:};
 
 
 bloqueParamSubprograma		::= bloqueParamSubprograma SEMICOLON listaIdentificadores COLON tipoPrimitivo
@@ -213,9 +225,10 @@ bloqueParamSubprograma		::= bloqueParamSubprograma SEMICOLON listaIdentificadore
 								| empty;
 
 // Bloque de sentencias
-bloqueSentencias			::= sentencia SEMICOLON bloqueSentencias | empty;
+bloqueSentencias			::= sentencia SEMICOLON bloqueSentencias 
+								| empty;								
 
-sentencia		::= expresion | sentenciaAsignacion | sentenciaIf | sentenciaIO | sentenciaReturn |sentenciaFor;
+sentencia		::= expresion | sentenciaAsignacion | sentenciaIf | sentenciaIO | sentenciaReturn | sentenciaFor;
 
 
 // Expresiones
