@@ -107,42 +107,37 @@ terminal Token POINT;
 
 non terminal program;
 non terminal Axiom axiom;
-non terminal declaraciones;
-non terminal bloqueSentencias;
-non terminal seccionConstantes;
-non terminal seccionTipos;
-non terminal seccionVariables;
-non terminal seccionSubprogramas;
-non terminal seccionCuerpoPrograma;
-non terminal declaracionConstante;
-
-non terminal declaracionTipos;
-non terminal declaracionVariables;
-non terminal declaracionSubprogramas;
-non terminal bloqueParamSubprograma;
-
-
-non terminal valorConstante;
-non terminal tipoPrimitivo;
-non terminal listaIdentificadores;
-
-non terminal sentencia;
-non terminal sentenciaIO;
-non terminal sentenciaAsignacion;
-non terminal sentenciaIf;
-non terminal sentenciaReturn;
-non terminal sentenciaLlamadaSubprograma;
-non terminal sentenciaFor;
-non terminal bloqueCamposRegistro;
-non terminal campoRegistro;
-non terminal expresionAccesoRegistro;
-
-non terminal parametro;
-non terminal expresion;
-non terminal expresionAritmetica;
-non terminal expresionLogica;
-non terminal listaParametros;
-non terminal empty;
+non terminal Declaraciones declaraciones;
+non terminal BloqueSentencias bloqueSentencias;
+non terminal SeccionConstantes seccionConstantes;
+non terminal SeccionTipos seccionTipos;
+non terminal SeccionVariables seccionVariables;
+non terminal SeccionSubprogramas seccionSubprogramas;
+non terminal SeccionCuerpoPrograma seccionCuerpoPrograma;
+non terminal DeclaracionConstante declaracionConstante;
+non terminal DeclaracionTipos declaracionTipos;
+non terminal DeclaracionVariables declaracionVariables;
+non terminal DeclaracionSubprogramas declaracionSubprogramas;
+non terminal BloqueParamSubprograma bloqueParamSubprograma;
+non terminal ValorConstante valorConstante;
+non terminal TipoPrimitivo tipoPrimitivo;
+non terminal ListaIdentificadores listaIdentificadores;
+non terminal Sentencia sentencia;
+non terminal SentenciaIO sentenciaIO;
+non terminal SentenciaAsignacion sentenciaAsignacion;
+non terminal SentenciaIf sentenciaIf;
+non terminal SentenciaReturn sentenciaReturn;
+non terminal SentenciaLlamadaSubprograma sentenciaLlamadaSubprograma;
+non terminal SentenciaFor sentenciaFor;
+non terminal BloqueCamposRegistro bloqueCamposRegistro;
+non terminal CampoRegistro campoRegistro;
+non terminal ExpresionAccesoRegistro expresionAccesoRegistro;
+non terminal Parametro parametro;
+non terminal Expresion expresion;
+non terminal ExpresionAritmetica expresionAritmetica;
+non terminal ExpresionLogica expresionLogica;
+non terminal ListaParametros listaParametros;
+non terminal Empty empty;
 
 
 
