@@ -211,14 +211,21 @@ seccionCuerpoPrograma		::= BEGIN bloqueSentencias END IDENTIFIER SEMICOLON
 
 listaIdentificadores ::= listaIdentificadores:lid COMMA IDENTIFIER:id
 						{:
-							//Verificamos si 
+							//Verificamos si el identificador está en la tabla de símbolos
+							
 							//Añadimos identificador a lista de identificadores
-							lid.addIdentifier(id);					
+							lid.addIdentifier(id);
+							RESULT=lid;					
 						:}
-						  | IDENTIFIER:id;
-						  {:	//Creamos lista de identificadores, insertando ya su primer elemento.
-						  	ListaIdentificadores listaid = new ListaIdentificadores(id);
-						  :}
+						  | IDENTIFIER:id
+						  {:	//Creamos lista de identificadores, e insertamos el primer elemento id.
+						  	
+						  	ListaIdentificadores listaid = new ListaIdentificadores();
+						  	semanticErrorManager.semanticDebug("Tras creación listaIdentificadores. Size = " + listaid.getSize());
+						  	listaid.addIdentifier(id);
+						  	semanticErrorManager.semanticDebug("Tras añadir identificador: " + id.getLexema() + ", listaIdentificadores. Size = " + listaid.getSize() );
+						  	RESULT=listaid;
+						  :};
 
 // Declaración de constantes simbólicas
 declaracionConstante ::= listaIdentificadores:lid COLON CONSTANT ASSIGN valorConstante:vc SEMICOLON 
@@ -230,33 +237,18 @@ declaracionConstante ::= listaIdentificadores:lid COLON CONSTANT ASSIGN valorCon
 								// Obtenemos la tabla de símbolos del ámbito actual, y verificamos si los identificadores de la lista están ya definidos en la TS
 								SymbolTableIF tablaSimbolos = scope.getSymbolTable();
 								semanticErrorManager.semanticDebug("Tabla símbolos del scope:" + scope.getName() + " obtenida. Tamaño TS: " + tablaSimbolos.getSize());
-								ArrayList<SymbolConstant> identifiersList = lid.getIdentifiersList();
-								if (identifiersList == null){
-								semanticErrorManager.semanticDebug("número de identificadores: ");
+								ArrayList<Token> identifiersList = lid.getIdentifiersList();
+								semanticErrorManager.semanticDebug("Tras obtener lista de Identificadores como ArrayList. Tamaño ArrayList=" + identifiersList.size());
+								for(int i = 0; i<identifiersList.size(); i++){
+									if(tablaSimbolos.containsSymbol(identifiersList.get(i).getLexema()))
+										semanticErrorManager.semanticFatalError("Error en declaración constante, ya existe declaración de " + identifiersList.get(i).getLexema());
+									else{	//SymbolConstant(scope, name, type)
+										TypeSimple tipoSimple = new TypeSimple(scope);
+										SymbolConstant symbolconstant = new SymbolConstant(scope, identifiersList.get(i).getLexema(), tipoSimple);
+										tablaSimbolos.addSymbol(symbolconstant);
+									}
 								}
-								//semanticErrorManager.semanticDebug("Tras obtener lista de Identificadores como ArrayList. Tamaño ArrayList=" + identifiersList.size());}
 								
-								for (int i=0; i<lid.getSize(); i++){
-									String symbolname = identifiersList.get(i).toString();
-									//Comprobamos si ya existe en la tabla de símbolos  
-									if (tablaSimbolos.containsSymbol (symbolname))
-									{ 	//Id ya existe en TS
-										semanticErrorManager.semanticFatalError ("Identificador: " + symbolname + " ya existe en table de símbolos");
-									}
-									else 
-									{	//ID no existe en TS. Añadimos a TS.
-										ArrayList<SymbolConstant> identifiers = lid.getIdentifiersList();
-										TypeSimple type = new TypeSimple(scope);
-										for (int j=0; j < lid.getSize(); i++)
-										{
-											semanticErrorManager.semanticDebug("Añadiendo id a TS. En bucle for, i:" + i + ",lid.getSize=" + lid.getSize());
-											SymbolConstant symConst = new SymbolConstant(scope, symbolname, type);
-											tablaSimbolos.addSymbol (symConst);
-											semanticErrorManager.semanticDebug("Añadido símbolo constante a TS con SymbolConstant(scope,symbolname,type)=(" + scope.getName()
-													 	+ "," + symbolname + "," + type.getName());
-									}
-									}
-								}	
 								
 												
 							:};
