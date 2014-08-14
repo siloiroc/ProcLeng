@@ -3,7 +3,10 @@ package compiler.syntax.nonTerminal;
 public class ExpresionAritmetica extends NonTerminal {
 
 	public ExpresionAritmetica() {
-		// TODO Auto-generated constructor stub
+		super();
 	}
 
+	public ExpresionAritmetica(Expresion e1, Expresion e2){
+		
+	}
 }

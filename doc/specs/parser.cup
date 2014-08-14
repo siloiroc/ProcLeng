@@ -172,9 +172,30 @@ program ::=
 
 axiom ::= ;
 
-axiom ::= PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET IS declaraciones
-		  | PROCEDURE IDENTIFIER LEFTBRACKET error RIGHTBRACKET IS declaraciones{:syntaxErrorManager.syntaxInfo("ERROR 00x: Estructura programa - Procedimiento principal no puede tener parámetros");:}
-		  | PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET error declaraciones {:syntaxErrorManager.syntaxInfo("ERROR 001: Estructura programa, falta IS");:};
+axiom ::= PROCEDURE IDENTIFIER:id 
+			{:
+				//Creación del ámbito inicial del programa
+				String name = id.getLexema();
+				scopeManager.openScope(name);
+				ScopeIF scope = scopeManager.getCurrentScope();
+				semanticErrorManager.semanticDebug("El nombre del scope creado es: " + scope.getName());
+				
+				//Obtenemos la tabla de tipos del ámbito actual
+				TypeTableIF tablaTipos = scope.getTypeTable();
+				semanticErrorManager.semanticDebug("Tabla de tipos obtenida, pertenece al scope/ámbito: " + tablaTipos.getScope().getName() + " y tiene tamaño: " + tablaTipos.getSize()); 
+				
+				//Insertar todos los TypeSimple en la Tabla de Tipos
+				TypeSimple typeBoolean = new TypeSimple(scope);
+				TypeSimple typeInteger = new TypeSimple(scope);
+				tablaTipos.addType("Boolean", typeBoolean);
+				tablaTipos.addType("Integer", typeInteger); 
+				semanticErrorManager.semanticDebug("Tabla de tipos obtenida del scope/ámbito: " + tablaTipos.getScope().getName() + " y tiene tamaño: " + tablaTipos.getSize());
+				
+				//scopeManager.closeScope();
+				//semanticErrorManager.semanticDebug("Scope cerrado: " + scope.getName());
+			:}  LEFTBRACKET RIGHTBRACKET IS declaraciones:d;
+//		  | PROCEDURE IDENTIFIER LEFTBRACKET error RIGHTBRACKET IS declaraciones{:syntaxErrorManager.syntaxInfo("ERROR 00x: Estructura programa - Procedimiento principal no puede tener parámetros");:}
+//		  | PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET error declaraciones {:syntaxErrorManager.syntaxInfo("ERROR 001: Estructura programa, falta IS");:};
 //		  | error {:syntaxErrorManager.syntaxInfo("ERROR 00X: Error general estructura programa");:};
 
 //declaraciones ::= seccionConstantes seccionTiposGlobales seccionVarGlobales | empty;
@@ -188,13 +209,60 @@ seccionCuerpoPrograma		::= BEGIN bloqueSentencias END IDENTIFIER SEMICOLON
 								| error {:syntaxErrorManager.syntaxInfo("ERROR 003: Estructura programa");:};
 								
 
-listaIdentificadores ::= listaIdentificadores COMMA IDENTIFIER | IDENTIFIER;
+listaIdentificadores ::= listaIdentificadores:lid COMMA IDENTIFIER:id
+						{:
+							//Verificamos si 
+							//Añadimos identificador a lista de identificadores
+							lid.addIdentifier(id);					
+						:}
+						  | IDENTIFIER:id;
+						  {:	//Creamos lista de identificadores, insertando ya su primer elemento.
+						  	ListaIdentificadores listaid = new ListaIdentificadores(id);
+						  :}
 
 // Declaración de constantes simbólicas
-declaracionConstante ::= listaIdentificadores COLON CONSTANT ASSIGN valorConstante SEMICOLON {:syntaxErrorManager.syntaxDebug("En declaración constante");:}
-						 | listaIdentificadores COLON CONSTANT error valorConstante {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, operador asignación");:}
-						 | listaIdentificadores COLON CONSTANT ASSIGN error {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, valor incorrecto");:}
-						 | listaIdentificadores COLON CONSTANT ASSIGN valorConstante error SEMICOLON{:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, falta punto y coma");:};
+declaracionConstante ::= listaIdentificadores:lid COLON CONSTANT ASSIGN valorConstante:vc SEMICOLON 
+							{:syntaxErrorManager.syntaxDebug("En declaración constante");
+							
+								//	Obtenemos ámbito actual
+								ScopeIF scope = scopeManager.getCurrentScope();
+								semanticErrorManager.semanticDebug("Scope actual, nombre:" + scope.getName());
+								// Obtenemos la tabla de símbolos del ámbito actual, y verificamos si los identificadores de la lista están ya definidos en la TS
+								SymbolTableIF tablaSimbolos = scope.getSymbolTable();
+								semanticErrorManager.semanticDebug("Tabla símbolos del scope:" + scope.getName() + " obtenida. Tamaño TS: " + tablaSimbolos.getSize());
+								ArrayList<SymbolConstant> identifiersList = lid.getIdentifiersList();
+								if (identifiersList == null){
+								semanticErrorManager.semanticDebug("número de identificadores: ");
+								}
+								//semanticErrorManager.semanticDebug("Tras obtener lista de Identificadores como ArrayList. Tamaño ArrayList=" + identifiersList.size());}
+								
+								for (int i=0; i<lid.getSize(); i++){
+									String symbolname = identifiersList.get(i).toString();
+									//Comprobamos si ya existe en la tabla de símbolos  
+									if (tablaSimbolos.containsSymbol (symbolname))
+									{ 	//Id ya existe en TS
+										semanticErrorManager.semanticFatalError ("Identificador: " + symbolname + " ya existe en table de símbolos");
+									}
+									else 
+									{	//ID no existe en TS. Añadimos a TS.
+										ArrayList<SymbolConstant> identifiers = lid.getIdentifiersList();
+										TypeSimple type = new TypeSimple(scope);
+										for (int j=0; j < lid.getSize(); i++)
+										{
+											semanticErrorManager.semanticDebug("Añadiendo id a TS. En bucle for, i:" + i + ",lid.getSize=" + lid.getSize());
+											SymbolConstant symConst = new SymbolConstant(scope, symbolname, type);
+											tablaSimbolos.addSymbol (symConst);
+											semanticErrorManager.semanticDebug("Añadido símbolo constante a TS con SymbolConstant(scope,symbolname,type)=(" + scope.getName()
+													 	+ "," + symbolname + "," + type.getName());
+									}
+									}
+								}	
+								
+												
+							:};
+// 						 | listaIdentificadores COLON CONSTANT error valorConstante {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, operador asignación");:}
+//						 | listaIdentificadores COLON CONSTANT ASSIGN error {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, valor incorrecto");:}
+//						 | listaIdentificadores COLON CONSTANT ASSIGN valorConstante error SEMICOLON{:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, falta punto y coma");:};
 						 				 
 						 
 valorConstante ::= TRUE | FALSE | NUMBER;
@@ -233,17 +301,52 @@ expresion	::= expresionAritmetica
 				| LEFTBRACKET expresion RIGHTBRACKET
 				| IDENTIFIER;
 
-expresionAritmetica ::= expresion PLUS expresion 
+expresionAritmetica ::= expresion:e1 PLUS expresion:e2
+							{:
+								ExpresionAritmetica e = new ExpresionAritmetica(e1, e2);
+								//Comprobación de tipos sobre e1 y e2
+								//Recuperamos tipos de e1 y e2
+//								TypeIF t1 = 
+//								TypeIF t2 = 
+//								semanticErrorManager.semanticDebug("Expresión Aritmética - Tipo de e1: " + t1);
+//								semanticErrorManager.semanticDebug("Expresión Aritmética - Tipo de e2: " + t2);
+//								if (t1.isCompatible (t2, TypeIF.PLUS))
+//								{
+//								}
+//								else semanticErrorManager.semanticFatalError ("Expresión Aritmética - Tipos incompatibles");
+//								//Comprobamos compatibilidad de t1 y t2 para PLUS
+														
+								//Generación de código para e1 + e2							
+								RESULT = e; 
+							:} 
 						| NUMBER; 
 
-expresionLogica		::= expresion OR expresion 
-						| expresion GREATTHAN expresion
-						| expresion EQUAL expresion
+expresionLogica		::= expresion:e1 OR expresion:e2
+							{:
+								ExpresionLogica e = new ExpresionLogica(e1, e2);
+								//Comprobación de tipos sobre e1 y e2
+								//Generación de código para e1 OR e2							
+								RESULT = e;
+							:} 
+						| expresion:e1 GREATTHAN expresion:e2
+							{:
+								ExpresionLogica e = new ExpresionLogica(e1, e2);
+								//Comprobación de tipos sobre e1 y e2
+								//Generación de código para e1 > e2
+								RESULT = e;
+							:}
+						| expresion:e1 EQUAL expresion:e2
+							{:
+								ExpresionLogica e = new ExpresionLogica(e1, e2);
+								//Comprobación de tipos sobre e1 y e2
+								//Generación de código para e1 = e2
+								RESULT=e;
+							:}
 						| sentenciaLlamadaSubprograma
 						| TRUE 
 						| FALSE;
 						
-//expresionAccesoRegistro ::=	IDENTIFIER POINT IDENTIFIER;
+
 expresionAccesoRegistro		::= IDENTIFIER POINT expresionAccesoRegistro | IDENTIFIER POINT IDENTIFIER;  
 			
  
@@ -252,26 +355,17 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET parametro RIGHTBRACKET;
 parametro		::= expresion | STRING;
 
 //Sentencia Asignacion
-//sentenciaAsignacion	::= IDENTIFIER ASSIGN expresionAritmetica 
-//						| IDENTIFIER ASSIGN expresionLogica
-//						| IDENTIFIER ASSIGN sentenciaLlamadaSubprograma
-//						| expresionAccesoRegistro ASSIGN expresion;
 sentenciaAsignacion		::= IDENTIFIER ASSIGN expresion
 							| expresionAccesoRegistro ASSIGN expresion;  
 						
 
 //Sentencia If
-//sentenciaIf				::= sentenciaIfEmparejada | sentenciaIfNoEmparejada;
-//sentenciaIfEmparejada	::= IF (expresionLogica) bloqueSentencias ELSE sentenciaIfEmparejada;
-//sentenciaIfNoEmparejada ::= IF (expresionLogica) bloqueSentencias | IF (expresionLogica) sentenciaIfEmparejada ELSE sentenciaIfNoEmparejada;
-
 sentenciaIf			::= IF expresion THEN bloqueSentencias END IF | IF expresion THEN bloqueSentencias ELSE bloqueSentencias END IF;
 
 // Sentencia de retorno de función
 sentenciaReturn	::= RETURN expresion;
 
 // Sentencia de llamada a subprograma
-//sentenciaLlamadaSubprograma	::= IDENTIFIER LEFTBRACKET expresion RIGHTBRACKET;
 sentenciaLlamadaSubprograma	::= IDENTIFIER LEFTBRACKET listaParametros RIGHTBRACKET;
 listaParametros				::= listaParametros COMMA expresion | expresion | empty;
 
