@@ -3,7 +3,7 @@ package compiler.semantic.symbol;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolBase;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
-
+	
 /**
  * Class for SymbolConstant.
  */
@@ -14,7 +14,8 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
 public class SymbolConstant
     extends SymbolBase
 {
-    
+	private int value; //Atributo valor de constante
+	
     /**
      * Constructor for SymbolConstant.
      * @param scope The declaration scope.
@@ -26,5 +27,19 @@ public class SymbolConstant
                            TypeIF type)
     {
         super (scope, name, type);
-    } 
+    }
+
+	/**
+	 * @return the value
+	 */
+	public int getValue() {
+		return value;
+	}
+
+	/**
+	 * @param value the value to set
+	 */
+	public void setValue(int value) {
+		this.value = value;
+	} 
 }

@@ -14,6 +14,7 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
 public class SymbolVariable
     extends SymbolBase
 {  
+	private int value;		//Atributo de variable
    
     /**
      * Constructor for SymbolVariable.
@@ -26,5 +27,19 @@ public class SymbolVariable
                            TypeIF type)
     {
         super (scope, name, type);
-    } 
+    }
+
+	/**
+	 * @return the value
+	 */
+	public int getValue() {
+		return value;
+	}
+
+	/**
+	 * @param value the value to set
+	 */
+	public void setValue(int value) {
+		this.value = value;
+	} 
 }

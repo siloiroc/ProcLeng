@@ -1,10 +1,10 @@
 package compiler.semantic.type;
 
 import compiler.CompilerContext;
-
 import es.uned.lsi.compiler.code.ExecutionEnvironmentIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeBase;
+import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 /**
  * Class for TypeSimple.
@@ -24,6 +24,14 @@ public class TypeSimple
     public TypeSimple (ScopeIF scope)
     {
         super (scope);
+    }
+    
+    public TypeSimple (ScopeIF scope, String name){
+    	super(scope, name);
+    }
+    
+    public TypeSimple (TypeIF type){
+    	super(type);
     }
     
     /**

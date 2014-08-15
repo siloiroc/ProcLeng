@@ -1,7 +1,8 @@
 procedure testCase03 () is
 
 CIERTO: constant := True;
-CIERTO: constant := 3;
+
+x, y: Integer;
 
 begin
 

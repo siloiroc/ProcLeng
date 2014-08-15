@@ -30,6 +30,10 @@ public class ListaIdentificadores extends NonTerminal {
 		this.identifiersList = identifiersList;
 	}
 	
+	/**
+	 * 
+	 * @param token Añade un nuevo token de identificador a la lista de tokens interna
+	 */
 	public void addIdentifier(Token token){
 		this.identifiersList.add(token);
 	}
