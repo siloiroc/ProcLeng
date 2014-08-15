@@ -1,7 +1,5 @@
 package compiler.syntax.nonTerminal;
 
-import compiler.lexical.Token;
-
 public class ValorConstante extends NonTerminal {
 	private String value;
 

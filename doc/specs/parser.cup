@@ -1,5 +1,6 @@
+package compiler.syntax;
 
-// Declaración de importaciones
+// Declaración de importaciones 
 //(No modificar las proporcionadas. Se pueden agregar mas)
 
 import java_cup.runtime.Symbol;
@@ -25,33 +26,32 @@ import compiler.code.*;
 // Declaración del código de usuario
 
 action code {:
+	
+	SyntaxErrorManager   syntaxErrorManager   = CompilerContext.getSyntaxErrorManager();
+	SemanticErrorManager semanticErrorManager = CompilerContext.getSemanticErrorManager ();
+	ScopeManagerIF       scopeManager         = CompilerContext.getScopeManager ();
+	FinalCodeFactoryIF   finalCodeFactory     = CompilerContext.getFinalCodeFactory ();
 
-SyntaxErrorManager syntaxErrorManager = CompilerContext.getSyntaxErrorManager();
-SemanticErrorManager semanticErrorManager = CompilerContext.getSemanticErrorManager ();
-ScopeManagerIF scopeManager = CompilerContext.getScopeManager ();
-FinalCodeFactoryIF finalCodeFactory = CompilerContext.getFinalCodeFactory ();
-
-:}
+:}	
 
 parser code {:
-SyntaxErrorManager syntaxErrorManager = CompilerContext.getSyntaxErrorManager();
-
-public void syntax_error(Symbol symbol)
-{
-Token token = (Token) symbol.value;
-syntaxErrorManager.syntaxError ("Error sintactico, lexema:" + token.getLexema(), token);
-}
-
-public void unrecovered_syntax_error(java_cup.runtime.Symbol symbol)
-{
-Token token = (Token) symbol.value;
-syntaxErrorManager.syntaxFatalError ("Error fatal", token);
-}
+	SyntaxErrorManager syntaxErrorManager = CompilerContext.getSyntaxErrorManager();
+	
+	public void syntax_error(Symbol symbol)
+	{ 
+	    Token token = (Token) symbol.value;
+	    syntaxErrorManager.syntaxError ("Error sintactico", token);	    
+	}
+		
+	public void unrecovered_syntax_error(java_cup.runtime.Symbol symbol)
+	{	
+		Token token = (Token) symbol.value;
+	    syntaxErrorManager.syntaxFatalError ("Error fatal", token);
+	}
 :}
 
+// Declaración de terminales (Ejemplo)
 
-
-// Declaración de terminales
 terminal Token IDENTIFIER;
 terminal Token NUMBER;
 terminal Token STRING;
@@ -100,7 +100,6 @@ terminal Token ASSIGN;
 terminal Token POINT;
 
 
-
 // Declaración de no terminales
 // no modificar los propuestos
 
@@ -138,9 +137,6 @@ non terminal ExpresionLogica expresionLogica;
 non terminal ListaParametros listaParametros;
 non terminal Empty empty;
 
-
-
-
 // Declaración de relaciones de precedencia
 precedence left POINT, LEFTBRACKET, RIGHTBRACKET;
 precedence left PLUS;
@@ -153,25 +149,28 @@ precedence left OR;
 
 start with program;
 
-program ::=
-  {:
-        syntaxErrorManager.syntaxInfo ("Starting parsing...");
+program ::= 
+  {: 
+        syntaxErrorManager.syntaxInfo ("Starting parsing..."); 
    :}
   axiom:ax
-  {:
-   // No modificar esta estructura, aunque se pueden añadir más acciones semánticas
-  
-   //List intermediateCode = ax.getIntermediateCode ();
-   //finalCodeFactory.create (intermediateCode);
+  {: 
+  		// No modificar esta estructura, aunque se pueden añadir más acciones semánticas
+  		
+  		//List intermediateCode = ax.getIntermediateCode ();
+  		//finalCodeFactory.create (intermediateCode);
 
-  
-   syntaxErrorManager.syntaxInfo ("Parsing process ended.");
+  		
+  		syntaxErrorManager.syntaxInfo ("Parsing process ended.");
    :};
 
 
-axiom ::= PROCEDURE IDENTIFIER:id 
+axiom ::= ;
+
+
+axiom ::= PROCEDURE IDENTIFIER:id
 			{:
-				//Creación del ámbito global del programa
+			//Creación del ámbito global del programa
 				String name = id.getLexema();
 				scopeManager.openScope(name);
 				ScopeIF scope = scopeManager.getCurrentScope();
@@ -200,12 +199,7 @@ axiom ::= PROCEDURE IDENTIFIER:id
 				
 				//scopeManager.closeScope();
 				//semanticErrorManager.semanticDebug("Scope cerrado: " + scope.getName());
-			:}  LEFTBRACKET RIGHTBRACKET IS declaraciones:d
-			{:
-				Axioma axioma = new Axioma();
-				
-				RESULT = axioma;
-			:};
+			:} LEFTBRACKET RIGHTBRACKET IS declaraciones:d;
 //		  | PROCEDURE IDENTIFIER LEFTBRACKET error RIGHTBRACKET IS declaraciones{:syntaxErrorManager.syntaxInfo("ERROR 00x: Estructura programa - Procedimiento principal no puede tener parámetros");:}
 //		  | PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET error declaraciones {:syntaxErrorManager.syntaxInfo("ERROR 001: Estructura programa, falta IS");:};
 //		  | error {:syntaxErrorManager.syntaxInfo("ERROR 00X: Error general estructura programa");:};
@@ -238,7 +232,7 @@ listaIdentificadores ::= listaIdentificadores:idlist COMMA IDENTIFIER:id
 							}
 							else{
 								//Añadimos identificador a lista de identificadores
-								idlist.addIdentifier(id);
+								idlist.addIdentifier(id.getLexema());
 								RESULT=idlist;
 								}					
 						:}
@@ -247,10 +241,11 @@ listaIdentificadores ::= listaIdentificadores:idlist COMMA IDENTIFIER:id
 						  	//Creamos lista de identificadores, e insertamos el primer elemento id.
 						  	ListaIdentificadores idlist = new ListaIdentificadores();
 						  	semanticErrorManager.semanticDebug("Tras creación listaIdentificadores. Size = " + idlist.getSize());
-						  	idlist.addIdentifier(id);
+						  	idlist.addIdentifier(id.getLexema());
 						  	semanticErrorManager.semanticDebug("Tras añadir identificador: " + id.getLexema() + ", listaIdentificadores. Size = " + idlist.getSize() );
 						  	RESULT=idlist;
 						  :};
+
 
 // Declaración de constantes simbólicas
 declaracionConstante ::= listaIdentificadores:lid COLON CONSTANT ASSIGN valorConstante:vc SEMICOLON 
@@ -264,25 +259,22 @@ declaracionConstante ::= listaIdentificadores:lid COLON CONSTANT ASSIGN valorCon
 								semanticErrorManager.semanticDebug("Tabla símbolos del scope:" + scope.getName() + " obtenida. Tamaño TS: " + tablaSimbolos.getSize());
 								
 								// Obtenemos lista de identificadores
-								ArrayList<Token> identifiersList = lid.getIdentifiersList();
+								ArrayList<String> identifiersList = lid.getIdentifiersList();
 								semanticErrorManager.semanticDebug("Tras obtener lista de Identificadores como ArrayList. Tamaño ArrayList=" + identifiersList.size());
 								
 								//Verificamos si los identificadores de la lista están ya definidos en la TS. 
 								for(int i = 0; i<identifiersList.size(); i++){
-									if(tablaSimbolos.containsSymbol(identifiersList.get(i).getLexema()))
-										semanticErrorManager.semanticFatalError("Error en declaración de Constante, ya existe declaración de " + identifiersList.get(i).getLexema());
+									if(tablaSimbolos.containsSymbol(identifiersList.get(i)))
+										semanticErrorManager.semanticFatalError("Error en declaración de Constante, ya existe declaración de " + identifiersList.get(i));
 									else{
 										// Símbolos no existen en TS, por lo que añadimos cada uno de ellos a la TS.		
 										// SymbolConstant(scope, name, type)
 										TypeIF typeInTT = scopeManager.searchType("Boolean");
-										SymbolConstant symbolconstant = new SymbolConstant(scope, identifiersList.get(i).getLexema(), typeInTT);
+										SymbolConstant symbolconstant = new SymbolConstant(scope, identifiersList.get(i), typeInTT);
 										tablaSimbolos.addSymbol(symbolconstant);
 									}
 								}
 							:};
-							
-
-									
 							
 // 						 | listaIdentificadores COLON CONSTANT error valorConstante {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, operador asignación");:}
 //						 | listaIdentificadores COLON CONSTANT ASSIGN error {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, valor incorrecto");:}
@@ -303,7 +295,6 @@ valorConstante ::= TRUE:vc
 				   	 		ValorConstante value = new ValorConstante(num.getLexema());
 				   	 		RESULT = value;
 				   	 	:};
-
 // Declaración de tipos globales
 declaracionTipos 		::= TYPE IDENTIFIER IS RECORD bloqueCamposRegistro END RECORD SEMICOLON;
 bloqueCamposRegistro	::= campoRegistro SEMICOLON| bloqueCamposRegistro campoRegistro SEMICOLON;
@@ -319,14 +310,14 @@ declaracionVariables	::= listaIdentificadores:lid COLON tipoPrimitivo:tp SEMICOL
 								// Obtenemos la tabla de símbolos del ámbito actual, y verificamos si los identificadores de la lista de variables están ya definidos en la TS
 								SymbolTableIF tablaSimbolos = scope.getSymbolTable();
 								semanticErrorManager.semanticDebug("Tabla símbolos del scope:" + scope.getName() + " obtenida. Tamaño TS: " + tablaSimbolos.getSize());
-								ArrayList<Token> identifiersList = lid.getIdentifiersList();
+								ArrayList<String> identifiersList = lid.getIdentifiersList();
 								semanticErrorManager.semanticDebug("Tras obtener lista de Identificadores como ArrayList. Tamaño ArrayList=" + identifiersList.size());
 								for(int i = 0; i<identifiersList.size(); i++){
-									if(tablaSimbolos.containsSymbol(identifiersList.get(i).getLexema()))
-										semanticErrorManager.semanticFatalError("Error en declaración de Variable, ya existe declaración de " + identifiersList.get(i).getLexema());
+									if(tablaSimbolos.containsSymbol(identifiersList.get(i)))
+										semanticErrorManager.semanticFatalError("Error en declaración de Variable, ya existe declaración de " + identifiersList.get(i));
 									else{ 
 										TypeIF tipo = scopeManager.searchType("Integer");
-										SymbolVariable symbolvariable = new SymbolVariable(scope, identifiersList.get(i).getLexema(), tipo);
+										SymbolVariable symbolvariable = new SymbolVariable(scope, identifiersList.get(i), tipo);
 										tablaSimbolos.addSymbol(symbolvariable);
 									}
 								}
@@ -339,7 +330,7 @@ tipoPrimitivo 			::= INTEGER:tp
 								 {: TipoPrimitivo tipoPrim = new TipoPrimitivo(tp.getLexema());
 								 	RESULT = tipoPrim;
 								 :}
-							| IDENTIFIER; 
+							| IDENTIFIER;  
 
 // Declaración de subprogramas
 declaracionSubprogramas		::= FUNCTION IDENTIFIER LEFTBRACKET bloqueParamSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS seccionTipos 
@@ -438,7 +429,7 @@ sentenciaAsignacion		::= IDENTIFIER:id ASSIGN expresion:exp
 								:}
 							| expresionAccesoRegistro ASSIGN expresion;  
 						
-
+						
 //Sentencia If
 sentenciaIf			::= IF expresion THEN bloqueSentencias END IF | IF expresion THEN bloqueSentencias ELSE bloqueSentencias END IF;
 

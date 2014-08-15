@@ -2,15 +2,13 @@ package compiler.syntax.nonTerminal;
 
 import java.util.ArrayList;
 
-import compiler.lexical.Token;
-
 /**
  * @author agilrod
  *
  */
 public class ListaIdentificadores extends NonTerminal {
 	
-	private ArrayList<Token> identifiersList = new ArrayList<Token>();
+	private ArrayList<String> identifiersList = new ArrayList<String>();
 	/**
 	 * 
 	 */
@@ -20,13 +18,13 @@ public class ListaIdentificadores extends NonTerminal {
 	/**
 	 * @return the identifiersList
 	 */
-	public ArrayList<Token> getIdentifiersList() {
+	public ArrayList<String> getIdentifiersList() {
 		return identifiersList;
 	}
 	/**
 	 * @param identifiersList the identifiersList to set
 	 */
-	public void setIdentifiersList(ArrayList<Token> identifiersList) {
+	public void setIdentifiersList(ArrayList<String> identifiersList) {
 		this.identifiersList = identifiersList;
 	}
 	
@@ -34,8 +32,8 @@ public class ListaIdentificadores extends NonTerminal {
 	 * 
 	 * @param token Añade un nuevo token de identificador a la lista de tokens interna
 	 */
-	public void addIdentifier(Token token){
-		this.identifiersList.add(token);
+	public void addIdentifier(String id){
+		this.identifiersList.add(id);
 	}
 	
 	public int getSize(){
