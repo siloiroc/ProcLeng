@@ -1,20 +1,14 @@
-procedure testCase03 () is
+-- salida 
 
-CIERTO: constant := True;
+procedure testCase02 () is
 
 type Tpersona is record
-	dni: Integer;
-	casado: Boolean;
-end record;
-type Tpersona is record
-	dni: Integer;
+	Putline: Integer;
 	casado: Boolean;
 end record;
 
-x, y: Integer;
-	
 begin
+	Put_line("hola");
+	Put_line("mundo");
 
-x:= 1 + 2;
-
-end testCase03;
+end testCase02;
