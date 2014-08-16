@@ -194,9 +194,6 @@ axiom ::= PROCEDURE IDENTIFIER:id
 					semanticErrorManager.semanticDebug("Nombre de tipo: " + listaTipos.get(i).getName());
 				}
 				
-				
-				
-				
 				//scopeManager.closeScope();
 				//semanticErrorManager.semanticDebug("Scope cerrado: " + scope.getName());
 			:} LEFTBRACKET RIGHTBRACKET IS declaraciones:d;
@@ -296,10 +293,37 @@ valorConstante ::= TRUE:vc
 				   	 		RESULT = value;
 				   	 	:};
 // Declaración de tipos globales
-declaracionTipos 		::= TYPE IDENTIFIER IS RECORD bloqueCamposRegistro END RECORD SEMICOLON;
-bloqueCamposRegistro	::= campoRegistro SEMICOLON| bloqueCamposRegistro campoRegistro SEMICOLON;
-campoRegistro			::= IDENTIFIER COLON tipoPrimitivo;
-//ERROR: El tipo de un registro también puede ser otro registro, no sólo Integer y Boolean
+declaracionTipos 		::= TYPE IDENTIFIER:id IS RECORD bloqueCamposRegistro:bcr END RECORD SEMICOLON
+							{:// Obtenemos ámbito actual
+								ScopeIF scope = scopeManager.getCurrentScope();
+								semanticErrorManager.semanticDebug("****Sección Declaración Tipos*****: Scope actual, nombre:" + scope.getName());
+								semanticErrorManager.semanticDebug("**********************************");
+
+								// Obtenemos la tabla de tipos del ámbito actual,y verificamos si el tipo está definido ya en TT, si no, lo añadimos								
+								TypeTableIF tablaTipos = scope.getTypeTable();
+								if(tablaTipos.containsType(id.getLexema()))
+										semanticErrorManager.semanticFatalError("ERROR - Error en declaración de Tipo, ya existe declaración de " + id.getLexema());
+								else{ 
+									//Creamos nuevo tipo Registro y lo introducimos en la tabla de tipos
+									TypeRecord typerec = new TypeRecord(scope, "Record");
+									tablaTipos.addType(id.getLexema(), typerec);
+									semanticErrorManager.semanticDebug("Tipo Record: " + id.getLexema() + " añadido a TT del scope:" + scope.getName() + " (tamañoTT=" + tablaTipos.getSize() + ")");
+								}
+								semanticErrorManager.semanticDebug("FIN ****Sección Declaración Tipos*****: Scope actual, nombre:" + scope.getName());
+								semanticErrorManager.semanticDebug("**********************************");								
+							:};
+							
+bloqueCamposRegistro	::= bloqueCamposRegistro campoRegistro SEMICOLON
+							{:
+								
+							:} 
+							| campoRegistro SEMICOLON; 
+campoRegistro			::= IDENTIFIER:id COLON tipoPrimitivo
+							{:
+								CampoRegistro camporeg = new CampoRegistro();
+								
+							:};
+
  
 // Declaración de variables globales
 declaracionVariables	::= listaIdentificadores:lid COLON tipoPrimitivo:tp SEMICOLON
@@ -358,21 +382,20 @@ expresion	::= expresionAritmetica
 
 expresionAritmetica ::= expresion:e1 PLUS expresion:e2
 							{:
-//								ExpresionAritmetica e = new ExpresionAritmetica(e1, e2);
+								
 //								//Comprobación de tipos sobre e1 y e2
-//								//Recuperamos tipos de e1 y e2
-//								TypeIF t1 = e1.getType(); 
-//								TypeIF t2 = e2.getType();
-//								semanticErrorManager.semanticDebug("Expresión Aritmética - Tipo de e1: " + t1.getName());
-//								semanticErrorManager.semanticDebug("Expresión Aritmética - Tipo de e2: " + t2.getName());
-//								if (t1.isCompatible (t2, TypeIF.PLUS))
+//								TypeIF e1type = scopeManager.searchType("Integer");
+//								TypeIF e2type = scopeManager.searchType("Integer");
+//								semanticErrorManager.semanticDebug("Expresión Aritmética - Tipo de e1: " + e1type.getName());
+//								semanticErrorManager.semanticDebug("Expresión Aritmética - Tipo de e2: " + e2type.getName());
+//								if (e1type == e2type)
 //								{
+//									semanticErrorManager.semanticDebug("Expresión Aritmética - Tipos compatibles" );							
 //								}
 //								else semanticErrorManager.semanticFatalError ("Expresión Aritmética - Tipos incompatibles");
-//								//Comprobamos compatibilidad de t1 y t2 para PLUS
-														
-								//Generación de código para e1 + e2							
-//								RESULT = e; 
+
+								ExpresionAritmetica e = new ExpresionAritmetica(e1, e2);
+								RESULT = e; 
 							:} 
 						| NUMBER; 
 
@@ -431,7 +454,8 @@ sentenciaAsignacion		::= IDENTIFIER:id ASSIGN expresion:exp
 						
 						
 //Sentencia If
-sentenciaIf			::= IF expresion THEN bloqueSentencias END IF | IF expresion THEN bloqueSentencias ELSE bloqueSentencias END IF;
+sentenciaIf			::= IF expresion THEN bloqueSentencias END IF 
+						| IF expresion THEN bloqueSentencias ELSE bloqueSentencias END IF;
 
 // Sentencia de retorno de función
 sentenciaReturn	::= RETURN expresion;
