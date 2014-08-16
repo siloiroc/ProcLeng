@@ -1,5 +1,7 @@
 package compiler.semantic.type;
 
+import compiler.syntax.nonTerminal.BloqueCamposRegistro;
+
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeBase;
 
@@ -10,10 +12,10 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
 // TODO: Student work
 //       Include properties to characterize records
 
-public class TypeRecord
-    extends TypeBase
+public class TypeRecord extends TypeBase        
 {   
-       
+	private BloqueCamposRegistro bloqueCampos = new BloqueCamposRegistro();
+	
     /**
      * Constructor for TypeRecord.
      * @param scope The declaration scope.
@@ -42,6 +44,26 @@ public class TypeRecord
         super (record.getScope (), record.getName ());
     } 
     
+    public TypeRecord (ScopeIF scope, String name, BloqueCamposRegistro bcr){
+    	super(scope, name);
+    	this.bloqueCampos = bcr;
+    }
+    
+	/**
+	 * @return the bloqueCampos
+	 */
+	public BloqueCamposRegistro getBloqueCampos() {
+		return bloqueCampos;
+	}
+
+	/**
+	 * @param bloquecampos the bloqueCampos to set
+	 */
+	public void setBloquecampos(BloqueCamposRegistro bloquecampos) {
+		this.bloqueCampos = bloquecampos;
+	}
+    
+    
     /**
      * Returns the size of the type.
      * @return the size of the type.
@@ -50,6 +72,9 @@ public class TypeRecord
     public int getSize ()
     {
         // TODO: Student work
-        return 1;
+    	// Tamaño del tipo registro: Número de campos??? 
+    	return this.bloqueCampos.getListaCamposRegistro().size();
     }
+
+
 }

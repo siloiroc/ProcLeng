@@ -305,23 +305,37 @@ declaracionTipos 		::= TYPE IDENTIFIER:id IS RECORD bloqueCamposRegistro:bcr END
 										semanticErrorManager.semanticFatalError("ERROR - Error en declaración de Tipo, ya existe declaración de " + id.getLexema());
 								else{ 
 									//Creamos nuevo tipo Registro y lo introducimos en la tabla de tipos
-									TypeRecord typerec = new TypeRecord(scope, "Record");
+									TypeRecord typerec = new TypeRecord(scope, id.getLexema(), bcr);
 									tablaTipos.addType(id.getLexema(), typerec);
 									semanticErrorManager.semanticDebug("Tipo Record: " + id.getLexema() + " añadido a TT del scope:" + scope.getName() + " (tamañoTT=" + tablaTipos.getSize() + ")");
+									
+									TypeRecord tipoRegistro = (TypeRecord) tablaTipos.getType(id.getLexema());
+									semanticErrorManager.semanticDebug("Campos en Registro (leyendo de TT)- RECORD: " + tipoRegistro.getName() + ", Num. campos=" + tipoRegistro.getSize());
+									for (int j=0; j < tipoRegistro.getBloqueCampos().getListaCamposRegistro().size(); j++){
+										semanticErrorManager.semanticDebug("     " + tipoRegistro.getBloqueCampos().getListaCamposRegistro().get(j).getName() +
+												":" + tipoRegistro.getBloqueCampos().getListaCamposRegistro().get(j).getTipo().getValue() );
+									}
 								}
 								semanticErrorManager.semanticDebug("FIN ****Sección Declaración Tipos*****: Scope actual, nombre:" + scope.getName());
 								semanticErrorManager.semanticDebug("**********************************");								
 							:};
 							
-bloqueCamposRegistro	::= bloqueCamposRegistro campoRegistro SEMICOLON
+bloqueCamposRegistro	::= bloqueCamposRegistro:bcr campoRegistro:cr SEMICOLON
 							{:
-								
+								BloqueCamposRegistro bloquecampos = bcr;
+								bloquecampos.addCampoRegistro(cr);
+								RESULT = bloquecampos;
 							:} 
-							| campoRegistro SEMICOLON; 
-campoRegistro			::= IDENTIFIER:id COLON tipoPrimitivo
+							| campoRegistro:cr SEMICOLON
 							{:
-								CampoRegistro camporeg = new CampoRegistro();
-								
+								BloqueCamposRegistro bloquecampos = new BloqueCamposRegistro();
+								bloquecampos.addCampoRegistro(cr);
+								RESULT = bloquecampos;
+							:}; 
+campoRegistro			::= IDENTIFIER:id COLON tipoPrimitivo:tp
+							{:
+								CampoRegistro camporeg = new CampoRegistro(id.getLexema(), tp);
+								RESULT = camporeg;
 							:};
 
  
@@ -346,15 +360,18 @@ declaracionVariables	::= listaIdentificadores:lid COLON tipoPrimitivo:tp SEMICOL
 									}
 								}
 							:};
-tipoPrimitivo 			::= INTEGER:tp 
-								 {: TipoPrimitivo tipoPrim = new TipoPrimitivo(tp.getLexema());
+tipoPrimitivo 			::= INTEGER:tpint
+								 {: TipoPrimitivo tipoPrim = new TipoPrimitivo(tpint.getLexema());
 								 	RESULT = tipoPrim;
 								 :}
-							| BOOLEAN:tp
-								 {: TipoPrimitivo tipoPrim = new TipoPrimitivo(tp.getLexema());
+							| BOOLEAN:tpbool
+								 {: TipoPrimitivo tipoPrim = new TipoPrimitivo(tpbool.getLexema());
 								 	RESULT = tipoPrim;
 								 :}
-							| IDENTIFIER;  
+							| IDENTIFIER:id
+								{:	TipoPrimitivo tipoPrim = new TipoPrimitivo(id.getLexema());
+									RESULT = tipoPrim;
+								:};  
 
 // Declaración de subprogramas
 declaracionSubprogramas		::= FUNCTION IDENTIFIER LEFTBRACKET bloqueParamSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS seccionTipos 
