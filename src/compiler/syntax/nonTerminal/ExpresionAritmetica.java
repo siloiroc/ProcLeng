@@ -1,6 +1,6 @@
 package compiler.syntax.nonTerminal;
 
-public class ExpresionAritmetica extends NonTerminal {
+public class ExpresionAritmetica extends Expresion {
 	
 	private int value; //Atributo valor, de la expresión aritmética.
 	

@@ -17,7 +17,7 @@ public abstract class NonTerminal
     /**
      * Constructor for NonTerminal.
      */
-    public NonTerminal ()
+    public NonTerminal () 
     {
         super ();
         this.intermediateCode = new ArrayList<QuadrupleIF> ();

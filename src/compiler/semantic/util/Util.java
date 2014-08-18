@@ -26,5 +26,9 @@ public class Util {
 		CompilerContext.getSemanticErrorManager().semanticDebug("END **** Debug Scope & Tables ****");
 	}
 	
+	public static void SearchTypeTableType(ScopeIF scope){
+		
+	}
+	
 
 }

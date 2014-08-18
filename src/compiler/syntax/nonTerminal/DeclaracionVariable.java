@@ -1,8 +1,8 @@
 package compiler.syntax.nonTerminal;
 
-public class DeclaracionVariables extends NonTerminal {
+public class DeclaracionVariable extends NonTerminal {
 
-	public DeclaracionVariables() {
+	public DeclaracionVariable() {
 		// TODO Auto-generated constructor stub
 	}
 

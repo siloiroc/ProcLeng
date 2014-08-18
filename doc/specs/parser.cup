@@ -114,12 +114,14 @@ non terminal SeccionVariables seccionVariables;
 non terminal SeccionSubprogramas seccionSubprogramas;
 non terminal SeccionCuerpoPrograma seccionCuerpoPrograma;
 non terminal DeclaracionConstante declaracionConstante;
-non terminal DeclaracionTipos declaracionTipos;
-non terminal DeclaracionVariables declaracionVariables;
-non terminal DeclaracionSubprogramas declaracionSubprogramas;
+non terminal DeclaracionTipo declaracionTipo;
+non terminal DeclaracionVariable declaracionVariable;
+non terminal DeclaracionSubprograma declaracionSubprograma;
 non terminal BloqueParamSubprograma bloqueParamSubprograma;
 non terminal ValorConstante valorConstante;
 non terminal TipoPrimitivo tipoPrimitivo;
+non terminal Tipo tipo;
+non terminal TipoRegistro tipoRegistro;
 non terminal ListaIdentificadores listaIdentificadores;
 non terminal Sentencia sentencia;
 non terminal SentenciaIO sentenciaIO;
@@ -136,6 +138,7 @@ non terminal ExpresionAritmetica expresionAritmetica;
 non terminal ExpresionLogica expresionLogica;
 non terminal ListaParametros listaParametros;
 non terminal Empty empty;
+non terminal Referencia referencia;
 
 // Declaración de relaciones de precedencia
 precedence left POINT, LEFTBRACKET, RIGHTBRACKET;
@@ -204,12 +207,17 @@ axiom ::= PROCEDURE IDENTIFIER:id
 //declaraciones ::= seccionConstantes seccionTiposGlobales seccionVarGlobales | empty;
 declaraciones				::=	seccionConstantes;
 seccionConstantes 			::= declaracionConstante seccionConstantes | seccionTipos;
-seccionTipos				::= declaracionTipos seccionTipos | seccionVariables;
-seccionVariables			::= declaracionVariables seccionVariables | seccionSubprogramas;
-seccionSubprogramas			::= declaracionSubprogramas seccionSubprogramas | seccionCuerpoPrograma;
-seccionCuerpoPrograma		::= BEGIN bloqueSentencias END IDENTIFIER SEMICOLON
-								|BEGIN bloqueSentencias END error SEMICOLON {:syntaxErrorManager.syntaxInfo("ERROR 002: Estructura programa, falta NOMBRE_PROGRAMA en sentencia END");:}
-								| error {:syntaxErrorManager.syntaxInfo("ERROR 003: Estructura programa");:};
+seccionTipos				::= declaracionTipo seccionTipos | seccionVariables;
+seccionVariables			::= declaracionVariable SEMICOLON seccionVariables | seccionSubprogramas;
+seccionSubprogramas			::= declaracionSubprograma seccionSubprogramas | seccionCuerpoPrograma;
+seccionCuerpoPrograma		::= BEGIN 
+								{: semanticErrorManager.semanticDebug("*******************Inicio BloqueSentencias*******************"); :}
+								bloqueSentencias END IDENTIFIER SEMICOLON
+								{:
+									semanticErrorManager.semanticDebug("*******************Fin BloqueSentencias************************");
+								:};
+//								|BEGIN bloqueSentencias END error SEMICOLON {:syntaxErrorManager.syntaxInfo("ERROR 002: Estructura programa, falta NOMBRE_PROGRAMA en sentencia END");:}
+//								| error {:syntaxErrorManager.syntaxInfo("ERROR 003: Estructura programa");:};
 								
 
 listaIdentificadores ::= listaIdentificadores:idlist COMMA IDENTIFIER:id
@@ -268,7 +276,7 @@ declaracionConstante ::= listaIdentificadores:lid COLON CONSTANT ASSIGN valorCon
 									}
 								}
 							:};
-							
+							 
 // 						 | listaIdentificadores COLON CONSTANT error valorConstante {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, operador asignación");:}
 //						 | listaIdentificadores COLON CONSTANT ASSIGN error {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, valor incorrecto");:}
 //						 | listaIdentificadores COLON CONSTANT ASSIGN valorConstante error SEMICOLON{:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, falta punto y coma");:};
@@ -289,84 +297,77 @@ valorConstante ::= TRUE:vc
 				   	 		RESULT = value;
 				   	 	:};
 // Declaración de tipos globales
-declaracionTipos 		::= TYPE IDENTIFIER:id IS RECORD bloqueCamposRegistro:bcr END RECORD SEMICOLON
-							{:// Obtenemos ámbito actual
-								ScopeIF scope = scopeManager.getCurrentScope();
-								semanticErrorManager.semanticDebug("****Sección Declaración Tipos*****: Scope actual, nombre:" + scope.getName());
+declaracionTipo 		::= TYPE IDENTIFIER:id IS tipoRegistro:tipoReg
+							{:
+								semanticErrorManager.semanticDebug("**Declaración Tipo: " + id.getLexema() + "******");
 								semanticErrorManager.semanticDebug("**********************************");
-
-								// Obtenemos la tabla de tipos del ámbito actual,y verificamos si el tipo está definido ya en TT, si no, lo añadimos								
+								// Obtenemos la tabla de tipos del ámbito actual,y verificamos si el tipo está definido ya en TT, si no, lo añadimos
+								ScopeIF scope = scopeManager.getCurrentScope();								
 								TypeTableIF tablaTipos = scope.getTypeTable();
 								if(tablaTipos.containsType(id.getLexema()))
 										semanticErrorManager.semanticFatalError("ERROR - Error en declaración de Tipo, ya existe declaración de " + id.getLexema());
 								else{ 
-									//Creamos nuevo tipo Registro y lo introducimos en la tabla de tipos
-									TypeRecord typerec = new TypeRecord(scope, id.getLexema(), bcr);
-									tablaTipos.addType(id.getLexema(), typerec);
-									semanticErrorManager.semanticDebug("Tipo Record: " + id.getLexema() + " añadido a TT del scope:" + scope.getName() + " (tamañoTT=" + tablaTipos.getSize() + ")");
 									
-									TypeRecord tipoRegistro = (TypeRecord) tablaTipos.getType(id.getLexema());
-									semanticErrorManager.semanticDebug("Campos en Registro (leyendo de TT)- RECORD: " + tipoRegistro.getName() + ", Num. campos=" + tipoRegistro.getSize());
-									for (int j=0; j < tipoRegistro.getBloqueCampos().getListaCamposRegistro().size(); j++){
-										semanticErrorManager.semanticDebug("     " + tipoRegistro.getBloqueCampos().getListaCamposRegistro().get(j).getName() +
-												":" + tipoRegistro.getBloqueCampos().getListaCamposRegistro().get(j).getTipo().getValue() );
-									}
 								}
-								semanticErrorManager.semanticDebug("FIN ****Sección Declaración Tipos*****: Scope actual, nombre:" + scope.getName());
-								semanticErrorManager.semanticDebug("**********************************");								
+								semanticErrorManager.semanticDebug("FIN**Declaración Tipo: " + id.getLexema() + "******");
+								semanticErrorManager.semanticDebug("**********************************");										
+							:};
+
+tipoRegistro			::= RECORD bloqueCamposRegistro:bcr END RECORD SEMICOLON
+							{:
+								//Creamos nuevo tipo Registro y lo introducimos en la tabla de tipos							
 							:};
 							
-bloqueCamposRegistro	::= bloqueCamposRegistro:bcr campoRegistro:cr SEMICOLON
-							{:
-								BloqueCamposRegistro bloquecampos = bcr;
-								bloquecampos.addCampoRegistro(cr);
-								RESULT = bloquecampos;
-							:} 
-							| campoRegistro:cr SEMICOLON
-							{:
-								BloqueCamposRegistro bloquecampos = new BloqueCamposRegistro();
-								bloquecampos.addCampoRegistro(cr);
-								RESULT = bloquecampos;
-							:}; 
+//bloqueCamposRegistro	::= bloqueCamposRegistro:bcr campoRegistro:cr SEMICOLON
+//							{:
+//								BloqueCamposRegistro bloquecampos = bcr;
+//								bloquecampos.addCampoRegistro(cr);
+//								RESULT = bloquecampos;
+//							:} 
+//							| campoRegistro:cr SEMICOLON
+//							{:
+//								BloqueCamposRegistro bloquecampos = new BloqueCamposRegistro();
+//								bloquecampos.addCampoRegistro(cr);
+//								RESULT = bloquecampos;
+//							:};
+
+bloqueCamposRegistro	::= declaracionVariable SEMICOLON
+							| bloqueCamposRegistro declaracionVariable SEMICOLON; 
+ 
 campoRegistro			::= IDENTIFIER:id COLON tipoPrimitivo:tp
-							{:
-								//Comprobamos si el simbolo está ya definido en la tabla de símbolos
-								//En ámbito actual? o hay que crear otro?
+							{:	//Campo es de tipo Integer o Boolean	
+							//Comprobamos si el simbolo está ya definido en la tabla de símbolos
+							
 								ScopeIF scope = scopeManager.getCurrentScope();								
 								SymbolTableIF tablaSimbolos = scope.getSymbolTable();
 								TypeTableIF tablaTipos = scope.getTypeTable();
 								
-								semanticErrorManager.semanticDebug("TipoPrimitivo del identificador " + id.getLexema() + " es: " + tp.getValue());
-								Util utilidades = new Util();
-								utilidades.debugTablesToString(scope);
-								
-								CampoRegistro camporeg = new CampoRegistro(id.getLexema(), tp);
-								TypeIF tipo = scopeManager.searchType(tp.getValue());								
-								SymbolVariable symbolvariable = new SymbolVariable(scope, id.getLexema(), tipo); 
-								
 								if(tablaSimbolos.containsSymbol(id.getLexema()))
-								{
 									semanticErrorManager.semanticFatalError("ERROR T02: Campo de registro: " + id.getLexema() + "ya definido anteriormente");
+								else{
+									CampoRegistro camporeg = new CampoRegistro(id.getLexema(), tp);
+									TypeIF tipo = scopeManager.searchType(tp.getValue());
+									SymbolVariable symbolvariable = new SymbolVariable(scope, id.getLexema(), tipo);
+									semanticErrorManager.semanticDebug("Después symbolvariable: ");
+									semanticErrorManager.semanticDebug("El tipo es: tp.getValue()=" + tp.getValue());
+									Util util = new Util();
+									util.debugTablesToString(scope);
+									
+									if(!tablaTipos.containsType(tipo))
+									{//Si tipo no existe en tabla de tipos, mostramos error semántico
+										semanticErrorManager.semanticFatalError("ERROR T03: Campo de registro: " + id.getLexema() + " de tipo desconocido " + tp.getValue());
+									}
+									else{	//Añadimos el identificador a la tabla de símbolos, en el ámbito actual
+										//CampoRegistro camporeg = new CampoRegistro(id.getLexema(), tp);
+										tablaSimbolos.addSymbol(id.getLexema(), symbolvariable);
+										RESULT = camporeg;
+										}
 								}
-								else if(!tablaTipos.containsType(tp.getValue()))
-								{
-										//Si tipo no existe en tabla de tipos, mostramos error semántico
-									semanticErrorManager.semanticFatalError("ERROR T03: Campo de registro: " + id.getLexema() + " de tipo desconocido " + tp.getValue());
-								}
-								else{	//Añadimos el identificador a la tabla de símbolos, en el ámbito actual
-									//CampoRegistro camporeg = new CampoRegistro(id.getLexema(), tp);
-
-
-									tablaSimbolos.addSymbol(id.getLexema(), symbolvariable);
-									RESULT = camporeg;
-								}
-								
 
 							:};
 
- 
 // Declaración de variables globales
-declaracionVariables	::= listaIdentificadores:lid COLON tipoPrimitivo:tp SEMICOLON
+declaracionVariable		::= listaIdentificadores:lid COLON tipoPrimitivo:tp
 							{:	//	Obtenemos ámbito actual
 								ScopeIF scope = scopeManager.getCurrentScope();
 								semanticErrorManager.semanticDebug("Sección Declaración Variables: Scope actual, nombre:" + scope.getName());
@@ -381,12 +382,17 @@ declaracionVariables	::= listaIdentificadores:lid COLON tipoPrimitivo:tp SEMICOL
 									if(tablaSimbolos.containsSymbol(identifiersList.get(i)))
 										semanticErrorManager.semanticFatalError("Error en declaración de Variable, ya existe declaración de " + identifiersList.get(i));
 									else{ 
-										TypeIF tipo = scopeManager.searchType("INTEGER");
+										TypeIF tipo = scopeManager.searchType(tp.getValue());
 										SymbolVariable symbolvariable = new SymbolVariable(scope, identifiersList.get(i), tipo);
 										tablaSimbolos.addSymbol(symbolvariable);
 									}
 								}
+								semanticErrorManager.semanticDebug("*** FIN Sección Declaración Variables: Scope actual, nombre:" + scope.getName());
 							:};
+
+tipo					::= INTEGER
+							| BOOLEAN
+							| IDENTIFIER;
 tipoPrimitivo 			::= INTEGER:tpint
 								 {: TipoPrimitivo tipoPrim = new TipoPrimitivo(tpint.getLexema().toUpperCase());
 								 	RESULT = tipoPrim;
@@ -396,12 +402,12 @@ tipoPrimitivo 			::= INTEGER:tpint
 								 	RESULT = tipoPrim;
 								 :}
 							| IDENTIFIER:id
-								{:	TipoPrimitivo tipoPrim = new TipoPrimitivo(id.getLexema());
+								{:	TipoPrimitivo tipoPrim = new TipoPrimitivo("IDENTIFIER");
 									RESULT = tipoPrim;
 								:};  
 
 // Declaración de subprogramas
-declaracionSubprogramas		::= FUNCTION IDENTIFIER LEFTBRACKET bloqueParamSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS seccionTipos 
+declaracionSubprograma		::= FUNCTION IDENTIFIER LEFTBRACKET bloqueParamSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS seccionTipos 
 								| PROCEDURE IDENTIFIER LEFTBRACKET bloqueParamSubprograma RIGHTBRACKET IS seccionTipos
 								| FUNCTION IDENTIFIER LEFTBRACKET bloqueParamSubprograma RIGHTBRACKET error IS {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error definición función, falta return");:};
 
@@ -411,21 +417,67 @@ bloqueParamSubprograma		::= bloqueParamSubprograma SEMICOLON listaIdentificadore
 								| empty;
 
 // Bloque de sentencias
-bloqueSentencias			::= sentencia SEMICOLON bloqueSentencias 
+bloqueSentencias			::=  
+								{:
+									semanticErrorManager.semanticDebug("Sentencia: ");
+								:} sentencia:sent SEMICOLON bloqueSentencias
 								| empty;								
 
-sentencia		::= expresion | sentenciaAsignacion | sentenciaIf | sentenciaIO | sentenciaReturn | sentenciaFor;
+sentencia		::= expresion {: semanticErrorManager.semanticDebug("Sentencia -> Expresion"); :}  
+					| sentenciaAsignacion {: semanticErrorManager.semanticDebug("Sentencia->SentenciaAsignación"); :}   
+					| sentenciaIf {: semanticErrorManager.semanticDebug("Sentencia -> SentenciaIF"); :}  
+					| {: semanticErrorManager.semanticDebug("Sentencia -> sentenciaIO"); :} sentenciaIO 
+					| sentenciaReturn {: semanticErrorManager.semanticDebug("Sentencia -> SentenciaReturn"); :}  
+					| sentenciaFor{: semanticErrorManager.semanticDebug("Sentencia -> SentenciaFor"); :}  ;
 
 
 // Expresiones
-expresion	::= expresionAritmetica 
-				| expresionLogica 
-				| expresionAccesoRegistro 
-				| LEFTBRACKET expresion RIGHTBRACKET
-				| IDENTIFIER;
+expresion	::= expresionAritmetica:exprarit
+				{:
+					semanticErrorManager.semanticDebug("en Expresion -> ExpresionAritmetica: ");
+					RESULT = exprarit;
+				:}
+				|expresionLogica:exprlog 
+				{:
+					semanticErrorManager.semanticDebug("en Expresion -> ExpresionLogica");
+					RESULT = exprlog;
+				:}  
+				| LEFTBRACKET expresion:expr RIGHTBRACKET
+				{:
+					semanticErrorManager.semanticDebug("en Expresion -> (expresion) ");
+					RESULT = expr;
+				:}				 
+				| sentenciaLlamadaSubprograma
+				{:
+					semanticErrorManager.semanticDebug("en Expresion -> SentenciaLlamadaSubprograma");
+				:}
+				
+				| referencia:ref
+				{:
+				semanticErrorManager.semanticDebug("en Expresion -> Referencia, Id=" + ref.getName());
+					String name = ref.getName();
+					if(!scopeManager.containsSymbol(name))
+					{
+						semanticErrorManager.semanticFatalError("Error. Identificador no definido: " + name); 
+						//+ ", [Line=" + id.getLine() + ",Col=" + id.getColumn() + "]");
+					}
+					else
+					{	//Sí existe en la tabla de Símbolos					
+						SymbolIF sId = scopeManager.searchSymbol(name);
+						TypeIF type = sId.getType();
+						RESULT = new Expresion(type);
+					}
+				
+					
+				:}
+				| error SEMICOLON 
+				{:
+					syntaxErrorManager.syntaxInfo("Error sintáctico en Expresión");
+				:};
 
 expresionAritmetica ::= expresion:e1 PLUS expresion:e2
 							{:
+								semanticErrorManager.semanticDebug("En ExpresionAritmetica -> Expresion + Expresion");
 								
 //								//Comprobación de tipos sobre e1 y e2
 //								TypeIF e1type = scopeManager.searchType("Integer");
@@ -438,53 +490,90 @@ expresionAritmetica ::= expresion:e1 PLUS expresion:e2
 //								}
 //								else semanticErrorManager.semanticFatalError ("Expresión Aritmética - Tipos incompatibles");
 
-								ExpresionAritmetica e = new ExpresionAritmetica(e1, e2);
-								RESULT = e; 
+								ExpresionAritmetica exprarit = new ExpresionAritmetica(e1, e2);
+								RESULT = exprarit; 
 							:} 
-						| NUMBER; 
+						| NUMBER:num
+						{:
+							ExpresionAritmetica exprarit = new ExpresionAritmetica();
+							exprarit.setValue(Integer.parseInt(num.getLexema()));
+							semanticErrorManager.semanticDebug("En ExpresionAritmetica -> NUMBER");
+						:}; 
 
 expresionLogica		::= expresion:e1 OR expresion:e2
 							{:
-								ExpresionLogica e = new ExpresionLogica(e1, e2);
+								ExpresionLogica exprlog = new ExpresionLogica(e1, e2);
 								//Comprobación de tipos sobre e1 y e2
 								//Generación de código para e1 OR e2							
-								RESULT = e;
+								RESULT = exprlog;
 							:} 
 						| expresion:e1 GREATTHAN expresion:e2
 							{:
-								ExpresionLogica e = new ExpresionLogica(e1, e2);
+								ExpresionLogica exprlog = new ExpresionLogica(e1, e2);
 								//Comprobación de tipos sobre e1 y e2
 								//Generación de código para e1 > e2
-								RESULT = e;
+								RESULT = exprlog;
 							:}
 						| expresion:e1 EQUAL expresion:e2
 							{:
-								ExpresionLogica e = new ExpresionLogica(e1, e2);
+								ExpresionLogica exprlog = new ExpresionLogica(e1, e2);
 								//Comprobación de tipos sobre e1 y e2
 								//Generación de código para e1 = e2
-								RESULT=e;
+								RESULT=exprlog;
 							:}
-						| sentenciaLlamadaSubprograma
-						| TRUE 
-						| FALSE;
+						| TRUE:tr 
+						{:
+							ExpresionLogica expr = new ExpresionLogica();
+							expr.setValue(true);
+							semanticErrorManager.semanticDebug("en ExpresiónLógica -> TRUE");
+							RESULT = expr;
+						:}
+						| FALSE
+						{:
+							ExpresionLogica expr = new ExpresionLogica();
+							expr.setValue(false);
+							semanticErrorManager.semanticDebug("en ExpresiónLógica -> FALSE");
+							RESULT = expr;
+						:}
+						;
 						
-
-expresionAccesoRegistro		::= IDENTIFIER POINT expresionAccesoRegistro | IDENTIFIER POINT IDENTIFIER;  
+referencia			::= referencia:refer POINT IDENTIFIER:id
+								{: 
+									String name = id.getLexema();
+									semanticErrorManager.semanticDebug("En Referencia, ref.id: " + refer.getName() + "." + id.getLexema());
+									
+									TypeIF referType = refer.getType();
+									if(referType instanceof TypeRecord)
+									{
+										TypeRecord tRec = (TypeRecord) referType;
+										if(tRec.containsField(name)){
+											//TypeIF innerType = tRec.getType();
+											//RESULT = new Referencia(innerType, refer.getName());
+										}
+										else semanticErrorManager.semanticDebug("ERROR R001 - " + refer.getName() + " NO contiene campo " + name);
+									}
+									else semanticErrorManager.semanticDebug("ERROR R002-" + refer.getName() + ".Tipo=" + refer.getType() + " NO instancia de TypeRecord");
+								:} 
+								| IDENTIFIER:id
+								{:	
+								:};  
 			
  
 // Sentencia IO
-sentenciaIO 	::= PUTLINE LEFTBRACKET expresion RIGHTBRACKET
+sentenciaIO 	::= PUTLINE LEFTBRACKET 
 					{:
 						SentenciaIO sentenciaIO = new SentenciaIO();
+						semanticErrorManager.semanticDebug(" sentenciaIO=PutLine(expresion)" );
 						RESULT = sentenciaIO;
-					:}
+					:} expresion:expr RIGHTBRACKET
 					| PUTLINE LEFTBRACKET STRING RIGHTBRACKET;
+//					| error {:syntaxErrorManager.syntaxFatalError("ERROR S001: Error en sentencia Put_line"); :};
 
 
 //Sentencia Asignacion
 sentenciaAsignacion		::= IDENTIFIER:id ASSIGN expresion:exp
 								{:
-								
+								semanticErrorManager.semanticDebug ("sentenciaAsignacion -> Id := expresion");
 								//Comprobamos si se ha definido el símbolo en la TS anteriormente, si no, mostramos error semántico								
 								ScopeIF scope = scopeManager.getCurrentScope();																
 								SymbolTableIF tablaSimbolos = scope.getSymbolTable();										
@@ -498,6 +587,8 @@ sentenciaAsignacion		::= IDENTIFIER:id ASSIGN expresion:exp
 									semanticErrorManager.semanticDebug("El tipo de la variable: " + id.getLexema() + " es: " + idtype.getName());
 									//TypeIF exptype = exp.getType();
 								}
+								SentenciaAsignacion asignacion = new SentenciaAsignacion();
+								RESULT = asignacion;
 								:}
 							| expresionAccesoRegistro ASSIGN expresion;  
 						
@@ -516,5 +607,6 @@ listaParametros				::= listaParametros COMMA expresion | expresion | empty;
 
 // Sentencia For
 sentenciaFor	::=	FOR IDENTIFIER IN expresion DOUBLEPOINT expresion LOOP bloqueSentencias END LOOP;
+
 
 empty ::= ;

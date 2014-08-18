@@ -1,7 +1,7 @@
 package compiler.semantic.type;
 
-import compiler.syntax.nonTerminal.BloqueCamposRegistro;
 
+import compiler.syntax.nonTerminal.BloqueCamposRegistro;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeBase;
 
@@ -14,8 +14,8 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
 
 public class TypeRecord extends TypeBase        
 {   
-	private BloqueCamposRegistro bloqueCampos = new BloqueCamposRegistro();
-	
+	private BloqueCamposRegistro bloqueCamposReg = new BloqueCamposRegistro();
+
     /**
      * Constructor for TypeRecord.
      * @param scope The declaration scope.
@@ -46,21 +46,22 @@ public class TypeRecord extends TypeBase
     
     public TypeRecord (ScopeIF scope, String name, BloqueCamposRegistro bcr){
     	super(scope, name);
-    	this.bloqueCampos = bcr;
+    	this.bloqueCamposReg = bcr;
+
     }
     
 	/**
 	 * @return the bloqueCampos
 	 */
 	public BloqueCamposRegistro getBloqueCampos() {
-		return bloqueCampos;
+		return bloqueCamposReg;
 	}
 
 	/**
 	 * @param bloquecampos the bloqueCampos to set
 	 */
 	public void setBloquecampos(BloqueCamposRegistro bloquecampos) {
-		this.bloqueCampos = bloquecampos;
+		this.bloqueCamposReg = bloquecampos;
 	}
     
     
@@ -73,7 +74,17 @@ public class TypeRecord extends TypeBase
     {
         // TODO: Student work
     	// Tamaño del tipo registro: Número de campos??? 
-    	return this.bloqueCampos.getListaCamposRegistro().size();
+    	return this.bloqueCamposReg.getListaCamposRegistro().size();
+    }
+    
+    
+    /**
+     * Comprueba si un nombre es un campo de un registro
+     * @param field
+     * @return
+     */
+    public boolean containsField(String field){
+    	return this.bloqueCamposReg.containsField(field);
     }
 
 

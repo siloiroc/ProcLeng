@@ -1,6 +1,6 @@
 package compiler.syntax.nonTerminal;
 
-public class ExpresionLogica extends NonTerminal {
+public class ExpresionLogica extends Expresion {
 	
 	private boolean value; 	//Atributo valor booleano, de la Expresión Lógica
 	
@@ -27,4 +27,5 @@ public class ExpresionLogica extends NonTerminal {
 		this.value = value;
 	}
 
+	
 }

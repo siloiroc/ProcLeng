@@ -7,7 +7,7 @@ public class BloqueCamposRegistro extends NonTerminal {
 
 	private ArrayList<CampoRegistro> listaCamposRegistro = new ArrayList<CampoRegistro>();	//Atributo: Lista de los campos del registro
 	
-	public BloqueCamposRegistro() {
+	public BloqueCamposRegistro() { 
 		super();
 	}
 
@@ -37,5 +37,14 @@ public class BloqueCamposRegistro extends NonTerminal {
 	 */
 	public void setListaCamposRegistro(ArrayList<CampoRegistro> listaCamposRegistro) {
 		this.listaCamposRegistro = listaCamposRegistro;
+	}
+	
+	public boolean containsField(String field){
+		if (this.listaCamposRegistro.contains(new CampoRegistro(field,new TipoPrimitivo("INTEGER"))) 
+			|| this.listaCamposRegistro.contains(new CampoRegistro(field, new TipoPrimitivo("BOOLEAN")))
+			|| this.listaCamposRegistro.contains(new CampoRegistro(field, new TipoPrimitivo("IDENTIFIER"))))
+			return true;
+		else
+			return false;
 	}
 }

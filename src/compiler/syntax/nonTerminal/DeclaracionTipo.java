@@ -1,8 +1,8 @@
 package compiler.syntax.nonTerminal;
 
-public class DeclaracionTipos extends NonTerminal {
+public class DeclaracionTipo extends NonTerminal {
 
-	public DeclaracionTipos() {
+	public DeclaracionTipo() {
 		// TODO Auto-generated constructor stub
 	}
 
