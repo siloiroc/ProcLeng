@@ -2,6 +2,8 @@ package compiler.syntax.nonTerminal;
 
 import java.util.ArrayList;
 
+import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
+
 /**
  * @author agilrod
  *
@@ -15,6 +17,12 @@ public class ListaIdentificadores extends NonTerminal {
 	public ListaIdentificadores() {
 		super();
 	}
+	
+	public ListaIdentificadores(String name){
+		super();
+		this.identifiersList.add(name);
+	}
+	
 	/**
 	 * @return the identifiersList
 	 */
@@ -28,10 +36,11 @@ public class ListaIdentificadores extends NonTerminal {
 		this.identifiersList = identifiersList;
 	}
 	
-	/**
-	 * 
-	 * @param token Añade un nuevo token de identificador a la lista de tokens interna
-	 */
+	public String getIdentifiersListItem(int item){
+		return this.identifiersList.get(item);
+	}
+	
+
 	public void addIdentifier(String id){
 		this.identifiersList.add(id);
 	}
