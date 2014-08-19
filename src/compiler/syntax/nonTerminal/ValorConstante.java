@@ -1,7 +1,7 @@
 package compiler.syntax.nonTerminal;
 
 public class ValorConstante extends NonTerminal {
-	private String value;
+	private String value;		//Atributo: value (puede ser True, False, Número)
 
 	public ValorConstante() {
 		super();

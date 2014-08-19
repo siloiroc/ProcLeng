@@ -1,7 +1,10 @@
 package compiler.syntax.nonTerminal;
 
+import es.uned.lsi.compiler.semantic.type.TypeIF;
+
 public class TipoPrimitivo extends NonTerminal {
 	private String value;	//Atributo valor del tipo primitivo
+	private TypeIF type;
 	
 	public TipoPrimitivo() {
 		super();
@@ -11,6 +14,17 @@ public class TipoPrimitivo extends NonTerminal {
 		super();
 		this.value = value;
 	} 
+	
+	public TipoPrimitivo(TypeIF type, String value){
+		super();
+		this.type = type;
+		this.value = value;
+	}
+	
+	public TipoPrimitivo(TypeIF type){
+		super();
+		this.type = type;
+	}
 	
 	/**
 	 * @return the value
@@ -46,6 +60,20 @@ public class TipoPrimitivo extends NonTerminal {
 		//return super.hashCode();
 		return 255 * this.getValue().hashCode(); 
 				
+	}
+
+	/**
+	 * @return the type
+	 */
+	public TypeIF getType() {
+		return type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(TypeIF type) {
+		this.type = type;
 	}
 
 }

@@ -14,7 +14,7 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
 public class SymbolConstant
     extends SymbolBase
 {
-	private int value; //Atributo valor de constante
+	private String value; //Atributo valor de constante
 	
     /**
      * Constructor for SymbolConstant.
@@ -32,14 +32,14 @@ public class SymbolConstant
 	/**
 	 * @return the value
 	 */
-	public int getValue() {
+	public String getValue() {
 		return value;
 	}
 
 	/**
 	 * @param value the value to set
 	 */
-	public void setValue(int value) {
+	public void setValue(String value) {
 		this.value = value;
 	} 
 }

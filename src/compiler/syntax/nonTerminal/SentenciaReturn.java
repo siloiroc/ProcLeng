@@ -1,9 +1,9 @@
 package compiler.syntax.nonTerminal;
 
-public class SentenciaReturn extends NonTerminal {
+public class SentenciaReturn extends Sentencia {
 
 	public SentenciaReturn() {
-		// TODO Auto-generated constructor stub
+		super();
 	}
 
 }

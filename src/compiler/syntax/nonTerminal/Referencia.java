@@ -6,6 +6,7 @@ public class Referencia extends NonTerminal {
 
 	private TypeIF type; 	
 	private String name;
+	private int value;
 	
 	public Referencia() {
 		super();
@@ -41,6 +42,20 @@ public class Referencia extends NonTerminal {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * @return the value
+	 */
+	public int getValue() {
+		return value;
+	}
+
+	/**
+	 * @param value the value to set
+	 */
+	public void setValue(int value) {
+		this.value = value;
 	}
 
 }

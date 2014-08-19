@@ -237,68 +237,71 @@ listaIdentificadores ::= listaIdentificadores:idlist COMMA IDENTIFIER:id
 						{:
 							semanticErrorManager.semanticDebug("**ListaIdentificadores**");
 							String name = id.getLexema();
-							//Verificamos si el identificador está en la tabla de símbolos
-							ScopeIF scope = scopeManager.getCurrentScope();
-							Util util = new Util();
+							ListaIdentificadores identifierList = idlist;
+							identifierList.addIdentifier(name);
+							RESULT = identifierList;
 							
-							if(util.checkSymbolTableScope(scope, name))
-							{
-								//Si existe el símbolo en ámbitos abiertos, lo obtenemos,
-								SymbolIF sym = scopeManager.searchSymbol(name);
-								if (sym instanceof SymbolConstant){
-									SymbolConstant symconst = (SymbolConstant)sym;
-									Object value = symconst.getValue();
-									//RESULT = new RNumero(value);
-								}
-								else
-									semanticErrorManager.semanticFatalError("Símbolo no es de tipo SymbolConstant");
-							}
-							else{
-								//Añadimos identificador a lista de identificadores
-								//idlist.addIdentifier(id.getLexema());
-								//RESULT=idlist;
-								}					
+							
+							//Verificamos si el identificador está en la tabla de símbolos
+//							ScopeIF scope = scopeManager.getCurrentScope();
+//							Util util = new Util();
+//							
+//							if(!util.checkSymbolTableScope(scope, name))
+//							{
+//								//Si no existe el símbolo en ámbitos abiertos, lo creamos y añadimos a ListaIdentificadores
+//								ListaIdentificadores identifierList = idlist;
+//								identifierList.addIdentifier(name);
+//								RESULT = identifierList;							
+//							}
+//							else
+//								semanticErrorManager.semanticFatalError("ERROR LI001: ID=" + name + " ya definido");
 						:}
 						  | IDENTIFIER:id
 						  {:	
 						  	semanticErrorManager.semanticDebug("**listaidentificadores -> id **");
 						  	String name = id.getLexema();
-						  	//Creamos lista de identificadores, e insertamos el primer elemento id.
-						  	//ListaIdentificadores idlist = new ListaIdentificadores();
-						  	//idlist.addIdentifier(id.getLexema());
-						  	//RESULT=idlist;
-						  	ScopeIF scope = scopeManager.getCurrentScope();
-							Util util = new Util();
-							if(!util.checkSymbolTableScope(scope, name))
-							{
-								ListaIdentificadores idlist = new ListaIdentificadores(name);
-								RESULT = idlist;
-							}
-							else 
-								semanticErrorManager.semanticFatalError("ERROR LI001: ID=" + name + "ya definido");  
+						  	ListaIdentificadores identifierList = new ListaIdentificadores(name);
+							RESULT = identifierList;
+						  	
+//						  	ScopeIF scope = scopeManager.getCurrentScope();
+//							Util util = new Util();
+//							if(!util.checkSymbolTableScope(scope, name))
+//							{
+//								ListaIdentificadores idlist = new ListaIdentificadores(name);
+//								RESULT = idlist;
+//							}
+//							else 
+//								semanticErrorManager.semanticFatalError("ERROR LI001: ID=" + name + "ya definido");  
 						  :};
 
 
 // Declaración de constantes simbólicas
 declaracionConstante ::=  listaIdentificadores:lid COLON CONSTANT 
 							{: 	semanticErrorManager.semanticDebug("**DECLARACION CONSTANTE**"); 
-								semanticErrorManager.semanticDebug("En declaracionConstante -> listaIdentificadores : CONSTANT := valorConstante;");
+								//semanticErrorManager.semanticDebug("En declaracionConstante -> listaIdentificadores : CONSTANT := valorConstante;");
 							:}	
 							ASSIGN valorConstante:vc SEMICOLON 
 							{:  //syntaxErrorManager.syntaxDebug("En declaración constante");
+								
 								ScopeIF scope = scopeManager.getCurrentScope();
 								Util util = new Util();
 																
 								//Verificamos si los identificadores de la lista están ya definidos en la Tabla de Símbolos 
 								for(int i = 0; i < lid.getSize(); i++){
 									if(util.checkSymbolTableScope(scope, lid.getIdentifiersListItem(i)))
-										semanticErrorManager.semanticFatalError("Error en declaración de Constante, ya existe declaración de " + lid.getIdentifiersListItem(i));
+										semanticErrorManager.semanticFatalError("ERROR CONST001: en declaración de Constantes, ya existe declaración de " + lid.getIdentifiersListItem(i));
 									else{
-										// Símbolos no existen en TS, por lo que añadimos cada uno de ellos a la TS.		
-										TypeIF typeInTT = scopeManager.searchType("Boolean");
-										SymbolConstant symbolconstant = new SymbolConstant(scope, lid.getIdentifiersListItem(i), typeInTT);
-										util.addToSymbolTable(scope, symbolconstant);
-										
+										// Símbolos no existen en TS, por lo que añadimos cada uno de ellos a la TS.
+										SymbolConstant symbolConstant;																					
+										if (vc.getValue().equals("TRUE") || vc.getValue().equals("FALSE")){
+											symbolConstant = new SymbolConstant(scope, lid.getIdentifiersListItem(i), scopeManager.searchType("BOOLEAN"));
+										}
+										else{
+											symbolConstant = new SymbolConstant(scope, lid.getIdentifiersListItem(i), scopeManager.searchType("INTEGER"));
+										}
+										symbolConstant.setValue(vc.getValue());
+										//semanticErrorManager.semanticDebug("Construido SymbolConstant, con: " + scope + ", " + lid.getIdentifiersListItem(i) + "," + scopeManager.searchType("INTEGER").getName());  
+										util.addToSymbolTable(scope, symbolConstant);
 									}
 								}
 							:};
@@ -311,13 +314,13 @@ declaracionConstante ::=  listaIdentificadores:lid COLON CONSTANT
 valorConstante ::= TRUE:vc 
 						{: 
 							semanticErrorManager.semanticDebug("En valorConstante -> TRUE");
-							ValorConstante value = new ValorConstante(vc.getLexema());
+							ValorConstante value = new ValorConstante(vc.getLexema().toUpperCase());
 					   		RESULT = value; 
 					   :}
 				   | FALSE:vc
 				   		{:	
 				   			semanticErrorManager.semanticDebug("En valorConstante -> FALSE");
-				   			ValorConstante value = new ValorConstante(vc.getLexema());
+				   			ValorConstante value = new ValorConstante(vc.getLexema().toUpperCase());
 				   			RESULT = value; 
 				   		:} 
 				   | NUMBER:num 
@@ -327,9 +330,26 @@ valorConstante ::= TRUE:vc
 				   	 		RESULT = value;
 				   	 	:};
 // Declaración de tipos globales
-declaracionTipo 		::= TYPE IDENTIFIER:id IS tipoRegistro:tipoReg
+declaracionTipo 		::= {:semanticErrorManager.semanticDebug("**DECLARACION TIPO**");:} 
+							TYPE IDENTIFIER:id IS RECORD bloqueCamposRegistro:bcr END RECORD SEMICOLON 
 							{:
-								semanticErrorManager.semanticDebug("En declaracionTipo -> TYPE id IS tipoRegistro");							
+//								semanticErrorManager.semanticDebug("En declaracionTipo -> TYPE id IS tipoRegistro");							
+//								semanticErrorManager.semanticDebug("**Declaración Tipo: " + id.getLexema() + "******");
+//								semanticErrorManager.semanticDebug("**********************************");
+//								// Obtenemos la tabla de tipos del ámbito actual,y verificamos si el tipo está definido ya en TT, si no, lo añadimos
+//								ScopeIF scope = scopeManager.getCurrentScope();								
+//								TypeTableIF tablaTipos = scope.getTypeTable();
+//								if(tablaTipos.containsType(id.getLexema()))
+//										semanticErrorManager.semanticFatalError("ERROR - Error en declaración de Tipo, ya existe declaración de " + id.getLexema());
+//								else{ 
+//									//Creamos nuevo tipo Registro y lo introducimos en la tabla de tipos
+//									TypeRecord typeRecord = new TypeRecord(scope, id.getLexema());
+//									tablaTipos.addType(id.getLexema(), typeRecord);
+//								}
+//								semanticErrorManager.semanticDebug("FIN**Declaración Tipo: " + id.getLexema() + "******");
+//								semanticErrorManager.semanticDebug("**********************************");										
+								
+								semanticErrorManager.semanticDebug("En declaracionTipo -> TYPE id IS RECORD bloqueCamposRegistro END RECORD;");							
 								semanticErrorManager.semanticDebug("**Declaración Tipo: " + id.getLexema() + "******");
 								semanticErrorManager.semanticDebug("**********************************");
 								// Obtenemos la tabla de tipos del ámbito actual,y verificamos si el tipo está definido ya en TT, si no, lo añadimos
@@ -338,113 +358,123 @@ declaracionTipo 		::= TYPE IDENTIFIER:id IS tipoRegistro:tipoReg
 								if(tablaTipos.containsType(id.getLexema()))
 										semanticErrorManager.semanticFatalError("ERROR - Error en declaración de Tipo, ya existe declaración de " + id.getLexema());
 								else{ 
-									
+									//Creamos nuevo tipo Registro y lo introducimos en la tabla de tipos
+									TypeRecord typeRecord = new TypeRecord(scope, id.getLexema(), bcr);
+									tablaTipos.addType(id.getLexema(), typeRecord);
 								}
 								semanticErrorManager.semanticDebug("FIN**Declaración Tipo: " + id.getLexema() + "******");
-								semanticErrorManager.semanticDebug("**********************************");										
-							:};
-
-tipoRegistro			::= RECORD bloqueCamposRegistro:bcr END RECORD SEMICOLON
-							{:
-								semanticErrorManager.semanticDebug("En tipoRegistro -> RECORD bloqueCamposRegistro END RECORD;");
-								//Creamos nuevo tipo Registro y lo introducimos en la tabla de tipos							
+								semanticErrorManager.semanticDebug("**********************************");								
 							:};
 							
-//bloqueCamposRegistro	::= bloqueCamposRegistro:bcr campoRegistro:cr SEMICOLON
+
+//tipoRegistro			::= RECORD bloqueCamposRegistro:bcr END RECORD SEMICOLON
 //							{:
-//								BloqueCamposRegistro bloquecampos = bcr;
-//								bloquecampos.addCampoRegistro(cr);
-//								RESULT = bloquecampos;
-//							:} 
-//							| campoRegistro:cr SEMICOLON
-//							{:
-//								BloqueCamposRegistro bloquecampos = new BloqueCamposRegistro();
-//								bloquecampos.addCampoRegistro(cr);
-//								RESULT = bloquecampos;
+//								semanticErrorManager.semanticDebug("En tipoRegistro -> RECORD bloqueCamposRegistro END RECORD;");
+//								TipoRegistro tipoRegistro = new TipoRegistro(bcr);
+//								RESULT = tipoRegistro;							
+//							:};
+							
+bloqueCamposRegistro	::=	bloqueCamposRegistro:bcr declaracionVariable:decVar SEMICOLON
+							{:
+								semanticErrorManager.semanticDebug("En bloqueCamposRegistro -> bloqueCamposRegistro declaracionVariable;");
+								BloqueCamposRegistro bloquecampos = bcr;
+								bloquecampos.addCampoRegistro(decVar);
+								RESULT = bloquecampos;													
+							:} 
+							| declaracionVariable:decVar SEMICOLON
+							{:
+								semanticErrorManager.semanticDebug("En bloqueCamposRegistro -> declaracionVariable");
+								BloqueCamposRegistro bloquecampos = new BloqueCamposRegistro(decVar);
+								RESULT = bloquecampos;
+							:}; 
+  
+ 
+//campoRegistro			::= IDENTIFIER:id COLON tipoPrimitivo:tp
+//							{:	//Campo es de tipo Integer o Boolean	
+//							//Comprobamos si el simbolo está ya definido en la tabla de símbolos
+//							
+//								ScopeIF scope = scopeManager.getCurrentScope();								
+//								SymbolTableIF tablaSimbolos = scope.getSymbolTable();
+//								TypeTableIF tablaTipos = scope.getTypeTable();
+//								
+//								if(tablaSimbolos.containsSymbol(id.getLexema()))
+//									semanticErrorManager.semanticFatalError("ERROR T02: Campo de registro: " + id.getLexema() + "ya definido anteriormente");
+//								else{
+//									CampoRegistro camporeg = new CampoRegistro(id.getLexema(), tp);
+//									TypeIF tipo = scopeManager.searchType(tp.getValue());
+//									SymbolVariable symbolvariable = new SymbolVariable(scope, id.getLexema(), tipo);
+//									semanticErrorManager.semanticDebug("Después symbolvariable: ");
+//									semanticErrorManager.semanticDebug("El tipo es: tp.getValue()=" + tp.getValue());
+//									Util util = new Util();
+//									util.debugTablesToString(scope);
+//									
+//									if(!tablaTipos.containsType(tipo))
+//									{//Si tipo no existe en tabla de tipos, mostramos error semántico
+//										semanticErrorManager.semanticFatalError("ERROR T03: Campo de registro: " + id.getLexema() + " de tipo desconocido " + tp.getValue());
+//									}
+//									else{	//Añadimos el identificador a la tabla de símbolos, en el ámbito actual
+//										//CampoRegistro camporeg = new CampoRegistro(id.getLexema(), tp);
+//										tablaSimbolos.addSymbol(id.getLexema(), symbolvariable);
+//										RESULT = camporeg;
+//										}
+//								}
 //							:};
 
-bloqueCamposRegistro	::=	bloqueCamposRegistro declaracionVariable SEMICOLON
-							{:
-								semanticErrorManager.semanticDebug("En bloqueCamposRegistro -> bloqueCamposRegistro declaracionVariable;");														
-							:} 
-							| declaracionVariable SEMICOLON
-							{:
-								semanticErrorManager.semanticDebug("En bloqueCamposRegistro -> declaracionVariable");							
-							:}; 
- 
-campoRegistro			::= IDENTIFIER:id COLON tipoPrimitivo:tp
-							{:	//Campo es de tipo Integer o Boolean	
-							//Comprobamos si el simbolo está ya definido en la tabla de símbolos
-							
-								ScopeIF scope = scopeManager.getCurrentScope();								
-								SymbolTableIF tablaSimbolos = scope.getSymbolTable();
-								TypeTableIF tablaTipos = scope.getTypeTable();
-								
-								if(tablaSimbolos.containsSymbol(id.getLexema()))
-									semanticErrorManager.semanticFatalError("ERROR T02: Campo de registro: " + id.getLexema() + "ya definido anteriormente");
-								else{
-									CampoRegistro camporeg = new CampoRegistro(id.getLexema(), tp);
-									TypeIF tipo = scopeManager.searchType(tp.getValue());
-									SymbolVariable symbolvariable = new SymbolVariable(scope, id.getLexema(), tipo);
-									semanticErrorManager.semanticDebug("Después symbolvariable: ");
-									semanticErrorManager.semanticDebug("El tipo es: tp.getValue()=" + tp.getValue());
-									Util util = new Util();
-									util.debugTablesToString(scope);
-									
-									if(!tablaTipos.containsType(tipo))
-									{//Si tipo no existe en tabla de tipos, mostramos error semántico
-										semanticErrorManager.semanticFatalError("ERROR T03: Campo de registro: " + id.getLexema() + " de tipo desconocido " + tp.getValue());
-									}
-									else{	//Añadimos el identificador a la tabla de símbolos, en el ámbito actual
-										//CampoRegistro camporeg = new CampoRegistro(id.getLexema(), tp);
-										tablaSimbolos.addSymbol(id.getLexema(), symbolvariable);
-										RESULT = camporeg;
-										}
-								}
-
-							:};
-
 // Declaración de variables globales
-declaracionVariable		::= listaIdentificadores:lid COLON tipoPrimitivo:tp
+declaracionVariable		::= listaIdentificadores:lid COLON 
+								{:
+									semanticErrorManager.semanticDebug("**DECLARACION VARIABLE**"); 
+									semanticErrorManager.semanticDebug("En declaracionVariable -> listaIdentificadores : tipoPrimitivo;");
+								:} tipoPrimitivo:tp
 							{:	
-//								semanticErrorManager.semanticDebug("En declaracionVariable -> listaidentificadores : tipoPrimitivo");
-								//	Obtenemos ámbito actual
-//								ScopeIF scope = scopeManager.getCurrentScope();
-//								semanticErrorManager.semanticDebug("Sección Declaración Variables: Scope actual, nombre:" + scope.getName());
-								
-								// Obtenemos la tabla de símbolos del ámbito actual, y verificamos si los identificadores de la lista de variables están ya definidos en la TS
-//								SymbolTableIF tablaSimbolos = scope.getSymbolTable();
-//								semanticErrorManager.semanticDebug("Sección Variables - Tabla símbolos del scope:" + scope.getName() + " obtenida. Tamaño TS: " + tablaSimbolos.getSize());
-//								ArrayList<String> identifiersList = lid.getIdentifiersList();
-//								semanticErrorManager.semanticDebug("Sección Variables - Tras obtener lista de Identificadores como ArrayList. Tamaño ArrayList=" + identifiersList.size());
-//								semanticErrorManager.semanticDebug("Sección Variables - Tamaño de listadeIdentificadores declaración variables=" + identifiersList.size());
-//								for(int i = 0; i<identifiersList.size(); i++){
-//									if(tablaSimbolos.containsSymbol(identifiersList.get(i)))
-//										semanticErrorManager.semanticFatalError("Error en declaración de Variable, ya existe declaración de " + identifiersList.get(i));
-//									else{ 
-//										TypeIF tipo = scopeManager.searchType(tp.getValue());
-//										SymbolVariable symbolvariable = new SymbolVariable(scope, identifiersList.get(i), tipo);
-//										tablaSimbolos.addSymbol(symbolvariable);
-//									}
-//								}
-//								semanticErrorManager.semanticDebug("*** FIN Sección Declaración Variables: Scope actual, nombre:" + scope.getName());
+								ScopeIF scope = scopeManager.getCurrentScope();
+								Util util = new Util();
+								//Verificamos si los identificadores de la lista están ya definidos en la Tabla de Símbolos 
+								for(int i = 0; i < lid.getSize(); i++){
+									if(util.checkSymbolTableScope(scope, lid.getIdentifiersListItem(i))){
+										semanticErrorManager.semanticFatalError("ERROR VAR001: en declaración de Variable, ya existe declaración de " + lid.getIdentifiersListItem(i));
+									}
+									else{ // Símbolos no existen en TS, por lo que añadimos cada uno de ellos a la Tabla de Símbolos (SymbolVariable).
+										SymbolVariable symbolVariable = new SymbolVariable(scope, lid.getIdentifiersListItem(i), scopeManager.searchType(tp.getType().getName()));
+										semanticErrorManager.semanticDebug("Construido SymbolVariable, con: " + scope + ", " + lid.getIdentifiersListItem(i) + "," + tp.getType().getName());  
+										util.addToSymbolTable(scope, symbolVariable);
+										
+										DeclaracionVariable decVariable = new DeclaracionVariable(tp.getType(), lid);
+										RESULT = decVariable;										
+									}
+									
+								}
+							
 							:};
 
 tipo					::= INTEGER
 							| BOOLEAN
 							| IDENTIFIER;
 tipoPrimitivo 			::= INTEGER:tpint
-								 {: TipoPrimitivo tipoPrim = new TipoPrimitivo(tpint.getLexema().toUpperCase());
+								 {: 
+								 	ScopeIF scope = scopeManager.getCurrentScope();
+								 	TipoPrimitivo tipoPrim = new TipoPrimitivo(new TypeSimple(scope, "INTEGER"), tpint.getLexema().toUpperCase());
 								 	RESULT = tipoPrim;
 								 :}
 							| BOOLEAN:tpbool
-								 {: TipoPrimitivo tipoPrim = new TipoPrimitivo(tpbool.getLexema().toUpperCase());
+								 {: 
+								 	ScopeIF scope = scopeManager.getCurrentScope();
+								 	TipoPrimitivo tipoPrim = new TipoPrimitivo(new TypeSimple(scope, "BOOLEAN"), tpbool.getLexema().toUpperCase());
 								 	RESULT = tipoPrim;
 								 :}
 							| IDENTIFIER:id
-								{:	TipoPrimitivo tipoPrim = new TipoPrimitivo("IDENTIFIER");
-									RESULT = tipoPrim;
-								:};  
+								{:	
+									String name = id.getLexema();
+									if(scopeManager.containsType(name)){
+										TypeIF type = scopeManager.searchType(name);
+										RESULT = new TipoPrimitivo(type);
+									}
+									else{
+										semanticErrorManager.semanticFatalError("ERROR PRIM001: - Tipo estructurado: " + name + " no definido");
+									}
+
+								:};
+ 
 
 // Declaración de subprogramas
 declaracionSubprograma		::= FUNCTION IDENTIFIER LEFTBRACKET bloqueParamSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS seccionTipos 
@@ -463,18 +493,35 @@ bloqueSentencias			::=
 								:} sentencia:sent SEMICOLON bloqueSentencias
 								| empty;								
 
-sentencia		::= expresion {: semanticErrorManager.semanticDebug("Sentencia -> Expresion"); :}  
-					| sentenciaAsignacion {: semanticErrorManager.semanticDebug("Sentencia->SentenciaAsignación"); :}   
-					| sentenciaIf {: semanticErrorManager.semanticDebug("Sentencia -> SentenciaIF"); :}  
-					| {: semanticErrorManager.semanticDebug("Sentencia -> sentenciaIO"); :} sentenciaIO 
-					| sentenciaReturn {: semanticErrorManager.semanticDebug("Sentencia -> SentenciaReturn"); :}  
-					| sentenciaFor{: semanticErrorManager.semanticDebug("Sentencia -> SentenciaFor"); :}  ;
+sentencia		::= 
+//					expresion
+//						{: semanticErrorManager.semanticDebug("Sentencia -> Expresion"); :}  
+					| sentenciaAsignacion:sentAsig 
+						{: semanticErrorManager.semanticDebug("Sentencia->SentenciaAsignación"); 
+							semanticErrorManager.semanticDebug("Sentencia->SentenciaAsignación= " + sentAsig.getName());
+							RESULT = sentAsig;
+						:}   
+					| sentenciaIf:sentIf 
+						{: 	semanticErrorManager.semanticDebug("Sentencia -> SentenciaIF");
+							RESULT = sentIf;
+						:}  
+					| {: semanticErrorManager.semanticDebug("Sentencia -> sentenciaIO"); :} sentenciaIO:sentIO
+						{: RESULT =  sentIO; :}
+					| sentenciaReturn:sentRet
+						{: 	semanticErrorManager.semanticDebug("Sentencia -> SentenciaReturn");
+							RESULT = sentRet; 
+						:}  
+					| sentenciaFor:sentFor
+						{: semanticErrorManager.semanticDebug("Sentencia -> SentenciaFor");
+							RESULT = sentFor;
+						:};
 
 
 // Expresiones
 expresion	::= expresionAritmetica:exprarit
 				{:
 					semanticErrorManager.semanticDebug("en Expresion -> ExpresionAritmetica: ");
+					semanticErrorManager.semanticDebug("Exp->ExpArit... " + exprarit.getValue());
 					RESULT = exprarit;
 				:}
 				|expresionLogica:exprlog 
@@ -491,22 +538,23 @@ expresion	::= expresionAritmetica:exprarit
 				{:
 					semanticErrorManager.semanticDebug("en Expresion -> SentenciaLlamadaSubprograma");
 				:}
-				
 				| referencia:ref
 				{:
 					semanticErrorManager.semanticDebug("en Expresion -> Referencia, Id=" + ref.getName());
-					String name = ref.getName();
-					if(!scopeManager.containsSymbol(name))
-					{
-						semanticErrorManager.semanticFatalError("ERROR REF001. Identificador no definido: " + name); 
-						//+ ", [Line=" + id.getLine() + ",Col=" + id.getColumn() + "]");
+					
+
+					
+					ScopeIF scope = scopeManager.getCurrentScope();
+					Util util = new Util();
+					//Verificamos si la referencia está ya definida en la Tabla de Símbolos 
+					if(!util.checkSymbolTableScope(scope, ref.getName())){
+							semanticErrorManager.semanticFatalError("ERROR REF001: No existe la declaración de " + ref.getName());
 					}
-					else
-					{	//Sí existe en la tabla de Símbolos					
-						SymbolIF sId = scopeManager.searchSymbol(name);
-						TypeIF type = sId.getType();
-						RESULT = new Expresion(type);
+					else{
+						TypeIF typeref = ref.getType(); 
+						RESULT = new Expresion(typeref);						
 					}
+					
 				:}
 				| error SEMICOLON 
 				{:
@@ -528,21 +576,21 @@ expresionAritmetica ::= expresion:e1 PLUS expresion:e2
 //								}
 //								else semanticErrorManager.semanticFatalError ("Expresión Aritmética - Tipos incompatibles");
 
-								ExpresionAritmetica exprarit = new ExpresionAritmetica(e1, e2);
+								ExpresionAritmetica exprarit = new ExpresionAritmetica(e1, e2, new TypeSimple(scopeManager.getCurrentScope(), "Integer"));
 								RESULT = exprarit; 
 						:} 
 						| NUMBER:num
 						{:
 							semanticErrorManager.semanticDebug("En ExpresionAritmetica -> NUMBER");
-							ExpresionAritmetica exprarit = new ExpresionAritmetica();
-							exprarit.setValue(Integer.parseInt(num.getLexema()));
-							semanticErrorManager.semanticDebug("En ExpresionAritmetica -> NUMBER");
+							ExpresionAritmetica exprarit = new ExpresionAritmetica(new TypeSimple(scopeManager.getCurrentScope(),"Integer"), Integer.parseInt(num.getLexema()));
+							semanticErrorManager.semanticDebug("ExpresionAritmetica->NUMBER. ExpresionAritmetica = " + exprarit.getValue());
+							RESULT = exprarit;
 						:}; 
 
 expresionLogica		::= expresion:e1 OR expresion:e2
 							{:
 								semanticErrorManager.semanticDebug("En ExpresionLogica -> exp OR exp");
-								ExpresionLogica exprlog = new ExpresionLogica(e1, e2);
+								ExpresionLogica exprlog = new ExpresionLogica(e1, e2, new TypeSimple(scopeManager.getCurrentScope(), "Boolean"));
 								//Comprobación de tipos sobre e1 y e2
 								//Generación de código para e1 OR e2							
 								RESULT = exprlog;
@@ -550,7 +598,7 @@ expresionLogica		::= expresion:e1 OR expresion:e2
 						| expresion:e1 GREATTHAN expresion:e2
 							{:
 								semanticErrorManager.semanticDebug("En ExpresionLogica -> exp > exp");
-								ExpresionLogica exprlog = new ExpresionLogica(e1, e2);
+								ExpresionLogica exprlog = new ExpresionLogica(e1, e2, new TypeSimple(scopeManager.getCurrentScope(), "Boolean") );
 								//Comprobación de tipos sobre e1 y e2
 								//Generación de código para e1 > e2
 								RESULT = exprlog;
@@ -558,7 +606,7 @@ expresionLogica		::= expresion:e1 OR expresion:e2
 						| expresion:e1 EQUAL expresion:e2
 							{:
 								semanticErrorManager.semanticDebug("En ExpresionLogica -> exp = exp");
-								ExpresionLogica exprlog = new ExpresionLogica(e1, e2);
+								ExpresionLogica exprlog = new ExpresionLogica(e1, e2, new TypeSimple(scopeManager.getCurrentScope(), "Boolean"));
 								//Comprobación de tipos sobre e1 y e2
 								//Generación de código para e1 = e2
 								RESULT=exprlog;
@@ -566,7 +614,7 @@ expresionLogica		::= expresion:e1 OR expresion:e2
 						| TRUE:tr 
 						{:
 							semanticErrorManager.semanticDebug("En ExpresionLogica -> TRUE");
-							ExpresionLogica expr = new ExpresionLogica();
+							ExpresionLogica expr = new ExpresionLogica(new TypeSimple(scopeManager.getCurrentScope(), "Boolean"));
 							expr.setValue(true);
 							semanticErrorManager.semanticDebug("en ExpresiónLógica -> TRUE");
 							RESULT = expr;
@@ -574,7 +622,7 @@ expresionLogica		::= expresion:e1 OR expresion:e2
 						| FALSE
 						{:
 							semanticErrorManager.semanticDebug("En ExpresionLogica -> FALSE");
-							ExpresionLogica expr = new ExpresionLogica();
+							ExpresionLogica expr = new ExpresionLogica(new TypeSimple(scopeManager.getCurrentScope(), "Boolean"));
 							expr.setValue(false);
 							semanticErrorManager.semanticDebug("en ExpresiónLógica -> FALSE");
 							RESULT = expr;
@@ -584,24 +632,99 @@ expresionLogica		::= expresion:e1 OR expresion:e2
 referencia			::= referencia:refer POINT IDENTIFIER:id
 						{: 
 									semanticErrorManager.semanticDebug("En Referencia-> refer.id");
-									String name = id.getLexema();
-									
+									String name = refer.getName();
+									String innername = id.getLexema();
 									
 									TypeIF referType = refer.getType();
 									if(referType instanceof TypeRecord)
 									{
-										TypeRecord tRec = (TypeRecord) referType;
-										if(tRec.containsField(name)){
-											//TypeIF innerType = tRec.getType();
-											//RESULT = new Referencia(innerType, refer.getName());
+										//TypeRecord tRec = (TypeRecord) referType;
+										
+										//Obtenemos símbolo indicado por la referencia, de la Tabla de Símbolos.
+										ScopeIF scope = scopeManager.getCurrentScope();
+										//semanticErrorManager.semanticDebug("name=" + name);
+										SymbolIF simbolo = scopeManager.searchSymbol(name);
+										//semanticErrorManager.semanticDebug("simbolo to String=" + simbolo.toString());
+										//semanticErrorManager.semanticDebug("simbolo getName()=" + simbolo.getName());
+										//semanticErrorManager.semanticDebug("tipo getType.getName()=" + simbolo.getType().getName());
+										TypeIF tipo = scopeManager.searchType(simbolo.getType().getName());
+										//semanticErrorManager.semanticDebug("tipo=" + tipo.toString());
+										
+										//semanticErrorManager.semanticDebug("tipo.getName()=" + tipo.getName());
+										
+										TypeRecord recPrueba = (TypeRecord) scopeManager.searchType("Tpersona");
+										//semanticErrorManager.semanticDebug("Tamaño de la lista de campos del bloque de campos de TPersona: " + recPrueba.getBloqueCampos().getListaCamposRegistro().size());
+										
+										for (int i = 0 ; i<recPrueba.getBloqueCampos().getListaCamposRegistro().size(); i++)
+										{
+											DeclaracionVariable decvar = recPrueba.getBloqueCampos().getListaCamposRegistro().get(i);
+											ArrayList<String> listaiden= decvar.getIdlist().getIdentifiersList();
+											for (int j = 0; j < listaiden.size(); j++)
+											{
+												//semanticErrorManager.semanticDebug("Campo(" + i + "): " + decvar.getIdlist().getIdentifiersList();
+											//	semanticErrorManager.semanticDebug("Campo(" + i + "): " + listaiden.get(j));
+											}
+											
 										}
-										else semanticErrorManager.semanticDebug("ERROR R001 - " + refer.getName() + " NO contiene campo " + name);
+										
+										
+										
+										TypeRecord tRec = (TypeRecord) tipo;
+										//semanticErrorManager.semanticDebug("Antes de tRec.containsField");
+										//semanticErrorManager.semanticDebug("tRec.getName()=" + tRec.getName());
+										//semanticErrorManager.semanticDebug("Tamaño de la lista de campos del bloque de campos del tRec: " + tRec.getBloqueCampos().getListaCamposRegistro().size()); 
+										for (int i = 0 ; i<tRec.getBloqueCampos().getListaCamposRegistro().size(); i++)
+										{
+											DeclaracionVariable decvar2 = tRec.getBloqueCampos().getListaCamposRegistro().get(i);
+											ArrayList<String> listaiden2= decvar2.getIdlist().getIdentifiersList();
+											for (int j = 0; j < listaiden2.size(); j++)
+											{
+												//semanticErrorManager.semanticDebug("Campo(" + i + "): " + decvar.getIdlist().getIdentifiersList();
+											//	semanticErrorManager.semanticDebug("Campo(" + i + "): " + listaiden2.get(j));
+											}
+											
+										}
+										
+										
+										
+										
+										if(tRec.containsField(id.getLexema())){
+											//semanticErrorManager.semanticDebug("DEBUG R001 - " + refer.getName() + " SI contiene campo " + id.getLexema());
+											//semanticErrorManager.semanticDebug("EntRec.containsField");
+											TypeIF innerType = scopeManager.searchType(scopeManager.searchSymbol(innername).getName());
+											//TypeIF innerType = tRec.getType();
+											RESULT = new Referencia(innerType, innername);
+										}
+										else {
+											semanticErrorManager.semanticDebug("ERROR R001 - " + refer.getName() + " NO contiene campo " + name);
+										}
 									}
 									else semanticErrorManager.semanticDebug("ERROR R002-" + refer.getName() + ".Tipo=" + refer.getType() + " NO instancia de TypeRecord");
 						:} 
 						| IDENTIFIER:id
 						{:
-							semanticErrorManager.semanticDebug("En Referencia -> ID");	
+							semanticErrorManager.semanticDebug("En Referencia -> ID");
+							String name = id.getLexema();
+							
+							ScopeIF scope = scopeManager.getCurrentScope();
+							Util util = new Util();
+							//Verificamos si la referencia está ya definida en la Tabla de Símbolos 
+							if(!util.checkSymbolTableScope(scope, name)){
+								semanticErrorManager.semanticFatalError("ERROR REF001: No existe la declaración de " + name);
+							}
+							else{
+								//Obtenemos tipo del identificador en la tabla de tipos
+								SymbolTableIF tablaSimbolos = scope.getSymbolTable(); 
+								TypeTableIF tablaTipos = scope.getTypeTable();
+								
+								tablaTipos.getType(name);
+								SymbolIF refsymbol = tablaSimbolos.getSymbol(name);	//Obtenemos símbolo del nombre (de la Tabla de Símbolos)
+								TypeIF typeref = refsymbol.getType();
+								
+								Referencia ref = new Referencia (typeref, name); 
+								RESULT = ref;						
+					}							
+							
 						:};  
 			
  
@@ -622,13 +745,8 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET
 //Sentencia Asignacion
 sentenciaAsignacion		::= referencia:ref ASSIGN expresion:exp
 							{:
-								semanticErrorManager.semanticDebug ("sentenciaAsignacion -> Id := expresion");
-//								//Comprobamos si se ha definido el símbolo en la TS anteriormente, si no, mostramos error semántico								
-//								ScopeIF scope = scopeManager.getCurrentScope();																
-//								SymbolTableIF tablaSimbolos = scope.getSymbolTable();										
-//								if(!tablaSimbolos.containsSymbol(id.getLexema())){
-//									semanticErrorManager.semanticFatalError("ERROR: Variable " + id.getLexema() + " not defined - Line=" + id.getLine() + ",Col=" + id.getColumn());
-//								}			
+								semanticErrorManager.semanticDebug ("sentenciaAsignacion -> Id := expresion (" + ref.getName() + ":=" + exp.getValue() + ")");
+
 //								else{
 //									//Comprobación de tipos.
 //									SymbolIF symbol = scopeManager.searchSymbol(id.getLexema());
@@ -636,19 +754,69 @@ sentenciaAsignacion		::= referencia:ref ASSIGN expresion:exp
 //									semanticErrorManager.semanticDebug("El tipo de la variable: " + id.getLexema() + " es: " + idtype.getName());
 //									//TypeIF exptype = exp.getType();
 //								}
-//								SentenciaAsignacion asignacion = new SentenciaAsignacion();
-//								RESULT = asignacion;
+								
+								//Verificación de tipos
+								//TypeIF reftype = ref.getType();
+								//TypeIF exptype = ref.getType();
+								
+								//Si la referencia es una llamada a función (es decir, es de tipo Función o Procedure
+								// TO-DO: Cuando llegue a Subprogramas
+								//if (reftype instanceof TypeFunction || reftype instanceof TypeProcedure){
+								//}
+								//
+								
+								//if (!reftype.isCompatible(expType, TypeIF.IGUAL)){
+								//semanticErrorManager.semanticFatalError("ERROR ASIG001: Tipos no compatibles en sentenciaAsignación");
+								//}
+								//else{
+									//Creación de objeto SentenciaAsignacion
+									SentenciaAsignacion asignacion = new SentenciaAsignacion(ref.getName() + ":=" + exp.getValue());
+									ref.setValue(exp.getValue());
+									SymbolVariable symvar = (SymbolVariable) scopeManager.searchSymbol(ref.getName());
+									symvar.setValue(exp.getValue());
+									RESULT = asignacion;
+								//}
 							:};
 							
 						
 //Sentencia If
-sentenciaIf			::= IF expresion THEN bloqueSentencias END IF 
+sentenciaIf			::= IF expresion:exp THEN bloqueSentencias:blqsent END IF 
 						{:
 							semanticErrorManager.semanticDebug("En sentenciaIf -> IF exp THEN bloquesentencias END IF");
+							//Obtenemos el tipo de la expresion, que deberá ser de tipo lógico
+							semanticErrorManager.semanticDebug("Tipo de la expresion del IF: " + exp.getType());
+							if(exp.getType() instanceof TypeSimple){
+								semanticErrorManager.semanticDebug("La expresion del IF es instanceof TypeSimple");
+								if(exp.getType().getName().equalsIgnoreCase("BOOLEAN"))
+								{
+									semanticErrorManager.semanticDebug("La expresion del IF es de tipo Booleano");
+									SentenciaIf sentenciaIf = new SentenciaIf();
+									RESULT = sentenciaIf;	
+								}
+								else
+									semanticErrorManager.semanticFatalError("ERROR IF001: La expresión de la sentencia IF no es de tipo Booleano");
+							}
+							else
+								semanticErrorManager.semanticDebug("La expresion del IF ***NO*** es instancia de TypeSimple");
 						:}
-						| IF expresion THEN bloqueSentencias ELSE bloqueSentencias END IF
+						| IF expresion:exp THEN bloqueSentencias:blqSentIf ELSE bloqueSentencias:blqSentElse END IF
 						{:
-						semanticErrorManager.semanticDebug("En sentenciaIf -> IF exp THEN bloquesentencias ELSE bloqueSentencias END IF");
+							semanticErrorManager.semanticDebug("En sentenciaIf -> IF exp THEN bloquesentencias ELSE bloqueSentencias END IF");
+							//Obtenemos el tipo de la expresion, que deberá ser de tipo lógico
+							if(exp.getType() instanceof TypeSimple){
+								if(exp.getType().getName().equalsIgnoreCase("BOOLEAN"))
+								{
+									semanticErrorManager.semanticDebug("La expresion del IF es de tipo Booleano");
+									SentenciaIf sentenciaIf = new SentenciaIf();
+									RESULT = sentenciaIf;	
+								}
+								else
+									semanticErrorManager.semanticFatalError("ERROR IF001: La expresión de la sentencia IF no es de tipo Booleano");
+							}
+							else
+								semanticErrorManager.semanticDebug("La expresion del IF ***NO*** es instancia de TypeSimple");							
+
+							
 						:};
 
 // Sentencia de retorno de función
@@ -674,10 +842,49 @@ listaParametros				::= listaParametros COMMA expresion
 
 
 // Sentencia For
-sentenciaFor	::=	FOR IDENTIFIER IN expresion DOUBLEPOINT expresion LOOP bloqueSentencias END LOOP
+sentenciaFor	::=	FOR IDENTIFIER:id IN expresion:expInicioFor DOUBLEPOINT expresion:expFinFor LOOP bloqueSentencias:blqSentFor END LOOP
 					{:
-					semanticErrorManager.semanticDebug("En sentenciaFor -> FOR id IN exp :: exp LOOP bloqueSentencias END LOOP");
+						String indiceFor = id.getLexema();
+						semanticErrorManager.semanticDebug("En sentenciaFor -> FOR id IN exp :: exp LOOP bloqueSentencias END LOOP");
+						// Verificaciones del Indice
+						// 		Indice debe estar definido en la tabla de símbolos
+						//		Indice debe ser de tipo entero
+						if(scopeManager.containsSymbol(indiceFor))
+						{
+							SymbolIF simboloFor = scopeManager.searchSymbol(indiceFor);					
+							TypeIF tiposimboloFor = scopeManager.searchType(simboloFor.getType().getName().toUpperCase());
+													
+							if(!tiposimboloFor.getName().equalsIgnoreCase("INTEGER"))
+								semanticErrorManager.semanticFatalError("ERROR FOR001: El índice: '" + indiceFor + "' de la sentencia FOR no es de tipo Integer");							
+							else
+							{
+								//semanticErrorManager.semanticDebug("El identificador del For es de tipo Entero");
+								
+								// Verificaciones de Expresiones inicio y Fin del bucle For
+								// 		Expresiones deben ser numéricas
+								if(expInicioFor.getType() instanceof TypeSimple)
+								{
+									if(!expInicioFor.getType().getName().equalsIgnoreCase("INTEGER"))
+										semanticErrorManager.semanticFatalError("ERROR FOR002: La expresión de inicio de la sentencia FOR no es de tipo Integer");
+									else 
+									{	
+										//semanticErrorManager.semanticDebug("La expresion del Inicio del For es de tipo Integer");
+										if(!expFinFor.getType().getName().equalsIgnoreCase("INTEGER"))
+											semanticErrorManager.semanticFatalError("ERROR FOR003: La expresión de Fin de la sentencia FOR no es de tipo Integer");
+										else{
+											//semanticErrorManager.semanticDebug("La expresion del Fin del For es de tipo Integer");
+											//Construimos objeto sentenciaFor
+											SentenciaFor sentenciaFor = new SentenciaFor();
+											RESULT = sentenciaFor;
+										}
+									}									
+								}
+								else
+									semanticErrorManager.semanticDebug("La expresion de Inicio de la sentencia FOR ***NO*** es instancia de TypeSimple");		
+							}	
+						}
+						else
+							semanticErrorManager.semanticFatalError("ERROR FOR004: El índice: '" + indiceFor + "' de la sentencia FOR no ha sido declarado");
 					:};
-
 
 empty ::= ;

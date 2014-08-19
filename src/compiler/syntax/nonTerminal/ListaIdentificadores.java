@@ -49,4 +49,22 @@ public class ListaIdentificadores extends NonTerminal {
 		return this.identifiersList.size();
 	}
 
+	public boolean containsIdentifier(String id){
+		boolean found = false;
+		for(int i=0; i < identifiersList.size(); i++)
+		{
+			
+			//System.out.println("ListaIdentificadores, recorriendo lista de ids. Id(" + i + ")");
+			
+			//System.out.println(this.identifiersList.get(i));
+			if (this.identifiersList.get(i).equals(id))
+			{
+				found = true;
+				//System.out.println("Encontrado" + id + " es lista ids=" + i);				
+			}
+		}
+		return found;
+		//System.out.println("En Lista Identificadores, buscando contiene campo" + id);
+		//return identifiersList.contains(id);
+	}
 }
