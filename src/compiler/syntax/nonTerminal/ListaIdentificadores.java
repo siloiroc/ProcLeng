@@ -2,8 +2,6 @@ package compiler.syntax.nonTerminal;
 
 import java.util.ArrayList;
 
-import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
-
 /**
  * @author agilrod
  *
@@ -67,4 +65,27 @@ public class ListaIdentificadores extends NonTerminal {
 		//System.out.println("En Lista Identificadores, buscando contiene campo" + id);
 		//return identifiersList.contains(id);
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		//return super.toString();
+		return this.identifiersList.toString();
+		
+		
+		/*String idlistString="";
+
+		for (String s : this.identifiersList)
+			idlistString = idlistString + "," + s;
+			
+		return idlistString;
+		*/
+		 
+		
+	}	
+	
+	
 }

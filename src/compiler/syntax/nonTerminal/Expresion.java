@@ -11,6 +11,11 @@ public class Expresion extends NonTerminal {
 		super();
 	}
 	
+	public Expresion(LlamadaProcedimiento llamSubprog){
+		super();
+	}
+	
+	
 	public Expresion(Expresion e1, Expresion e2){
 		
 	}

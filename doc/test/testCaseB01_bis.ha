@@ -1,43 +1,27 @@
+-- procedimientos paso por referencia
 
-procedure testCase02 () is
+procedure testCase09 () is
 
-CIERTO: constant := True;
-FALSO: constant := False;
-UNO: constant := 1;
 
-type Tpersona is record
-	dni: Integer;
-	edad: Integer;
-	casado: Boolean;
-end record;
+a,b,c : Integer;
 
-type Tfecha is record
-	dia: integer;
-	mes: integer;
-	anyo: integer;
-end record;
+procedure imprimeSuma (x,y: Integer) is
+w: Integer;
+begin
+	w:=x+y;		
+	Put_line("w(8):");
+	Put_line(w);
 
-type Tcita is record
-	usuario : Tpersona;
-	fecha   : Tfecha;
-end record;
+end resta;
 
-x : Integer;
-a : Boolean;
-yo, tu: Tpersona;
-cita : Tcita;
 
 begin
 
-yo.dni := 1234;
-yo.edad := 37;
-yo.casado := false;
-
-tu.dni := 9999;
-tu.edad := 30;
-tu.casado := true;
-
-
+	Put_line ("SUBPROGRAMAS PROCEDIMIENTO");
+	a:= 5;
 	
-
-end testCase02;
+	imprimeSuma (a,b);
+	b:= 3;
+	
+			
+end testCase09;
