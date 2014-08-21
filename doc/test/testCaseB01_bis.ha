@@ -1,27 +1,30 @@
--- procedimientos paso por referencia
-
-procedure testCase09 () is
+-- funciones paso por valor
 
 
-a,b,c : Integer;
+procedure testCase08 () is
 
-procedure imprimeSuma (x,y: Integer) is
-w: Integer;
+z: Integer;
+
+a,b: Integer;
+
+function suma (x,y: Integer) return Integer is
+a: Integer;
+
 begin
-	w:=x+y;		
-	Put_line("w(8):");
-	Put_line(w);
+		
+	a:= 5;
 
 end resta;
 
 
 begin
 
-	Put_line ("SUBPROGRAMAS PROCEDIMIENTO");
+	Put_line ("SUBPROGRAMAS FUNCIONES");
 	a:= 5;
-	
-	imprimeSuma (a,b);
 	b:= 3;
-	
+	z:= suma (a,b);
+	Put_line("z(8):");
+	Put_line(z);
 			
-end testCase09;
+
+end testCase08;

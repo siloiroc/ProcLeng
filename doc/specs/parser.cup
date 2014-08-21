@@ -633,7 +633,8 @@ listaParametrosFormales		::= listaParametrosFormales:lParamForm SEMICOLON listaI
 								
 
 // Bloque de sentencias
-bloqueSentencias	::= {:
+bloqueSentencias	::= sentencia:sent SEMICOLON bloqueSentencias 
+						{:
 							//semanticErrorManager.semanticDebug("En bloqueSentencias -> sentencia; bloqueSentencias");
 							//semanticErrorManager.semanticDebug("SCOPE ACTUAL=" + scopeManager.getCurrentScope().getName());
 							
@@ -641,10 +642,60 @@ bloqueSentencias	::= {:
 							//Para ver si tenemos que realizar estas verificaciones o no, comprobamos el nivel del Ámbito
 							//Si el nivel es 0, estamos en el ámbito global y no somos función, es decir, no tenemos que verificar que existe Return
 							//Si el nivel es 1, estamos en un subprograma, por lo que tenemos que comprobar si existe Return si es una función
-						:} sentencia:sent SEMICOLON bloqueSentencias
+							
+							ScopeIF scope = scopeManager.getCurrentScope();
+							int levelScope = scope.getLevel();
+							
+							if(levelScope > 0)
+							{	//Estamos en el bloqueSentencias de un subprograma
+								semanticErrorManager.semanticDebug("_*_*_*_*_*_*_*Scope actual: " + scope.getId() + ", " + scope.getName());
+								//El nombre del scope nos da el subprograma de este bloque de sentencias
+								//Obtenemos el símbolo del scope
+								SymbolIF symbol = scopeManager.searchSymbol(scope.getName());
+								semanticErrorManager.semanticDebug("_**_**_*_** symbol" + symbol.toString());
+								
+								if (symbol instanceof SymbolFunction)
+								{	//Si es una función tenemos que verificar si tiene return 
+									semanticErrorManager.semanticDebug("Soy una función");
+									semanticErrorManager.semanticDebug("Tipo:" + symbol.getType() + ", name=" + symbol.getName());
+									SymbolFunction symFunc = (SymbolFunction)scopeManager.searchSymbol(symbol.getName());
+								} 
+							
+								BloqueSentencias bloqueSent = new BloqueSentencias();
+								if (sent instanceof SentenciaReturn)
+								{
+									semanticErrorManager.semanticDebug("Soy una sentencia Return");
+									bloqueSent.setExisteReturn(true);
+									semanticErrorManager.semanticDebug("No empty:El level es > 0 y he puesto bloqueSent.setExisteReturn(true)");
+								}
+								else
+								{
+									semanticErrorManager.semanticDebug("sent no es instance de SentenciaReturn");							
+									if (!bloqueSent.isExisteReturn()){
+										semanticErrorManager.semanticFatalError("ERROR - No existe sentenciaReturn en el subprograma '" + symbol.getName() + "'");
+									}
+								}
+							RESULT = bloqueSent;
+							}
+							
+							
+						:} 
 						| empty 
 						{: 	//semanticErrorManager.semanticDebug("En bloqueSentencias -> empty");
-							//semanticErrorManager.semanticDebug("SCOPE ACTUAL=" + scopeManager.getCurrentScope().getName()); 
+							semanticErrorManager.semanticDebug("SCOPE ACTUAL=" + scopeManager.getCurrentScope().getName());
+							semanticErrorManager.semanticDebug("LEVEL SCOPE ACTUAL=" + scopeManager.getCurrentScope().getLevel());
+							BloqueSentencias bloqueSent = new BloqueSentencias();
+							
+							if(scopeManager.getCurrentScope().getLevel() > 0)
+							{
+								bloqueSent.setExisteReturn(false);
+								semanticErrorManager.semanticDebug("Empty: El level es > 0 y he puesto bloqueSent.setExisteReturn(false)");
+							}
+							if (!bloqueSent.isExisteReturn()){
+										semanticErrorManager.semanticDebug("ERROR - No existe sentenciaReturn en el subprograma");
+									}
+							
+							RESULT = bloqueSent; 
 						:};								
 
 sentencia		::= 
