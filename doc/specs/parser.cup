@@ -785,13 +785,41 @@ expresionAritmetica ::= expresion:e1 PLUS expresion:e2
 //								else semanticErrorManager.semanticFatalError ("Expresión Aritmética - Tipos incompatibles");
 
 								ExpresionAritmetica exprarit = new ExpresionAritmetica(e1, e2, new TypeSimple(scopeManager.getCurrentScope(), "Integer"));
-								RESULT = exprarit; 
+								
+								//Generación de Código Intermedio
+								ScopeIF scope = scopeManager.getCurrentScope();
+								TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+								TemporalIF eTemp = tempFactory.create();
+								TemporalIF e1Temp = e1.getTemporal();
+								TemporalIF e2Temp = e2.getTemporal();
+								IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+								codeBuilder.addQuadruples(e1.getIntermediateCode());
+								codeBuilder.addQuadruples(e2.getIntermediateCode());
+								codeBuilder.addQuadruple("ADD", eTemp, e1Temp, e2Temp);
+								exprarit.setTemporal(eTemp);
+								List intermediateCode = codeBuilder.create();
+								exprarit.setIntermediateCode(intermediateCode);
+								
+								RESULT = exprarit;																
+								 
 						:} 
 						| NUMBER:num
 						{:
 							//semanticErrorManager.semanticDebug("En ExpresionAritmetica -> NUMBER");
+							Integer value = Integer.parseInt(num.getLexema());
 							ExpresionAritmetica exprarit = new ExpresionAritmetica(new TypeSimple(scopeManager.getCurrentScope(),"Integer"), Integer.parseInt(num.getLexema()));
 							//semanticErrorManager.semanticDebug("ExpresionAritmetica->NUMBER. ExpresionAritmetica = " + exprarit.getValue());
+							
+							//Generación de Código Intermedio
+							ScopeIF scope = scopeManager.getCurrentScope();
+							TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+							TemporalIF eTemp = tempFactory.create();
+							IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+							codeBuilder.addQuadruple("MV", eTemp, value);
+							exprarit.setTemporal(eTemp);
+							List intermediateCode = codeBuilder.create();
+							exprarit.setIntermediateCode(intermediateCode);
+								
 							RESULT = exprarit;
 						:}; 
 
@@ -800,40 +828,106 @@ expresionLogica		::= expresion:e1 OR expresion:e2
 								//semanticErrorManager.semanticDebug("En ExpresionLogica -> exp OR exp");
 								ExpresionLogica exprlog = new ExpresionLogica(e1, e2, new TypeSimple(scopeManager.getCurrentScope(), "Boolean"));
 								//Comprobación de tipos sobre e1 y e2
-								//Generación de código para e1 OR e2							
-								RESULT = exprlog;
+												
+
+								//Generación de Código Intermedio para e1 OR e2
+								ScopeIF scope = scopeManager.getCurrentScope();
+								TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+								TemporalIF eTemp = tempFactory.create();
+								TemporalIF e1Temp = e1.getTemporal();
+								TemporalIF e2Temp = e2.getTemporal();
+								IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+								codeBuilder.addQuadruples(e1.getIntermediateCode());
+								codeBuilder.addQuadruples(e2.getIntermediateCode());
+								codeBuilder.addQuadruple("OR", eTemp, e1Temp, e2Temp);
+								exprlog.setTemporal(eTemp);
+								List intermediateCode = codeBuilder.create();
+								exprlog.setIntermediateCode(intermediateCode);
+								
+								RESULT = exprlog;		
 							:} 
 						| expresion:e1 GREATTHAN expresion:e2
 							{:
 								//semanticErrorManager.semanticDebug("En ExpresionLogica -> exp > exp");
 								ExpresionLogica exprlog = new ExpresionLogica(e1, e2, new TypeSimple(scopeManager.getCurrentScope(), "Boolean") );
 								//Comprobación de tipos sobre e1 y e2
-								//Generación de código para e1 > e2
-								RESULT = exprlog;
+								
+								
+								//Generación de Código Intermedio para e1 > e2
+								ScopeIF scope = scopeManager.getCurrentScope();
+								TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+								TemporalIF eTemp = tempFactory.create();
+								TemporalIF e1Temp = e1.getTemporal();
+								TemporalIF e2Temp = e2.getTemporal();
+								IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+								codeBuilder.addQuadruples(e1.getIntermediateCode());
+								codeBuilder.addQuadruples(e2.getIntermediateCode());
+								codeBuilder.addQuadruple("GR", eTemp, e1Temp, e2Temp);
+								exprlog.setTemporal(eTemp);
+								List intermediateCode = codeBuilder.create();
+								exprlog.setIntermediateCode(intermediateCode);
+								
+								RESULT = exprlog;	
 							:}
 						| expresion:e1 EQUAL expresion:e2
 							{:
 								//semanticErrorManager.semanticDebug("En ExpresionLogica -> exp = exp");
 								ExpresionLogica exprlog = new ExpresionLogica(e1, e2, new TypeSimple(scopeManager.getCurrentScope(), "Boolean"));
 								//Comprobación de tipos sobre e1 y e2
-								//Generación de código para e1 = e2
-								RESULT=exprlog;
+								
+								//Generación de Código Intermedio para e1 > e2
+								ScopeIF scope = scopeManager.getCurrentScope();
+								TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+								TemporalIF eTemp = tempFactory.create();
+								TemporalIF e1Temp = e1.getTemporal();
+								TemporalIF e2Temp = e2.getTemporal();
+								IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+								codeBuilder.addQuadruples(e1.getIntermediateCode());
+								codeBuilder.addQuadruples(e2.getIntermediateCode());
+								codeBuilder.addQuadruple("EQ", eTemp, e1Temp, e2Temp);
+								exprlog.setTemporal(eTemp);
+								List intermediateCode = codeBuilder.create();
+								exprlog.setIntermediateCode(intermediateCode);
+																
+								RESULT = exprlog;	
 							:}
 						| TRUE:tr 
 						{:
 							//semanticErrorManager.semanticDebug("En ExpresionLogica -> TRUE");
-							ExpresionLogica expr = new ExpresionLogica(new TypeSimple(scopeManager.getCurrentScope(), "Boolean"));
-							expr.setValue(true);
+							ExpresionLogica exprLog = new ExpresionLogica(new TypeSimple(scopeManager.getCurrentScope(), "Boolean"));
+							exprLog.setValue(true);
 							//semanticErrorManager.semanticDebug("en ExpresiónLógica -> TRUE");
-							RESULT = expr;
+							
+							//Generación de Código Intermedio
+							ScopeIF scope = scopeManager.getCurrentScope();
+							TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+							TemporalIF eTemp = tempFactory.create();
+							IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+							codeBuilder.addQuadruple("MV", eTemp, exprLog.getValue());
+							exprLog.setTemporal(eTemp);
+							List intermediateCode = codeBuilder.create();
+							exprLog.setIntermediateCode(intermediateCode);
+							
+							RESULT = exprLog;
 						:}
 						| FALSE
 						{:
 							//semanticErrorManager.semanticDebug("En ExpresionLogica -> FALSE");
-							ExpresionLogica expr = new ExpresionLogica(new TypeSimple(scopeManager.getCurrentScope(), "Boolean"));
-							expr.setValue(false);
+							ExpresionLogica exprLog = new ExpresionLogica(new TypeSimple(scopeManager.getCurrentScope(), "Boolean"));
+							exprLog.setValue(false);
 							//semanticErrorManager.semanticDebug("en ExpresiónLógica -> FALSE");
-							RESULT = expr;
+							
+							//Generación de Código Intermedio
+							ScopeIF scope = scopeManager.getCurrentScope();
+							TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+							TemporalIF eTemp = tempFactory.create();
+							IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+							codeBuilder.addQuadruple("MV", eTemp, exprLog.getValue());
+							exprLog.setTemporal(eTemp);
+							List intermediateCode = codeBuilder.create();
+							exprLog.setIntermediateCode(intermediateCode);
+							
+							RESULT = exprLog;
 						:}
 						;
 						

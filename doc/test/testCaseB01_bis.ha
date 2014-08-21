@@ -1,30 +1,9 @@
--- funciones paso por valor
+-- salida 
 
-
-procedure testCase08 () is
-
-z: Integer;
-
-a,b: Integer;
-
-function suma (x,y: Integer) return Integer is
-a: Integer;
+procedure testCase02 () is
 
 begin
-		
-	a:= 5;
+	Put_line("hola");
+	Put_line("mundo");
 
-end resta;
-
-
-begin
-
-	Put_line ("SUBPROGRAMAS FUNCIONES");
-	a:= 5;
-	b:= 3;
-	z:= suma (a,b);
-	Put_line("z(8):");
-	Put_line(z);
-			
-
-end testCase08;
+end testCase02;
