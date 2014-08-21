@@ -229,10 +229,20 @@ seccionCuerpoPrograma		::= {:
 									//semanticErrorManager.semanticDebug("LEVEL SCOPE ACTUAL=" + scopeManager.getCurrentScope().getLevel());									
 									if(scopeManager.getCurrentScope().getLevel() > 0)
 									{	//Si no somos el programa principal, debemos devolver una sentencia return
-										if (!bloqueSent.isExisteReturn()){
-											semanticErrorManager.semanticFatalError("ERROR - No existe sentenciaReturn en la función'" +
-														scopeManager.getCurrentScope().getName() + "'");
-										}								
+										//Pero sólo si somos una función. Obtenemos el nombre del subprograma en el que estamos
+										//consultando el nombre del ámbito actual, y a partir de ese nombre, obtenemos el símbolo 
+										//de la función buscando en las tablas de Símbolos 
+										 
+										ScopeIF scope = scopeManager.getCurrentScope();
+										SymbolIF symbol = scopeManager.searchSymbol(scope.getName());
+										if (symbol instanceof SymbolFunction)
+										{	 
+											if (!bloqueSent.isExisteReturn())
+											{
+												semanticErrorManager.semanticFatalError("ERROR - No existe sentenciaReturn en la función'" +
+														symbol.getName() + "'");
+											}								
+										} 
 									}
 								:} END IDENTIFIER SEMICOLON
 								{:semanticErrorManager.semanticDebug("************** FIN CUERPO PROGRAMA*****************");:}
@@ -644,8 +654,8 @@ listaParametrosFormales		::= listaParametrosFormales:lParamForm SEMICOLON listaI
 // Bloque de sentencias
 bloqueSentencias	::= sentencia:sent SEMICOLON bloqueSentencias:bloqueSent
 						{:
-							semanticErrorManager.semanticDebug("En bloqueSentencias -> sentencia; bloqueSentencias");
-							semanticErrorManager.semanticDebug("SCOPE ACTUAL=" + scopeManager.getCurrentScope().getName());
+							//semanticErrorManager.semanticDebug("En bloqueSentencias -> sentencia; bloqueSentencias");
+							//semanticErrorManager.semanticDebug("SCOPE ACTUAL=" + scopeManager.getCurrentScope().getName());
 							
 							//Verificaciones semánticas de tipo RETURN en Función
 							//Para ver si tenemos que realizar estas verificaciones o no, comprobamos el nivel del Ámbito
@@ -657,24 +667,24 @@ bloqueSentencias	::= sentencia:sent SEMICOLON bloqueSentencias:bloqueSent
 							
 							if(levelScope > 0)
 							{	//Estamos en el bloqueSentencias de un subprograma
-								semanticErrorManager.semanticDebug("_*_*_*_*_*_*_*Scope actual: " + scope.getId() + ", " + scope.getName());
+								//semanticErrorManager.semanticDebug("_*_*_*_*_*_*_*Scope actual: " + scope.getId() + ", " + scope.getName());
 								//El nombre del scope nos da el subprograma de este bloque de sentencias
 								//Obtenemos el símbolo del scope
 								SymbolIF symbol = scopeManager.searchSymbol(scope.getName());
-								semanticErrorManager.semanticDebug("_**_**_*_** symbol" + symbol.toString());
+								//semanticErrorManager.semanticDebug("_**_**_*_** symbol" + symbol.toString());
 								
 								if (symbol instanceof SymbolFunction)
 								{	//Si es una función tenemos que verificar si tiene return 
-									semanticErrorManager.semanticDebug("Soy una función");
-									semanticErrorManager.semanticDebug("Tipo:" + symbol.getType() + ", name=" + symbol.getName());
+//									semanticErrorManager.semanticDebug("Soy una función");
+//									semanticErrorManager.semanticDebug("Tipo:" + symbol.getType() + ", name=" + symbol.getName());
 									SymbolFunction symFunc = (SymbolFunction)scopeManager.searchSymbol(symbol.getName());
+									//Verificación de sentenciaReturn, para funciones (Se comprobará en seccionCuerpoPrograma)							
+									if (sent instanceof SentenciaReturn)
+									{
+										bloqueSent.setExisteReturn(true);
+									}							
 								} 
 								
-								//Verificación de sentenciaReturn, para funciones (Se comprobará en seccionCuerpoPrograma)							
-								if (sent instanceof SentenciaReturn)
-								{
-									bloqueSent.setExisteReturn(true);
-								}
 
 							RESULT = bloqueSent;
 							}

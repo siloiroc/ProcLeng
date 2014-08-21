@@ -11,11 +11,27 @@ function suma (x,y: Integer) return Integer is
 a:Integer;
 begin
 	a:=1;		
-	
 	a:=2;
+	return x + y;
+end suma;
 
-end resta;
+function suma2 (x,y: Integer) return Integer is
+a:Integer;
+begin
+	a:=1;		
+	a:=2;
+	return a;
+end suma;
 
+
+procedure imprimeSuma (x,y: Integer) is
+w: Integer;
+begin
+	w:=x+y;		
+	Put_line("w(8):");
+	Put_line(w);
+
+end imprimeSuma;
 
 begin
 
