@@ -1,21 +1,30 @@
--- constantes  
+-- funciones paso por valor
 
-procedure testCase03 () is
 
-CIERTO: constant := True;
-FALSO: constant := False;
-UNO: constant := 1;
+procedure testCase08 () is
+
+z: Integer;
+
+a,b: Integer;
+
+function suma (x,y: Integer) return Integer is
+a:Integer;
+begin
+	a:=1;		
+	
+	a:=2;
+
+end resta;
+
 
 begin
 
+	Put_line ("SUBPROGRAMAS FUNCIONES");
+	a:= 5;
+	b:= 3;
+	z:= suma (a,b);
+	Put_line("z(8):");
+	Put_line(z);
+			
 
-    Put_line(CIERTO);
-
-	Put_line("FALSO(false):");
-
-
-	Put_line("UNO(1):");
-
-
-
-end testCase03;
+end testCase08;

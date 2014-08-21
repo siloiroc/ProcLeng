@@ -221,10 +221,19 @@ seccionCuerpoPrograma		::= {:
 								:} 
 								BEGIN 
 								{: semanticErrorManager.semanticDebug("*******************Inicio BloqueSentencias*******************"); :}
-								bloqueSentencias 
+								bloqueSentencias:bloqueSent 
 								{:
 									semanticErrorManager.semanticDebug("*******************Fin BloqueSentencias************************");
-																		
+									
+									//semanticErrorManager.semanticDebug("SCOPE ACTUAL=" + scopeManager.getCurrentScope().getName());
+									//semanticErrorManager.semanticDebug("LEVEL SCOPE ACTUAL=" + scopeManager.getCurrentScope().getLevel());									
+									if(scopeManager.getCurrentScope().getLevel() > 0)
+									{	//Si no somos el programa principal, debemos devolver una sentencia return
+										if (!bloqueSent.isExisteReturn()){
+											semanticErrorManager.semanticFatalError("ERROR - No existe sentenciaReturn en la función'" +
+														scopeManager.getCurrentScope().getName() + "'");
+										}								
+									}
 								:} END IDENTIFIER SEMICOLON
 								{:semanticErrorManager.semanticDebug("************** FIN CUERPO PROGRAMA*****************");:}
 								;
@@ -633,10 +642,10 @@ listaParametrosFormales		::= listaParametrosFormales:lParamForm SEMICOLON listaI
 								
 
 // Bloque de sentencias
-bloqueSentencias	::= sentencia:sent SEMICOLON bloqueSentencias 
+bloqueSentencias	::= sentencia:sent SEMICOLON bloqueSentencias:bloqueSent
 						{:
-							//semanticErrorManager.semanticDebug("En bloqueSentencias -> sentencia; bloqueSentencias");
-							//semanticErrorManager.semanticDebug("SCOPE ACTUAL=" + scopeManager.getCurrentScope().getName());
+							semanticErrorManager.semanticDebug("En bloqueSentencias -> sentencia; bloqueSentencias");
+							semanticErrorManager.semanticDebug("SCOPE ACTUAL=" + scopeManager.getCurrentScope().getName());
 							
 							//Verificaciones semánticas de tipo RETURN en Función
 							//Para ver si tenemos que realizar estas verificaciones o no, comprobamos el nivel del Ámbito
@@ -660,42 +669,19 @@ bloqueSentencias	::= sentencia:sent SEMICOLON bloqueSentencias
 									semanticErrorManager.semanticDebug("Tipo:" + symbol.getType() + ", name=" + symbol.getName());
 									SymbolFunction symFunc = (SymbolFunction)scopeManager.searchSymbol(symbol.getName());
 								} 
-							
-								BloqueSentencias bloqueSent = new BloqueSentencias();
+								
+								//Verificación de sentenciaReturn, para funciones (Se comprobará en seccionCuerpoPrograma)							
 								if (sent instanceof SentenciaReturn)
 								{
-									semanticErrorManager.semanticDebug("Soy una sentencia Return");
 									bloqueSent.setExisteReturn(true);
-									semanticErrorManager.semanticDebug("No empty:El level es > 0 y he puesto bloqueSent.setExisteReturn(true)");
 								}
-								else
-								{
-									semanticErrorManager.semanticDebug("sent no es instance de SentenciaReturn");							
-									if (!bloqueSent.isExisteReturn()){
-										semanticErrorManager.semanticFatalError("ERROR - No existe sentenciaReturn en el subprograma '" + symbol.getName() + "'");
-									}
-								}
+
 							RESULT = bloqueSent;
 							}
-							
-							
 						:} 
 						| empty 
-						{: 	//semanticErrorManager.semanticDebug("En bloqueSentencias -> empty");
-							semanticErrorManager.semanticDebug("SCOPE ACTUAL=" + scopeManager.getCurrentScope().getName());
-							semanticErrorManager.semanticDebug("LEVEL SCOPE ACTUAL=" + scopeManager.getCurrentScope().getLevel());
-							BloqueSentencias bloqueSent = new BloqueSentencias();
-							
-							if(scopeManager.getCurrentScope().getLevel() > 0)
-							{
-								bloqueSent.setExisteReturn(false);
-								semanticErrorManager.semanticDebug("Empty: El level es > 0 y he puesto bloqueSent.setExisteReturn(false)");
-								if (!bloqueSent.isExisteReturn()){
-									semanticErrorManager.semanticFatalError("ERROR - No existe sentenciaReturn en el subprograma");
-								}								
-							}
-							
-							
+						{: 	//semanticErrorManager.semanticDebug("En bloqueSentencias -> empty");						
+							BloqueSentencias bloqueSent = new BloqueSentencias();					
 							RESULT = bloqueSent; 
 						:};								
 
@@ -711,8 +697,12 @@ sentencia		::=
 						{: 	//semanticErrorManager.semanticDebug("Sentencia -> SentenciaIF");
 							RESULT = sentIf;
 						:}  
-					| {: //semanticErrorManager.semanticDebug("Sentencia -> sentenciaIO"); :} sentenciaIO:sentIO
-						{: RESULT =  sentIO; :}
+					| {: 
+						//semanticErrorManager.semanticDebug("Sentencia -> sentenciaIO"); 
+					  :} sentenciaIO:sentIO
+						{: 
+						RESULT =  sentIO; 
+						:}
 					| sentenciaReturn:sentRet
 						{: 	//semanticErrorManager.semanticDebug("Sentencia -> SentenciaReturn");
 							RESULT = sentRet; 
@@ -752,8 +742,6 @@ expresion	::= expresionAritmetica:exprarit
 				:}
 				| referencia:ref
 				{:
-					//semanticErrorManager.semanticDebug("en Expresion -> Referencia, Id=" + ref.getName());
-
 					ScopeIF scope = scopeManager.getCurrentScope();
 					Util util = new Util();
 					//Verificamos si la referencia está ya definida en la Tabla de Símbolos 
@@ -1020,8 +1008,8 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 				:} 
 				| IDENTIFIER:id
 				{:
-					//semanticErrorManager.semanticDebug("En Referencia -> ID(" + id.getLexema() + ")");
 					String name = id.getLexema();
+					//semanticErrorManager.semanticDebug("En Referencia -> ID(" + name + ")");
 					
 					ScopeIF scope = scopeManager.getCurrentScope();
 					Util util = new Util();
@@ -1030,12 +1018,13 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 						semanticErrorManager.semanticFatalError("ERROR REF001: No existe la declaración de " + name + " [Line=" + id.getLine() + ",Col=" + id.getColumn() + "]");
 					}
 					else{
+						//semanticErrorManager.semanticDebug("En Referencia -> ID(" + name + ") - El ID está en la tabla de símbolos");
 						//Verificación de tipos
 						//Obtenemos tipo del identificador en la tabla de tipos
 						SymbolTableIF tablaSimbolos = scope.getSymbolTable(); 
 						TypeTableIF tablaTipos = scope.getTypeTable();
 						
-						tablaTipos.getType(name);
+						//tablaTipos.getType(name);
 						SymbolIF refsymbol = tablaSimbolos.getSymbol(name);	//Obtenemos símbolo del nombre (de la Tabla de Símbolos)
 						TypeIF typeref = refsymbol.getType();
 						
@@ -1046,7 +1035,7 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 						TemporalIF refTemp = tempFactory.create();
 						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
 									
-						SymbolVariable symbolVar = (SymbolVariable) scopeManager.searchSymbol(name);
+						SymbolIF symbolVar = scopeManager.searchSymbol(name);
 						Variable var = new Variable(name, symbolVar.getScope());
 						codeBuilder.addQuadruple("MVA", refTemp, var);
 						ref.setTemporal(refTemp);
@@ -1063,12 +1052,16 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 sentenciaIO 	::= PUTLINE LEFTBRACKET 
 					{:
 						//semanticErrorManager.semanticDebug(" sentenciaIO=PutLine(expresion)" );
+					:} expresion:expr RIGHTBRACKET
+					{:
 						SentenciaIO sentenciaIO = new SentenciaIO();
 						RESULT = sentenciaIO;
-					:} expresion:expr RIGHTBRACKET
+					:}
 					| PUTLINE LEFTBRACKET STRING RIGHTBRACKET
 					{:
 						//semanticErrorManager.semanticDebug(" sentenciaIO=PutLine(String)" );
+						SentenciaIO sentenciaIO = new SentenciaIO();
+						RESULT = sentenciaIO;
 					:};
 //					| error {:syntaxErrorManager.syntaxFatalError("ERROR S001: Error en sentencia Put_line"); :};
 
@@ -1153,7 +1146,7 @@ sentenciaIf			::= IF expresion:exp THEN bloqueSentencias:blqsent END IF
 // Sentencia de retorno de función
 sentenciaReturn	::= RETURN expresion
 					{:
-						//semanticErrorManager.semanticDebug("En sentenciaReturn -> RETURN expresion");
+						semanticErrorManager.semanticDebug("En sentenciaReturn -> RETURN expresion");
 						SentenciaReturn sentenciaReturn = new SentenciaReturn();
 						RESULT = sentenciaReturn;						
 					:};

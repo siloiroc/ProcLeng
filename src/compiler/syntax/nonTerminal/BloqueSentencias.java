@@ -2,7 +2,7 @@ package compiler.syntax.nonTerminal;
 
 public class BloqueSentencias extends NonTerminal {
 
-	private boolean existeReturn; 
+	private boolean existeReturn = false; 
 	
 	public BloqueSentencias() {
 		super();
