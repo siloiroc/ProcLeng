@@ -51,5 +51,8 @@ public class DeclaracionVariable extends NonTerminal {
 		return idlist.containsIdentifier(var);
 	}
 
+	public int getOffset(String campo){
+		return 1;
+	}
 	
 }

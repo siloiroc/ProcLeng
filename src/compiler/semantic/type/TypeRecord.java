@@ -15,7 +15,7 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
 public class TypeRecord extends TypeBase        
 {   
 	private BloqueCamposRegistro bloqueCamposReg = new BloqueCamposRegistro();
-
+	
     /**
      * Constructor for TypeRecord.
      * @param scope The declaration scope.
@@ -90,5 +90,7 @@ public class TypeRecord extends TypeBase
     	return this.bloqueCamposReg.containsField(field);
     }
 
-
+    public int getOffset(String campo){
+    	return this.bloqueCamposReg.getOffset(campo);
+    }
 }

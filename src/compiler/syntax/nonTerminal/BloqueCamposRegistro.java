@@ -59,4 +59,9 @@ public class BloqueCamposRegistro extends NonTerminal {
 			ArrayList<DeclaracionVariable> listaCamposRegistro) {
 		this.listaCamposRegistro = listaCamposRegistro;
 	}
+	
+	public int getOffset(String campo){
+		//this.listaCamposRegistro.getOffset(campo);
+		return 1;
+	}
 }

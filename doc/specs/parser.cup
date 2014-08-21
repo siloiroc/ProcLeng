@@ -690,10 +690,11 @@ bloqueSentencias	::= sentencia:sent SEMICOLON bloqueSentencias
 							{
 								bloqueSent.setExisteReturn(false);
 								semanticErrorManager.semanticDebug("Empty: El level es > 0 y he puesto bloqueSent.setExisteReturn(false)");
+								if (!bloqueSent.isExisteReturn()){
+									semanticErrorManager.semanticFatalError("ERROR - No existe sentenciaReturn en el subprograma");
+								}								
 							}
-							if (!bloqueSent.isExisteReturn()){
-										semanticErrorManager.semanticDebug("ERROR - No existe sentenciaReturn en el subprograma");
-									}
+							
 							
 							RESULT = bloqueSent; 
 						:};								
@@ -760,8 +761,20 @@ expresion	::= expresionAritmetica:exprarit
 							semanticErrorManager.semanticFatalError("ERROR REF001: No existe la declaración de " + ref.getName());
 					}
 					else{
-						TypeIF typeref = ref.getType(); 
-						RESULT = new Expresion(typeref);						
+						TypeIF typeref = ref.getType();
+						Expresion exprRef = new Expresion(typeref);
+						
+						//Generación de Código Intermedio
+						TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+						TemporalIF eTemp = tempFactory.create();
+						TemporalIF refTemp = ref.getTemporal();
+						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+						codeBuilder.addQuadruple("MVP", eTemp, refTemp);
+						exprRef.setTemporal(eTemp);
+						List intermediateCode = codeBuilder.create();
+						exprRef.setIntermediateCode(intermediateCode);
+						 
+						RESULT = exprRef;						
 					}
 				:}
 				| error SEMICOLON 
@@ -978,7 +991,26 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 									//semanticErrorManager.semanticDebug("EntRec.containsField");
 									TypeIF innerType = scopeManager.searchType(scopeManager.searchSymbol(innername).getName());
 									//TypeIF innerType = tRec.getType();
-									RESULT = new Referencia(innerType, innername);
+									
+									//Generación de CódigoIntermedio
+									Referencia ref = new Referencia(innerType, innername);
+									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+									TemporalIF refTemp = refer.getTemporal();
+									TemporalIF refTempIndex = refer.getTemporalIndex();
+									TemporalIF refTempOffset = tempFactory.create();
+									IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+									codeBuilder.addQuadruples(refer.getIntermediateCode());
+									
+									TypeRecord rType = (TypeRecord)refer.getType();
+									int idOffset	 = rType.getOffset(innername);
+									codeBuilder.addQuadruple("MV", refTempOffset, idOffset);
+									ref.setTemporal(refTemp);
+									ref.setTemporalIndex(refTempIndex);
+									ref.setTemporalOffset(refTempOffset);
+									List intermediateCode = codeBuilder.create();
+									ref.setIntermediateCode(intermediateCode);
+									
+									RESULT = ref;
 								}
 								else {
 									semanticErrorManager.semanticDebug("ERROR R001 - " + refer.getName() + " NO contiene campo " + name);
@@ -994,12 +1026,11 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 					ScopeIF scope = scopeManager.getCurrentScope();
 					Util util = new Util();
 					//Verificamos si la referencia está ya definida en la Tabla de Símbolos
-					//util.debugTablesToString(scope); 
-					//util.debugTablesToString(scope.getParentScope());
 					if(!util.checkSymbolTableScope(scope, name)){
 						semanticErrorManager.semanticFatalError("ERROR REF001: No existe la declaración de " + name + " [Line=" + id.getLine() + ",Col=" + id.getColumn() + "]");
 					}
 					else{
+						//Verificación de tipos
 						//Obtenemos tipo del identificador en la tabla de tipos
 						SymbolTableIF tablaSimbolos = scope.getSymbolTable(); 
 						TypeTableIF tablaTipos = scope.getTypeTable();
@@ -1008,8 +1039,21 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 						SymbolIF refsymbol = tablaSimbolos.getSymbol(name);	//Obtenemos símbolo del nombre (de la Tabla de Símbolos)
 						TypeIF typeref = refsymbol.getType();
 						
-						Referencia ref = new Referencia (typeref, name); 
-						RESULT = ref;						
+						Referencia ref = new Referencia (typeref, name);
+														
+						//Generación de Código Intermedio
+						TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+						TemporalIF refTemp = tempFactory.create();
+						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+									
+						SymbolVariable symbolVar = (SymbolVariable) scopeManager.searchSymbol(name);
+						Variable var = new Variable(name, symbolVar.getScope());
+						codeBuilder.addQuadruple("MVA", refTemp, var);
+						ref.setTemporal(refTemp);
+						List intermediateCode = codeBuilder.create();
+						ref.setIntermediateCode(intermediateCode);					 
+									
+						RESULT = ref;
 					}							
 					
 				:};  
