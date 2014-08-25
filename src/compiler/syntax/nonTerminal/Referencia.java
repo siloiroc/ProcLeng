@@ -1,8 +1,5 @@
 package compiler.syntax.nonTerminal;
 
-import java.util.List;
-
-import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
@@ -11,8 +8,8 @@ public class Referencia extends NonTerminal {
 	private TypeIF type; 	
 	private String name;
 	private int value;
+	private int size;
 	
-	private List<QuadrupleIF> intermediateCode;
     private TemporalIF temporal;
     private TemporalIF temporalIndex, temporalOffset;
 	
@@ -81,20 +78,6 @@ public class Referencia extends NonTerminal {
 	}
 
 	/**
-	 * @return the intermediateCode
-	 */
-	public List<QuadrupleIF> getIntermediateCode() {
-		return intermediateCode;
-	}
-
-	/**
-	 * @param intermediateCode the intermediateCode to set
-	 */
-	public void setIntermediateCode(List<QuadrupleIF> intermediateCode) {
-		this.intermediateCode = intermediateCode;
-	}
-
-	/**
 	 * @return the temporal
 	 */
 	public TemporalIF getTemporal() {
@@ -120,6 +103,20 @@ public class Referencia extends NonTerminal {
 	 */
 	public void setTemporalIndex(TemporalIF temporalIndex) {
 		this.temporalIndex = temporalIndex;
+	}
+
+	/**
+	 * @return the size
+	 */
+	public int getSize() {
+		return size;
+	}
+
+	/**
+	 * @param size the size to set
+	 */
+	public void setSize(int size) {
+		this.size = size;
 	}
 
 

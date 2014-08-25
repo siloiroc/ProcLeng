@@ -13,7 +13,7 @@ public class SeccionTipos extends NonTerminal {
 	 * 
 	 */
 	public SeccionTipos() {
-		// TODO Auto-generated constructor stub
+		super();
 	}
 
 }

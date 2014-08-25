@@ -1,8 +1,8 @@
 package compiler.syntax.nonTerminal;
 
-public class Empty extends NonTerminal {
+public class Axioma extends Axiom {
 
-	public Empty() {
+	public Axioma() {
 		super();
 	}
 

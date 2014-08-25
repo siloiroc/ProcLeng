@@ -3,44 +3,11 @@
 
 procedure testCase08 () is
 
-z: Integer;
-
 a,b: Integer;
 
-function suma (x,y: Integer) return Integer is
-a:Integer;
-begin
-	a:=1;		
-	a:=2;
-	return x + y;
-end suma;
-
-function suma2 (x,y: Integer) return Integer is
-a:Integer;
-begin
-	a:=1;		
-	a:=2;
-	return a;
-end suma;
-
-
-procedure imprimeSuma (x,y: Integer) is
-w: Integer;
-begin
-	w:=x+y;		
-	Put_line("w(8):");
-	Put_line(w);
-
-end imprimeSuma;
-
 begin
 
-	Put_line ("SUBPROGRAMAS FUNCIONES");
 	a:= 5;
-	b:= 3;
-	z:= suma (a,b);
-	Put_line("z(8):");
-	Put_line(z);
-			
+	b:= 1;		
 
 end testCase08;

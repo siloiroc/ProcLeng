@@ -13,7 +13,7 @@ public class SeccionVariables extends NonTerminal {
 	 * 
 	 */
 	public SeccionVariables() {
-		// TODO Auto-generated constructor stub
+		super();
 	}
 
 }
