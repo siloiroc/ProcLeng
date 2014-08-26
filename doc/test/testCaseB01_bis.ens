@@ -1,12 +1,12 @@
-test
-
-test
-
-test
-
-test
-
-test
-
-test
+; Inicio del programa
+WRSTR /string1			;Instruccion Put_Line
+WRSTR /string2			;Instruccion Put_Line
+WRSTR /string3			;Instruccion Put_Line
+WRSTR /string4			;Instruccion Put_Line
+; Fin del programa
+; Definición conjunto de datos en memoria
+string1:			 DATA "hola\n"
+string2:			 DATA "mundo\n"
+string3:			 DATA "que tal\n"
+string4:			 DATA "estas?\n"
 

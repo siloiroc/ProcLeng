@@ -159,10 +159,8 @@ program ::=
   {: 
   		// No modificar esta estructura, aunque se pueden añadir más acciones semánticas
   		 		
-  		List intermediateCode = ax.getIntermediateCode ();
-  		semanticErrorManager.semanticDebug("ax.IntermediateCode=" + intermediateCode.toString());
-  		semanticErrorManager.semanticDebug("antes de finalCodeFactory.create(intermediateCode)");
-  		semanticErrorManager.semanticDebug("ax.toString=" + ax.toString());
+  		//List intermediateCode = ax.getIntermediateCode ();
+  		//semanticErrorManager.semanticDebug("ax.IntermediateCode=" + intermediateCode.toString());
   		
   		//Solución de Foro: 
   		//Autor: ADMINISTRADOR CURSO
@@ -173,24 +171,21 @@ program ::=
 		//	Puedes solucionarlo incluyendo dentro de parser.cup una llamada al método setEnvironment del objeto 
 		//	finalCodeFactory, pasandole por parámetro un nuevo objeto ExecutionEnvironmentEns2001.
   		
-  		ExecutionEnvironmentEns2001 execEnvironment = new ExecutionEnvironmentEns2001();
-  		finalCodeFactory.setEnvironment(execEnvironment);
   		
-  		finalCodeFactory.create (intermediateCode);
-  		semanticErrorManager.semanticDebug("después de finalCodeFactory.create(intermediateCode)");
-  		
+  		//finalCodeFactory.create (intermediateCode);
 
 //  		int gAddress = 0;
 //  		int lOffset  = 0;
 //  		List<ScopeIF> scopes = scopeManager.getAllScopes();
-//  		for (ScopeIF scope : scopes){
+//  		for (ScopeIF scope : scopes)
+//  		{
 //  			List<SymbolIF> symbols = scope.getSymbolTable().getSymbols();
 //  			for (SymbolIF s : symbols){
 //  				if (s instanceof SymbolVariable){
 //  					if (scope.getLevel() == 0)
 //  						s.setAddress(gAddress + s.getType().getSize());
 //  					else
-//  						s.setAddress(lOffset + s.getType().getSize());
+// 						s.setAddress(lOffset + s.getType().getSize());
 //  				}
 //  			}
 //  			List<TemporalIF> temporals = scope.getTemporalTable().getTemporals();
@@ -198,12 +193,25 @@ program ::=
 //  				t.setAddress (lOffset + t.getSize());
 //  			}
 //  		}
-  		
+//  		
 //  		IntermediateCodeBuilder codeBuilder = new IntermediateCodeBuilder(scope);
 //  		codeBuilder.addQuadruple("DATA", gAddress);
 //  		codeBuilder.addQuadruples(intermediateCode);
 //  		finalCodeFactory.create (codeBuilder.create());
   		
+  			IntermediateCodeBuilder codeBuilder = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+  			codeBuilder.addQuadruple("INICIO");
+  			List intermediateCode = ax.getIntermediateCode ();
+  			codeBuilder.addQuadruples(intermediateCode);
+  			codeBuilder.addQuadruple("FIN");
+	  		//Añadimos todas las etiquetas y sentencias Data
+	  		codeBuilder.addQuadruple("DATA");
+  			
+  			ExecutionEnvironmentEns2001 execEnvironment = new ExecutionEnvironmentEns2001();
+  			finalCodeFactory.setEnvironment(execEnvironment); 		
+  			finalCodeFactory.create(codeBuilder.create());
+  			
+  			
   		syntaxErrorManager.syntaxInfo ("Parsing process ended.");
    :};
 
@@ -842,8 +850,8 @@ bloqueSentencias	::= sentencia:sent SEMICOLON bloqueSentencias:bloqueSent
 							
 							//Generación de Código Intermedio		
 							IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
-							codeBuilder.addQuadruples(bloqueSent.getIntermediateCode());
 							codeBuilder.addQuadruples(sent.getIntermediateCode());
+							codeBuilder.addQuadruples(bloqueSent.getIntermediateCode());
 							
 							List intermediateCode = codeBuilder.create();		
 							bloqueSent.setIntermediateCode(intermediateCode);			
@@ -993,7 +1001,7 @@ expresionAritmetica ::= expresion:e1 PLUS expresion:e2
 							Value valor = new Value(value);
 							
 							TemporalIF eTemp = tempFactory.create();
-							codeBuilder.addQuadruple("MOVENUM", eTemp, valor);
+							codeBuilder.addQuadruple("MOVE", eTemp, valor);
 							
 							exprarit.setTemporal(eTemp);
 							List intermediateCode = codeBuilder.create();
@@ -1217,7 +1225,7 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 									
 						SymbolIF symbolVar = scopeManager.searchSymbol(name);
 						Variable var = new Variable(name, symbolVar.getScope());
-						codeBuilder.addQuadruple("MOVEADDR", refTemp, var);
+						codeBuilder.addQuadruple("MOVE", refTemp, var);
 						ref.setTemporal(refTemp);
 						List intermediateCode = codeBuilder.create();
 						semanticErrorManager.semanticDebug("intermediateCodeRef=" + intermediateCode.toString());
@@ -1240,10 +1248,23 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET
 						SentenciaIO sentenciaIO = new SentenciaIO();
 						RESULT = sentenciaIO;
 					:}
-					| PUTLINE LEFTBRACKET STRING RIGHTBRACKET
+					| PUTLINE LEFTBRACKET STRING:str RIGHTBRACKET
 					{:
 						//semanticErrorManager.semanticDebug(" sentenciaIO=PutLine(String)" );
 						SentenciaIO sentenciaIO = new SentenciaIO();
+						//Generación de Código Intermedio 
+						ScopeIF scope = scopeManager.getCurrentScope();
+						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+						String s = str.getLexema();
+						s = s.substring(1, s.length()-1);
+						Value val = new Value(s + "\\n");
+						semanticErrorManager.semanticDebug("/////////////////////////////" + val.toString());
+						
+						//codeBuilder.addQuadruple("WRITELN", str.getLexema());
+						codeBuilder.addQuadruple("WRITELN", val);
+						List intermediateCode = codeBuilder.create();
+						sentenciaIO.setIntermediateCode(intermediateCode); 
+						semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - PUTLINE(String)" + sentenciaIO.getIntermediateCode());						
 						RESULT = sentenciaIO;
 					:};
 //					| error {:syntaxErrorManager.syntaxFatalError("ERROR S001: Error en sentencia Put_line"); :};
@@ -1301,7 +1322,9 @@ sentenciaAsignacion		::= referencia:ref ASSIGN expresion:exp
 								//codeBuilder.addQuadruple("ADD", sentAsigTemp, sentAsigTemp, rTempOffset);
 								//codeBuilder.addQuadruple("STP", sentAsigTemp, expTemp);
 								
-								codeBuilder.addQuadruple("ASSIGN",sentAsigTemp, rTemp, expTemp);
+								//codeBuilder.addQuadruple("ASSIGN",sentAsigTemp, rTemp, expTemp);
+								//codeBuilder.addQuadruple("ASSIGN",sentAsigTemp, expTemp);
+								codeBuilder.addQuadruple("ASSIGN", rTemp, expTemp);
 								 
 								List intermediateCode = codeBuilder.create();
 								asignacion.setIntermediateCode(intermediateCode);

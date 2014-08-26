@@ -12,7 +12,7 @@ public class Variable
 {
     private String  name     = null;
     private ScopeIF scope    = null;
-        
+            
     /**
      * Constructor for Variable.
      * @param name The name.
@@ -63,8 +63,8 @@ public class Variable
     @Override
     public final boolean isGlobal ()
     {
-        // TODO : Student Work
-        return true;
+    	//Variable es global si está definida en un ámbito con nivel 0
+    	return (this.scope.getLevel() == 0);
     }
 
     /**

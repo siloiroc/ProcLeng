@@ -7,7 +7,10 @@ a,b: Integer;
 
 begin
 
-	a:= 5;
-	b:= 1;		
+--	a:= 5;
+	Put_line("hola");
+	Put_line("mundo");
+	Put_line("que tal");
+	Put_line("estas?");
 
 end testCase08;

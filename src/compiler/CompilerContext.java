@@ -76,8 +76,6 @@ public class CompilerContext
      */
     public static ExecutionEnvironmentIF getExecutionEnvironment ()
     {
-    	System.out.println("En CompilerContext getExecutionEnvironment");
-    	
         return executionEnvironment;
     }
     

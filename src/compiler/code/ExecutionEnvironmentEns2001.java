@@ -4,10 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import compiler.CompilerContext;
+import compiler.code.translate.*;
+import compiler.intermediate.Variable;
 import compiler.semantic.type.TypeSimple;
 import es.uned.lsi.compiler.code.ExecutionEnvironmentIF;
 import es.uned.lsi.compiler.code.MemoryDescriptorIF;
 import es.uned.lsi.compiler.code.RegisterDescriptorIF;
+import es.uned.lsi.compiler.intermediate.OperandIF;
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 /**
@@ -92,70 +95,72 @@ public class ExecutionEnvironmentEns2001
      */
     @Override
     public final String translate (QuadrupleIF quadruple)
-    {      
-    	//System.out.println("En ExecutionEnvironmentEns2001 translate");
+    {        	
+    	//TODO: Student work
+    	String translation = ""; 
     	
-//    	
-//    	//TODO: Student work
-//    	StringBuffer buffer = new StringBuffer();
-//    	if( quadruple.getOperation().equals("MOVENUM")){
-//    		CompilerContext.getSemanticErrorManager().semanticDebug("test");
-//    		buffer.append("LD " + ".A " + "\n");
-//    	}
-//    	
-//    	if (quadruple.getOperation().equals("ADD")){
-//    		//String operand1 = translate(quadruple.getFirstOperand());
-////    		String operand2 = translate(quadruple.getSecondOperand());
-////    		String result   = translate(quadruple.getResult());
-//    		//buffer.append("LD " + ".A " + operand1 + "\n");
-//    		CompilerContext.getSemanticErrorManager().semanticDebug("test");
-//    		buffer.append("LD " + ".A " + "\n");
-////    		buffer.append("ADD " + result + " " + operand2);
-//    	}
-//    	if (quadruple.getOperation().equals("ASSIGN")){
-//    		CompilerContext.getSemanticErrorManager().semanticDebug("test");
-//    		buffer.append("LD " + ".A " + "\n");
-//    	}
-//    	
-//    	if (quadruple.getOperation().equals("MVP")){
-//    		CompilerContext.getSemanticErrorManager().semanticDebug("test");
-//    		buffer.append("LD " + ".A " + "\n");
-//    	}
-//    	if (quadruple.getOperation().equals("OR")){
-//    		CompilerContext.getSemanticErrorManager().semanticDebug("test");
-//    		buffer.append("LD " + ".A " + "\n");
-//    	}
-//    	if (quadruple.getOperation().equals("GR")){
-//    		CompilerContext.getSemanticErrorManager().semanticDebug("test");
-//    		buffer.append("LD " + ".A " + "\n");
-//    	}
-//    	if (quadruple.getOperation().equals("EQ")){
-//    		CompilerContext.getSemanticErrorManager().semanticDebug("test");
-//    		buffer.append("LD " + ".A " + "\n");
-//    	}
-//    	if (quadruple.getOperation().equals("MV")){
-//    		CompilerContext.getSemanticErrorManager().semanticDebug("test");
-//    		buffer.append("LD " + ".A " + "\n");
-//    	}
-//    	if (quadruple.getOperation().equals("MOVEADDR")){
-//    		CompilerContext.getSemanticErrorManager().semanticDebug("test");
-//    		buffer.append("LD " + ".A " + "\n");
-//    	}    	
+    	StringBuffer buffer = new StringBuffer();
+    	String operation = quadruple.getOperation();
+    	if(operation.equals("INICIO")){
+    		System.out.println("En ExecutionEnvironmentEns2001 INICIO PROGRAMA");
+    		TranslatorText tr = new TranslatorText();
+    		translation = tr.translate(quadruple);
+    	}
+    	if(operation.equals("FIN")){
+    		System.out.println("En ExecutionEnvironmentEns2001 FIN PROGRAMA");
+    		TranslatorText tr = new TranslatorText();
+    		translation = tr.translate(quadruple);
+    	}
+    	if(operation.equals("DATA")){
+    		System.out.println("En ExecutionEnvironmentEns2001 DATA");
+    		TranslatorText tr = new TranslatorText();
+    		translation = tr.translate(quadruple);
+    	}
     	
+    	if(operation.equals("MOVE")){
+    		System.out.println("En ExecutionEnvironmentEns2001 MOVE");
+    		TranslatorMove tr = new TranslatorMove();
+    		translation = tr.translate(quadruple);
+    	}
+    	if (operation.equals("WRITELN")){
+    		CompilerContext.getSemanticErrorManager().semanticDebug("Writeln");
+    		TranslatorWriteLn tr = new TranslatorWriteLn();
+    		translation = tr.translate(quadruple);
+    	}
+    	if (operation.equals("ADD")){
+    		CompilerContext.getSemanticErrorManager().semanticDebug("add");
+    		TranslatorAdd tr = new TranslatorAdd();
+    		translation = tr.translate(quadruple);
+    	}
+    	if (operation.equals("ASSIGN")){
+    		CompilerContext.getSemanticErrorManager().semanticDebug("assign");
+    		TranslatorAssign tr = new TranslatorAssign();
+    		translation = tr.translate(quadruple);
+    	}
     	
-    	//return buffer.toString();    		
-        //return quadruple.toString();
-    	return("test\n");
-        
+    	if (operation.equals("MVP")){
+    		CompilerContext.getSemanticErrorManager().semanticDebug("mvp");
+//    		buffer.append("LD " + ".A " + "\n");
+    	}
+    	if (operation.equals("OR")){
+    		CompilerContext.getSemanticErrorManager().semanticDebug("or");
+//    		buffer.append("LD " + ".A " + "\n");
+    	}
+    	if (operation.equals("GR")){
+    		CompilerContext.getSemanticErrorManager().semanticDebug("gr");
+//    		buffer.append("LD " + ".A " + "\n");
+    	}
+    	if (operation.equals("EQ")){
+    		CompilerContext.getSemanticErrorManager().semanticDebug("eq");
+//    		buffer.append("LD " + ".A " + "\n");
+    	}
+    	if (operation.equals("MOVEADDR")){
+    		CompilerContext.getSemanticErrorManager().semanticDebug("moveaddr");
+//    		buffer.append("LD " + ".A " + "\n");
+    	}    	
+    	
+    	return translation;
+		
+        //return quadruple.toString();        
     }
-    
-//    private String translate(OperandIF operand){
-//    	if (operand instanceof Variable){
-//    		Variable var = (Variable) operand;
-//    		if(var.isGlobal())
-//    			//return "/" + operand.getAddress();
-//    	}
-//    	//return "#" + operand.getAddress() + "[.IX]";
-//    	}
-//    }
 }
