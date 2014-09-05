@@ -1,0 +1,3 @@
+; Inicio del programa
+HALT ; Fin del programa
+END ;Macroinstrucción END. Ensamblador da por finalizado el código.

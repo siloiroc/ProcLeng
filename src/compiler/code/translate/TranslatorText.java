@@ -12,10 +12,11 @@ public class TranslatorText extends Translator {
 	public String translate(QuadrupleIF quadruple) {
 	 	String operation = quadruple.getOperation();
 	 	StringBuffer b = new StringBuffer();
-	 	if(operation.equals("INICIO")){
-	 		b.append("; Inicio del programa");
-	 	}
-	 	else if (operation.equals("FIN")){
+//	 	if(operation.equals("INICIO")){
+//	 		b.append("; Inicio del programa");
+//	 	}
+//	 	else 
+	 		if (operation.equals("FIN")){
 	 		//Instrucción ENS2001: HALT -> Detiene la ejecución de la máquina
 			//Formato:  HALT 
 			//Comportamiento: Activa el biestable H de fin de programa y detiene el procesador virtual

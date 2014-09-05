@@ -15,7 +15,7 @@ public class SymbolVariable
     extends SymbolBase
 {  
 	private int value;		//Atributo de variable
-	private int address;
+	private int address;	//Dirección de memoria del símbolo
    
     /**
      * Constructor for SymbolVariable.

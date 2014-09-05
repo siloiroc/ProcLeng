@@ -1,9 +1,16 @@
 ; Inicio del programa
+RES 2
+MOVE #65535, .SP
+
 WRSTR /string1			;Instruccion Put_Line
 WRSTR /string2			;Instruccion Put_Line
+WRSTR /string3			;Instruccion Put_Line
+WRSTR /string4			;Instruccion Put_Line
 HALT ; Fin del programa
 ; Cadenas de texto
 string1:			 DATA "hola\n"
 string2:			 DATA "mundo\n"
+string3:			 DATA "que tal\n"
+string4:			 DATA "estas?\n"
 END ;Macroinstrucción END. Ensamblador da por finalizado el código.
 

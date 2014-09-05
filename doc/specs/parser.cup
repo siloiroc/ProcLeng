@@ -174,33 +174,48 @@ program ::=
   		
   		//finalCodeFactory.create (intermediateCode);
 
-//  		int gAddress = 0;
-//  		int lOffset  = 0;
-//  		List<ScopeIF> scopes = scopeManager.getAllScopes();
-//  		for (ScopeIF scope : scopes)
-//  		{
-//  			List<SymbolIF> symbols = scope.getSymbolTable().getSymbols();
-//  			for (SymbolIF s : symbols){
-//  				if (s instanceof SymbolVariable){
-//  					if (scope.getLevel() == 0)
-//  						s.setAddress(gAddress + s.getType().getSize());
-//  					else
-// 						s.setAddress(lOffset + s.getType().getSize());
-//  				}
-//  			}
-//  			List<TemporalIF> temporals = scope.getTemporalTable().getTemporals();
-//  			for (TemporalIF t : temporals){
-//  				t.setAddress (lOffset + t.getSize());
-//  			}
-//  		}
-//  		
+  		int gAddress = 0;	//Almacenará el valor total que ocupan todas las variables globales
+  		int lOffset  = 0;
+  		List<ScopeIF> scopes = scopeManager.getAllScopes();
+  		for (ScopeIF scope : scopes)
+  		{
+  			List<SymbolIF> symbols = scope.getSymbolTable().getSymbols();
+  			for (SymbolIF s : symbols){
+  				if (s instanceof SymbolVariable)
+  				{
+  					SymbolVariable symvar = (SymbolVariable) s;
+  					if (scope.getLevel() == 0)
+  					{ //Si la variable es global, establecemos su dirección comenzando en la pos.0 de memoria
+  						symvar.setAddress(gAddress);
+  						semanticErrorManager.semanticDebug("Tamaño de la variable: " + symvar.getType().getSize());
+  						semanticErrorManager.semanticDebug("MEMORIA - Variable estará en la posición: " + gAddress + " de memoria");
+  						gAddress += symvar.getType().getSize();
+  					}
+  					else
+  					{ //Variable no global
+ 						symvar.setAddress(lOffset + symvar.getType().getSize());
+ 						lOffset += symvar.getAddress();
+ 					}
+  				}
+  			semanticErrorManager.semanticDebug("Tamaño total de reserva de espacio de memoria para variables globales = " + gAddress);  				
+  			semanticErrorManager.semanticDebug("Programa comenzará en dirección = " + (gAddress + 1));
+  			}
+  			List<TemporalIF> temporals = scope.getTemporalTable().getTemporals();
+  			for (TemporalIF t : temporals){
+  				Temporal temp = (Temporal) t;
+  				temp.setAddress (lOffset + temp.getSize());
+  				lOffset += temp.getSize();
+  			}
+  		}
+  		
 //  		IntermediateCodeBuilder codeBuilder = new IntermediateCodeBuilder(scope);
 //  		codeBuilder.addQuadruple("DATA", gAddress);
 //  		codeBuilder.addQuadruples(intermediateCode);
 //  		finalCodeFactory.create (codeBuilder.create());
   		
   			IntermediateCodeBuilder codeBuilder = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
-  			codeBuilder.addQuadruple("INICIO");
+  			//codeBuilder.addQuadruple("DATA", gAddress);
+  			codeBuilder.addQuadruple("INICIO", new Value(gAddress));
   			List intermediateCode = ax.getIntermediateCode ();
   			codeBuilder.addQuadruples(intermediateCode);
   			codeBuilder.addQuadruple("FIN");
@@ -998,10 +1013,9 @@ expresionAritmetica ::= expresion:e1 PLUS expresion:e2
 							ScopeIF scope = scopeManager.getCurrentScope();
 							TemporalFactoryIF tempFactory = new TemporalFactory(scope);
 							IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
-							Value valor = new Value(value);
 							
 							TemporalIF eTemp = tempFactory.create();
-							codeBuilder.addQuadruple("MOVE", eTemp, valor);
+							codeBuilder.addQuadruple("MOVE", eTemp, new Value(value));
 							
 							exprarit.setTemporal(eTemp);
 							List intermediateCode = codeBuilder.create();
@@ -1179,7 +1193,7 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 									
 									TypeRecord rType = (TypeRecord)refer.getType();
 									int idOffset	 = rType.getOffset(innername);
-									codeBuilder.addQuadruple("MV", refTempOffset, idOffset);
+									codeBuilder.addQuadruple("MOVE", refTempOffset, idOffset);
 									ref.setTemporal(refTemp);
 									ref.setTemporalIndex(refTempIndex);
 									ref.setTemporalOffset(refTempOffset);
@@ -1223,9 +1237,19 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 						TemporalIF refTemp = tempFactory.create();
 						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
 									
-						SymbolIF symbolVar = scopeManager.searchSymbol(name);
-						Variable var = new Variable(name, symbolVar.getScope());
-						codeBuilder.addQuadruple("MOVE", refTemp, var);
+						SymbolIF symbol = scopeManager.searchSymbol(name);
+						
+						if(symbol instanceof SymbolConstant){
+							SymbolConstant symconst = (SymbolConstant) symbol;
+							Value valor = new Value(symconst.getValue());
+							codeBuilder.addQuadruple("MOVE", refTemp, valor);
+						}
+						else{
+							Variable var = new Variable(name, symbol.getScope());
+							codeBuilder.addQuadruple("MOVE", refTemp, var);
+						}
+						
+						//codeBuilder.addQuadruple("MOVE", refTemp, var);
 						ref.setTemporal(refTemp);
 						List intermediateCode = codeBuilder.create();
 						semanticErrorManager.semanticDebug("intermediateCodeRef=" + intermediateCode.toString());
@@ -1313,20 +1337,24 @@ sentenciaAsignacion		::= referencia:ref ASSIGN expresion:exp
 								
 								//Creación de objeto SentenciaAsignacion
 								SentenciaAsignacion asignacion = new SentenciaAsignacion(ref.getName() + ":=" + exp.getValue());
-								ref.setValue(exp.getValue());
+								//ref.setValue(exp.getValue());
 								SymbolVariable symvar = (SymbolVariable) scopeManager.searchSymbol(ref.getName());
 								symvar.setValue(exp.getValue());
 								
 								ScopeIF scope = scopeManager.getCurrentScope();
 								TemporalFactoryIF tempFactory = new TemporalFactory(scope);
 								TemporalIF sentAsigTemp = tempFactory.create();
+								
 								TemporalIF expTemp = exp.getTemporal();
 								TemporalIF rTemp = ref.getTemporal();
 								TemporalIF rTempIndex = ref.getTemporalIndex();
 								TemporalIF rTempOffset = ref.getTemporalOffset();
 								IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
 								codeBuilder.addQuadruples(exp.getIntermediateCode());
-								codeBuilder.addQuadruples(ref.getIntermediateCode());
+								
+								//Creamos un objeto tipo Variable con nombre el id de la referencia
+//								Variable var = new Variable(ref.getValue());
+								//codeBuilder.addQuadruples(ref.getIntermediateCode());
 								
 								//codeBuilder.addQuadruple("MUL", sentAsigTemp, rTempIndex, ref.getSize());
 								//codeBuilder.addQuadruple("ADD", sentAsigTemp, sentAsigTemp, rTemp);

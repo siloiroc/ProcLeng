@@ -13,6 +13,7 @@ public class Temporal
     private String  name    = null;
     private ScopeIF scope   = null;
     private int     address = 0;
+    private int 	size 	= 0;	//Tamaño del Temporal
            
     /**
      * Constructor for Temporal.
@@ -25,6 +26,8 @@ public class Temporal
         super ();
         this.name = name;
         this.scope = scope;
+        this.size = 1; 	// Inicialización del tamaño del temporal. En ENS2001 todos los tipos simples pesan 1 palabra en memoria
+
     }
     
     
@@ -83,6 +86,22 @@ public class Temporal
     }
 
     /**
+	 * @return the size
+	 */
+	public int getSize() {
+		return size;
+	}
+
+
+	/**
+	 * @param size the size to set
+	 */
+	public void setSize(int size) {
+		this.size = size;
+	}
+
+
+	/**
      * Compares this object with another one.
      * @param other the other object.
      * @return true if both objects has the same properties.

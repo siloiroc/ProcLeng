@@ -20,7 +20,7 @@ public abstract class Translator implements TranslatorIF {
 	protected String translate(OperandIF operand){
 		String translation ="";
 		if (operand instanceof Value){
-			System.out.println("Es de tipo valor= " + operand.toString());
+			System.out.println("Operando: " + operand.toString() + " es de tipo valor= " + operand.toString());
 			Value val = (Value) operand;
 			translation = "#" + val.getValue();
 		}
@@ -28,12 +28,12 @@ public abstract class Translator implements TranslatorIF {
 		{
 			Variable var = (Variable)operand;
 			if (var.isGlobal()){ //Si variable es global, direccionamiento directo a memoria
-				System.out.println("Es de tipo variable y global =" + operand.toString());
+				System.out.println("Operando: " + operand.toString() + " es de tipo variable y global =" + operand.toString());
 				translation =  "/" + var.getAddress();
 				System.out.println("translation = " + translation);
 			}
 			else{
-				System.out.println("Es de tipo variable y otra");
+				System.out.println("Operando: " + operand.toString() + " es de tipo variable y otra");
 				translation = "#-" + var.getAddress() + "[.IX]";
 			}
 		}

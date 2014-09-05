@@ -102,17 +102,17 @@ public class ExecutionEnvironmentEns2001
     	StringBuffer buffer = new StringBuffer();
     	String operation = quadruple.getOperation();
     	if(operation.equals("INICIO")){
-    		System.out.println("En ExecutionEnvironmentEns2001 INICIO PROGRAMA");
-    		TranslatorText tr = new TranslatorText();
+//    		System.out.println("En ExecutionEnvironmentEns2001 INICIO PROGRAMA");
+    		TranslatorStart tr = new TranslatorStart();
     		translation = tr.translate(quadruple);
     	}
     	if(operation.equals("FIN")){
-    		System.out.println("En ExecutionEnvironmentEns2001 FIN PROGRAMA");
+//    		System.out.println("En ExecutionEnvironmentEns2001 FIN PROGRAMA");
     		TranslatorText tr = new TranslatorText();
     		translation = tr.translate(quadruple);
     	}
     	if(operation.equals("DATA")){
-    		System.out.println("En ExecutionEnvironmentEns2001 DATA");
+//    		System.out.println("En ExecutionEnvironmentEns2001 DATA");
     		TranslatorText tr = new TranslatorText();
     		translation = tr.translate(quadruple);
     	}
