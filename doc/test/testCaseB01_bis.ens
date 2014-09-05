@@ -1,12 +1,11 @@
 ; Inicio del programa
+MOVE #5, #1[.IX] ;Instruccion Move
+MOVE /0, #0[.IX] ;Instruccion Move
+MOVE #1[.IX], #0[.IX] ;Instruccion Assign
 WRSTR /string1			;Instruccion Put_Line
 WRSTR /string2			;Instruccion Put_Line
-WRSTR /string3			;Instruccion Put_Line
-WRSTR /string4			;Instruccion Put_Line
-; Fin del programa
-; Definición conjunto de datos en memoria
+HALT ; Fin del programa
+; Cadenas de texto
 string1:			 DATA "hola\n"
-string2:			 DATA "mundo\n"
-string3:			 DATA "que tal\n"
-string4:			 DATA "estas?\n"
-
+string2:			 DATA "T_4"
+END ;Macroinstrucción END. Ensamblador da por finalizado el código.

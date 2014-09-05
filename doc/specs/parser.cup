@@ -1242,10 +1242,21 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 // Sentencia IO
 sentenciaIO 	::= PUTLINE LEFTBRACKET 
 					{:
-						//semanticErrorManager.semanticDebug(" sentenciaIO=PutLine(expresion)" );
+						semanticErrorManager.semanticDebug(" sentenciaIO=PutLine(expresion)" );
 					:} expresion:expr RIGHTBRACKET
 					{:
 						SentenciaIO sentenciaIO = new SentenciaIO();
+						
+						//Generación de Código Intermedio
+						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+						///// Obtener el valor de la expresión
+						//GetTemporal??
+						TemporalIF temporal = expr.getTemporal();
+						
+						codeBuilder.addQuadruple("WRITELN", temporal);
+						List intermediateCode = codeBuilder.create();
+						sentenciaIO.setIntermediateCode(intermediateCode);
+						semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - PUTLINE(expresion)" + sentenciaIO.getIntermediateCode());						
 						RESULT = sentenciaIO;
 					:}
 					| PUTLINE LEFTBRACKET STRING:str RIGHTBRACKET

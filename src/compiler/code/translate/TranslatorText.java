@@ -12,19 +12,31 @@ public class TranslatorText extends Translator {
 	public String translate(QuadrupleIF quadruple) {
 	 	String operation = quadruple.getOperation();
 	 	StringBuffer b = new StringBuffer();
-	 	if(operation.equals("INICIO"))
+	 	if(operation.equals("INICIO")){
 	 		b.append("; Inicio del programa");
-	 	else if (operation.equals("FIN"))
-	 		b.append("; Fin del programa");
+	 	}
+	 	else if (operation.equals("FIN")){
+	 		//Instrucción ENS2001: HALT -> Detiene la ejecución de la máquina
+			//Formato:  HALT 
+			//Comportamiento: Activa el biestable H de fin de programa y detiene el procesador virtual
+	 		b.append("HALT ; Fin del programa");
+	 	}
+	 		
 	 	else if (operation.equals("DATA"))
 	 	{	
-	 		b.append("; Definición conjunto de datos en memoria\n");
-	 		b.append(DataLabels.getDataLabels());
+	 		if (DataLabels.getSize() !=0){
+	 			//Si existen etiquetas de datos (Cadenas) a mostrar, generamos las etiquetas
+//		 		b.append("; Definición conjunto de datos en memoria\n");
+		 		b.append("; Cadenas de texto\n");
+		 		b.append(DataLabels.getDataLabels());	 			
+	 		}
 	 		
-	 		String str = "\"hola\"";
-			str = str.substring(1, str.length()-1);
-			
-	 		
+	 		//Marcamos final completo del código con pseudoinstrucción END
+	 		//Ens2001: Macroinstrucción END
+	 		//Marca el final del código. Después de la macroinstrucción END, el ensamblador da
+	 		//por finalizado el proceso de traducción, ignorando cualquier instrucción posterior.
+	 		b.append("END ;Macroinstrucción END. Ensamblador da por finalizado el código.");
+
 	 	}
 	 		
 

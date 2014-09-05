@@ -21,6 +21,10 @@ public class DataLabels {
 		}
 		return sb;		
 	}
+	
+	public static int getSize(){
+		return dataLabels.size();
+	}
 
 	/**
 	 * @param dataLabels the dataLabels to set

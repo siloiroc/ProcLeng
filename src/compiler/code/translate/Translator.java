@@ -1,7 +1,5 @@
 package compiler.code.translate;
 
-import java.util.ArrayList;
-
 import compiler.intermediate.Temporal;
 import compiler.intermediate.Value;
 import compiler.intermediate.Variable;
