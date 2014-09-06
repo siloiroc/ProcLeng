@@ -884,7 +884,8 @@ bloqueSentencias	::= sentencia:sent SEMICOLON bloqueSentencias:bloqueSent
 sentencia		::= 
 //					expresion
 //						{: //semanticErrorManager.semanticDebug("Sentencia -> Expresion"); :}  
-					| sentenciaAsignacion:sentAsig 
+//					|
+					 sentenciaAsignacion:sentAsig 
 						{: //semanticErrorManager.semanticDebug("Sentencia->SentenciaAsignación"); 
 							//semanticErrorManager.semanticDebug("Sentencia->SentenciaAsignación= " + sentAsig.getName());
 							RESULT = sentAsig;
@@ -1005,7 +1006,6 @@ expresionAritmetica ::= expresion:e1 PLUS expresion:e2
 						{:
 							//semanticErrorManager.semanticDebug("En ExpresionAritmetica -> NUMBER");
 							Integer value = Integer.parseInt(num.getLexema());
-							semanticErrorManager.semanticDebug("El valor de NUM es=" + value);
 							ExpresionAritmetica exprarit = new ExpresionAritmetica(new TypeSimple(scopeManager.getCurrentScope(),"Integer"), value);
 							//semanticErrorManager.semanticDebug("ExpresionAritmetica->NUMBER. ExpresionAritmetica = " + exprarit.getValue());
 							
@@ -1018,6 +1018,7 @@ expresionAritmetica ::= expresion:e1 PLUS expresion:e2
 							codeBuilder.addQuadruple("MOVE", eTemp, new Value(value));
 							
 							exprarit.setTemporal(eTemp);
+							semanticErrorManager.semanticDebug("El temporal de expresionArit->Number es=" + exprarit.getTemporal());
 							List intermediateCode = codeBuilder.create();
 							semanticErrorManager.semanticDebug("intermediateCode=" + intermediateCode.toString());
 							exprarit.setIntermediateCode(intermediateCode);
@@ -1277,7 +1278,7 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET
 						//GetTemporal??
 						TemporalIF temporal = expr.getTemporal();
 						
-						codeBuilder.addQuadruple("WRITELN", temporal);
+						codeBuilder.addQuadruple("WRITEEXP", temporal);
 						List intermediateCode = codeBuilder.create();
 						sentenciaIO.setIntermediateCode(intermediateCode);
 						semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - PUTLINE(expresion)" + sentenciaIO.getIntermediateCode());						
@@ -1288,6 +1289,8 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET
 						//semanticErrorManager.semanticDebug(" sentenciaIO=PutLine(String)" );
 						SentenciaIO sentenciaIO = new SentenciaIO();
 						//Generación de Código Intermedio 
+						
+						//Generación de Código Intermedio
 						ScopeIF scope = scopeManager.getCurrentScope();
 						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
 						String s = str.getLexema();
@@ -1328,48 +1331,45 @@ sentenciaAsignacion		::= referencia:ref ASSIGN expresion:exp
 								//}
 								//
 								
-								//if (!reftype.isCompatible(expType, TypeIF.IGUAL)){
-								//semanticErrorManager.semanticFatalError("ERROR ASIG001: Tipos no compatibles en sentenciaAsignación");
-								//}
-								//else{
-								
-								//Generación de CódigoIntermedio
-								
-								//Creación de objeto SentenciaAsignacion
-								SentenciaAsignacion asignacion = new SentenciaAsignacion(ref.getName() + ":=" + exp.getValue());
-								//ref.setValue(exp.getValue());
-								SymbolVariable symvar = (SymbolVariable) scopeManager.searchSymbol(ref.getName());
-								symvar.setValue(exp.getValue());
-								
-								ScopeIF scope = scopeManager.getCurrentScope();
-								TemporalFactoryIF tempFactory = new TemporalFactory(scope);
-								TemporalIF sentAsigTemp = tempFactory.create();
-								
-								TemporalIF expTemp = exp.getTemporal();
-								TemporalIF rTemp = ref.getTemporal();
-								TemporalIF rTempIndex = ref.getTemporalIndex();
-								TemporalIF rTempOffset = ref.getTemporalOffset();
-								IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
-								codeBuilder.addQuadruples(exp.getIntermediateCode());
-								
-								//Creamos un objeto tipo Variable con nombre el id de la referencia
-//								Variable var = new Variable(ref.getValue());
-								//codeBuilder.addQuadruples(ref.getIntermediateCode());
-								
-								//codeBuilder.addQuadruple("MUL", sentAsigTemp, rTempIndex, ref.getSize());
-								//codeBuilder.addQuadruple("ADD", sentAsigTemp, sentAsigTemp, rTemp);
-								//codeBuilder.addQuadruple("ADD", sentAsigTemp, sentAsigTemp, rTempOffset);
-								//codeBuilder.addQuadruple("STP", sentAsigTemp, expTemp);
-								
-								//codeBuilder.addQuadruple("ASSIGN",sentAsigTemp, rTemp, expTemp);
-								//codeBuilder.addQuadruple("ASSIGN",sentAsigTemp, expTemp);
-								codeBuilder.addQuadruple("ASSIGN", rTemp, expTemp);
-								 
-								List intermediateCode = codeBuilder.create();
-								asignacion.setIntermediateCode(intermediateCode);
-								semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - ASIGNACIÓN->ref := exp" + asignacion.getIntermediateCode());
+								//Simbolo
+								SymbolIF symbol = scopeManager.searchSymbol(ref.getName());
+								TypeIF typeSymbol = symbol.getType();
+								if (symbol instanceof SymbolVariable){
+									//Generación de CódigoIntermedio
 									
-								RESULT = asignacion;
+									//Creación de objeto SentenciaAsignacion
+									SentenciaAsignacion asignacion = new SentenciaAsignacion(ref.getName() + ":=" + exp.getValue());
+									SymbolVariable symvar = (SymbolVariable) scopeManager.searchSymbol(ref.getName());
+									symvar.setValue(exp.getValue());
+									
+									ScopeIF scope = scopeManager.getCurrentScope();
+									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+									
+									TemporalIF sentAsigTemp = tempFactory.create();
+									TemporalIF expTemp = exp.getTemporal();
+									TemporalIF rTemp = ref.getTemporal();
+									
+									TemporalIF rTempIndex = ref.getTemporalIndex();
+									TemporalIF rTempOffset = ref.getTemporalOffset();
+									
+									IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+									codeBuilder.addQuadruples(exp.getIntermediateCode());
+									//codeBuilder.addQuadruples(ref.getIntermediateCode());
+									
+									Variable var = new Variable(ref.getName(), scopeManager.getCurrentScope());								
+									codeBuilder.addQuadruple("ASSIGN", var, expTemp);
+									 
+									List intermediateCode = codeBuilder.create();
+									asignacion.setIntermediateCode(intermediateCode);
+									semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - ASIGNACIÓN->ref := exp" + asignacion.getIntermediateCode());									
+								RESULT = asignacion;	
+								}
+								
+								
+								
+
+									
+								
 								//}
 							:};
 							

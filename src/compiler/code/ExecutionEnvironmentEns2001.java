@@ -127,6 +127,11 @@ public class ExecutionEnvironmentEns2001
     		TranslatorWriteLn tr = new TranslatorWriteLn();
     		translation = tr.translate(quadruple);
     	}
+    	if (operation.equals("WRITEEXP")){
+    		CompilerContext.getSemanticErrorManager().semanticDebug("WriteExpresion");
+    		TranslatorExpresion trExp = new TranslatorExpresion();
+    		translation = trExp.translate(quadruple);
+    	}
     	if (operation.equals("ADD")){
     		CompilerContext.getSemanticErrorManager().semanticDebug("add");
     		TranslatorAdd tr = new TranslatorAdd();
