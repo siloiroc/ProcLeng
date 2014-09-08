@@ -155,6 +155,10 @@ public class ExecutionEnvironmentEns2001
     		TranslatorBZ tr = new TranslatorBZ();
     		translation = tr.translate(quadruple);
     	}
+    	if (operation.equals("BNZ")){
+    		TranslatorBNZ tr = new TranslatorBNZ();
+    		translation = tr.translate(quadruple);
+    	}
     	if (operation.equals("BR")){
     		TranslatorBranch tr = new TranslatorBranch();
     		translation = tr.translate(quadruple);
