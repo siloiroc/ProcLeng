@@ -133,7 +133,7 @@ public class ExecutionEnvironmentEns2001
     		translation = trWrtExp.translate(quadruple);
     	}
     	if (operation.equals("ADD")){
-//    		CompilerContext.getSemanticErrorManager().semanticDebug("add");
+    		//CompilerContext.getSemanticErrorManager().semanticDebug("add");
     		TranslatorAdd tr = new TranslatorAdd();
     		translation = tr.translate(quadruple);
     	}
@@ -149,7 +149,8 @@ public class ExecutionEnvironmentEns2001
     	}
     	if (operation.equals("OR")){
     		CompilerContext.getSemanticErrorManager().semanticDebug("or");
-//    		buffer.append("LD " + ".A " + "\n");
+    		TranslatorExprLogica tr= new TranslatorExprLogica();
+    		translation = tr.translate(quadruple);
     	}
     	if (operation.equals("GR")){
     		CompilerContext.getSemanticErrorManager().semanticDebug("gr");

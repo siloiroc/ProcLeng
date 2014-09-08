@@ -10,8 +10,14 @@ public class TranslatorAdd extends Translator {
 
 	@Override
 	public String translate(QuadrupleIF quadruple) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		StringBuffer b = new StringBuffer();
+		
+		String strOper1  = translate(quadruple.getFirstOperand());
+		String strOper2  = translate(quadruple.getSecondOperand());
+		String strResult = translate(quadruple.getResult());		
+		b.append("ADD " + strOper1 + ", " + strOper2 + "\n");
+		b.append("MOVE .A, " + strResult);
 
+		return b.toString();
+	}
 }

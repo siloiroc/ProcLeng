@@ -1,36 +1,20 @@
--- funciones paso por valor
+procedure testCase04 () is
 
-
-procedure testCase08 () is
-
--- a,b,c,d,e: Integer;
-
-CIERTO: constant := True;
-FALSO: constant := False;
-UNO: constant := 1;
+--	x: Integer;
+	t: Boolean;
 
 begin
 
---	Put_line("CONSTANTES");
+	--Put_line("VARIABLES Y ARITMETICA SIMPLE");
 
---	Put_line("CIERTO(true):");
-        Put_line(CIERTO);
+--        x := 4 +2;
+        t := 3=2;
+--        Put_line("x(3):");
+--        Put_line(x);
 
---	Put_line("FALSO(false):");
---        Put_line(FALSO);
+--	t := False OR True;
+--        Put_line("t(false):");
+        Put_line(t);
 
---	Put_line("UNO(1):");
---        Put_line(UNO);
 
--- 	a:= 25;
--- 	
--- 	b:= 10;
--- 	Put_line("hola");
--- 	Put_line("mundo");	
--- 	Put_line(a);
--- 	
--- 	Put_line("que tal");
--- 	Put_line("estas?");
--- 	Put_line(b);
-
-end testCase08;
+end testCase04;
