@@ -6,6 +6,7 @@ public class DeclaracionVariable extends NonTerminal {
 
 	private TypeIF type;
 	private ListaIdentificadores idlist;
+//	private int size; 	//El número de identificadores en la línea de declaracion de variables
 	
 	public DeclaracionVariable() {
 		super();
@@ -15,6 +16,17 @@ public class DeclaracionVariable extends NonTerminal {
 	{
 		this.type = type;
 		this.idlist = idlist;
+	}
+
+	/**
+	 * @return the size
+	 */
+	public int getSize() {
+		return this.idlist.getSize();
+	}
+	
+	public int getMemorySize(){
+		return this.idlist.getSize()* this.type.getSize();
 	}
 
 	/**
@@ -46,13 +58,17 @@ public class DeclaracionVariable extends NonTerminal {
 	}
 
 	public boolean containsDecVariable(String var){
-		//System.out.println("En DeclaracionVariable, buscando contiene campo" + var);
-		//System.out.println("DeclaracionVariable devuelve encontrado=" + idlist.containsIdentifier(var));
+//		System.out.println("En DeclaracionVariable, buscando contiene campo:" + var);
+//		System.out.println("DeclaracionVariable devuelve encontrado=" + idlist.containsIdentifier(var));
 		return idlist.containsIdentifier(var);
+	}
+	
+	public String getIdentifiersListItem(int item){
+		return this.idlist.getIdentifiersListItem(item);
 	}
 
 	public int getOffset(String campo){
-		return 1;
+		return this.idlist.getIdentifierId(campo);
 	}
 	
 }

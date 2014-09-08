@@ -14,8 +14,9 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
 public class SymbolVariable
     extends SymbolBase
 {  
-	private int value;		//Atributo de variable
-	private int address;	//Dirección de memoria del símbolo
+	private int value;		//Atributo Valor del símbolo Variable
+	private int address;	//Dirección de memoria del símbolo Variable
+	private int offset;		//Offset del símbolo Variable
    
     /**
      * Constructor for SymbolVariable.
@@ -56,5 +57,19 @@ public class SymbolVariable
 	 */
 	public void setAddress(int address) {
 		this.address = address;
+	}
+
+	/**
+	 * @return the offset
+	 */
+	public int getOffset() {
+		return offset;
+	}
+
+	/**
+	 * @param offset the offset to set
+	 */
+	public void setOffset(int offset) {
+		this.offset = offset;
 	} 
 }

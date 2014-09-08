@@ -11,6 +11,8 @@ public class Referencia extends NonTerminal {
 	private int size;
 	
     private TemporalIF temporal;
+    private int index; 
+    private int offset;
     private TemporalIF temporalIndex, temporalOffset;
 	
 	/**
@@ -75,6 +77,34 @@ public class Referencia extends NonTerminal {
 	 */
 	public void setValue(int value) {
 		this.value = value;
+	}
+
+	/**
+	 * @return the index
+	 */
+	public int getIndex() {
+		return index;
+	}
+
+	/**
+	 * @param index the index to set
+	 */
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	/**
+	 * @return the offset
+	 */
+	public int getOffset() {
+		return offset;
+	}
+
+	/**
+	 * @param offset the offset to set
+	 */
+	public void setOffset(int offset) {
+		this.offset = offset;
 	}
 
 	/**

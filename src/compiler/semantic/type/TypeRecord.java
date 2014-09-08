@@ -2,8 +2,11 @@ package compiler.semantic.type;
 
 
 import compiler.syntax.nonTerminal.BloqueCamposRegistro;
+import compiler.syntax.nonTerminal.DeclaracionVariable;
+import compiler.syntax.nonTerminal.ListaIdentificadores;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeBase;
+import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 /**
  * Class for TypeRecord.
@@ -47,9 +50,22 @@ public class TypeRecord extends TypeBase
     public TypeRecord (ScopeIF scope, String name, BloqueCamposRegistro bcr){
     	super(scope, name);
     	this.bloqueCamposReg = bcr;
-
     }
     
+	/**
+	 * @return the size
+	 */
+	public int getSize() {
+		System.out.println("Estoy en TypeRecord y el bloqueCamposReg.getSize() ES = " + this.bloqueCamposReg.getSize());
+		return this.bloqueCamposReg.getSize();
+	}
+	
+	public int getMemorySize(){
+		return this.bloqueCamposReg.getMemorySize();
+	}
+
+
+
 	/**
 	 * @return the bloqueCampos
 	 */
@@ -66,31 +82,27 @@ public class TypeRecord extends TypeBase
     
     
     /**
-     * Returns the size of the type.
-     * @return the size of the type.
-     */
-    @Override
-    public int getSize ()
-    {
-        // TODO: Student work
-    	// Tamaño del tipo registro: Número de campos??? 
-    	return this.bloqueCamposReg.getListaCamposRegistro().size();
-    }
-    
-    
-    /**
      * Comprueba si un nombre es un campo de un registro
      * @param field
      * @return
      */
     public boolean containsField(String field){
-    	//System.out.println("En Type Record, buscando contiene campo" + field);
-    	//System.out.println("Campos de bloqueCamposRegistro");
+//    	System.out.println("En Type Record, buscando contiene campo=" + field);
+//    	System.out.println("Campos de bloqueCamposRegistro");
     	
     	return this.bloqueCamposReg.containsField(field);
     }
+    
+    public TypeIF getTypeField(String field){
+    	return this.getBloqueCampos().getTypeCampoRegistro(field);
+    }
+    
 
     public int getOffset(String campo){
     	return this.bloqueCamposReg.getOffset(campo);
+    }
+    
+    public void addCampoRegistro(String nombreCampo, TypeIF tipoCampo){
+     	this.bloqueCamposReg.addCampoRegistro(new DeclaracionVariable (tipoCampo, new ListaIdentificadores(nombreCampo)));
     }
 }

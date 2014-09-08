@@ -1,56 +1,43 @@
--- if con else operadores
-
-procedure testCase06 () is
+-- tipos estructurados REGISTROS
 
 
-        x: Integer;
-	y: Integer;
-	a: Boolean;
+procedure testCase07 () is
+
+	type Tpersona is record
+		dni: Integer;
+		casado: Boolean;
+	end record;
+	
+	type Tfecha is record
+		dia: Integer;
+		mes: Integer;
+		anyo: Integer;
+	end record;
+	
+	type Tcita is record
+		usuario: Tpersona;
+		fecha:	 Tfecha;
+	end record;
+	
+--	c1: Tcita;
+	p1 : Tpersona;	
+--	x, y: Integer;
+--	d: Boolean;
 
 begin
-	Put_line("IF ELSE OPERADORES");
+
+--	Put_line("REGISTROS");	
+
+--	x:= 12345;
+--	Put_line(x);
 	
-        x:=2;
-        y:=1;
- 
-	-- false
-	a := y>x;  
-
-        Put_line("x (falso):");
-     
-	if x = 5 then
-                Put_line("cierto");
-        else
-                Put_line("falso");
-	end if;
-
-	
-	Put_line("x (cierto):");
-	
-	if x > 1 then 
-                Put_line("cierto");
-        else 
-                Put_line("falso");
-	end if;
+--	p1.dni:=456;
+--	p1.casado:=False;		
+			
+--	Put_line("dni(12345):");
+--	Put_line(p1.dni);
+--	Put_line("casado(false):");
+--	Put_line(p1.casado);
 
 
-	Put_line("a (falso):");
-
-	-- if con parentesis al ser una expresion logica
-	if (a or False) then
-		Put_line("cierto");	
-	else 
-		Put_line("falso");
-	end if;
-
-	-- true
-	a := x > y;
-	Put_line("a (cierto):");
-
-	if a or (True or True) then
-		Put_line("cierto");	
-	else 
-		Put_line("falso");
-	end if;
-
-end testCase06;
+end testCase07;

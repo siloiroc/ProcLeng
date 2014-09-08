@@ -22,6 +22,14 @@ public class ListaIdentificadores extends NonTerminal {
 	}
 	
 	/**
+	 * @return the size
+	 */
+	public int getSize() {
+		return this.identifiersList.size();
+	}
+
+	
+	/**
 	 * @return the identifiersList
 	 */
 	public ArrayList<String> getIdentifiersList() {
@@ -43,10 +51,6 @@ public class ListaIdentificadores extends NonTerminal {
 		this.identifiersList.add(id);
 	}
 	
-	public int getSize(){
-		return this.identifiersList.size();
-	}
-
 	public boolean containsIdentifier(String id){
 		boolean found = false;
 		for(int i=0; i < identifiersList.size(); i++)
@@ -64,6 +68,19 @@ public class ListaIdentificadores extends NonTerminal {
 		return found;
 		//System.out.println("En Lista Identificadores, buscando contiene campo" + id);
 		//return identifiersList.contains(id);
+	}
+	
+	public int getIdentifierId(String name){
+		int identifierId = -1; 
+		for(int i=0; i < identifiersList.size(); i++)
+		{
+			if (this.identifiersList.get(i).equals(name))
+			{
+				identifierId = i;				
+			}
+		}
+		return identifierId;
+
 	}
 	
 	/* (non-Javadoc)

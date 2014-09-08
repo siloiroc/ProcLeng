@@ -191,7 +191,16 @@ program ::=
   					{ //Si la variable es global, establecemos su dirección comenzando en la pos.0 de memoria
   						symvar.setAddress(gAddress);
   						semanticErrorManager.semanticDebug("MEMORIA, dirección de de la variable: " + symvar.getName() + " con valor=" + symvar.getValue() + " dir=" + gAddress);
-  						gAddress += symvar.getType().getSize();
+  						semanticErrorManager.semanticDebug("MEMORIA, tamaño de de la variable: " + symvar.getName() + " es=" + symvar.getType().getSize());
+  						semanticErrorManager.semanticDebug("MEMORIA, el tipo de la variable: " + symvar.getName() + " es=" + symvar.getType());
+  						TypeIF symtype = symvar.getType();
+  						if (symtype instanceof TypeRecord){
+  							TypeRecord tR = (TypeRecord) symtype;
+  							gAddress += tR.getMemorySize();
+  						}
+  						else
+  							gAddress += symvar.getType().getSize();
+  						
   					}
   					else
   					{ //Variable no global
@@ -333,7 +342,19 @@ seccionTipos				::= declaracionTipo:declTipo seccionTipos:seccTipos
 									semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI-seccionTipos->seccionVars=" + seccVars.getIntermediateCode());
 									RESULT = seccVars;   
 								:};
-seccionVariables			::= declaracionVariable:declVar SEMICOLON seccionVariables:seccVars
+seccionVariables			::= declaracionVariable:declVar 
+								{:
+									Util util = new Util();
+									semanticErrorManager.semanticDebug("SIZE de DECLVARIABLE=" + declVar.getSize());
+									
+									for(int i = 0; i < declVar.getSize(); i++){
+									semanticErrorManager.semanticDebug("Añadiendo VARS a TS, size = " + declVar.getSize());
+									// Símbolos de las variables no existen en TS, por lo que añadimos cada uno de ellos a la Tabla de Símbolos (SymbolVariable).
+										SymbolVariable symbolVar = new SymbolVariable(scopeManager.getCurrentScope(), declVar.getIdentifiersListItem(i), declVar.getType());
+									util.addToSymbolTable(scopeManager.getCurrentScope(), symbolVar);
+									}
+								:}
+								SEMICOLON seccionVariables:seccVars
 								{:
 									//Generación de Código Intermedio
 									Declaraciones declSeccVars = new Declaraciones();
@@ -553,12 +574,36 @@ declaracionTipo 		::= {:semanticErrorManager.semanticDebug("**DECLARACION TIPO**
 									//Creamos nuevo tipo Registro y lo introducimos en la tabla de tipos
 									TypeRecord typeRecord = new TypeRecord(scope, id.getLexema(), bcr);
 									tablaTipos.addType(id.getLexema(), typeRecord);
+									
+//									//Añadimos los campos del bloqueCamposRegistro al tipo Registro
+//									int offset = 0; 
+//									for (int i=0; i< bcr.getSize(); i++)
+//									{	
+//										semanticErrorManager.semanticDebug("Añadiendo Registro====" + i);
+//										DeclaracionVariable decVarRegistro = (DeclaracionVariable) bcr.getDeclaracionVariableId(i);
+//										for (int j=0; j < decVarRegistro.getSize(); j++)
+//										{
+//											//Creamos un símbolo SymbolVariable por cada variable
+//											SymbolVariable symbolVarReg = new SymbolVariable(scopeManager.getCurrentScope(), decVarRegistro.getIdentifiersListItem(j), decVarRegistro.getType());
+//											symbolVarReg.setOffset(offset);
+//											offset++;
+//											//Añadimos 
+//											if (typeRecord.containsField(decVarRegistro.getIdentifiersListItem(j)))
+//												semanticErrorManager.semanticFatalError("ERROR TYPE001: La variable " + decVarRegistro.getIdentifiersListItem(j) + " ya ha sido definida en el tipo estructurado");
+//											else
+//												typeRecord.addCampoRegistro(decVarRegistro.getIdentifiersListItem(j), decVarRegistro.getType());											
+//										}
+//										
+//									}
+									
+									DeclaracionTipo decTipo = new DeclaracionTipo(typeRecord);
+									RESULT = decTipo;										
 								}
 								semanticErrorManager.semanticDebug("FIN**Declaración Tipo: " + id.getLexema() + "******");
 								semanticErrorManager.semanticDebug("**********************************");								
 							:};
 												
-bloqueCamposRegistro	::=	bloqueCamposRegistro:bcr declaracionVariable:decVar SEMICOLON
+bloqueCamposRegistro	::=	declaracionVariable:decVar SEMICOLON bloqueCamposRegistro:bcr 
 							{:
 								semanticErrorManager.semanticDebug("En bloqueCamposRegistro -> bloqueCamposRegistro declaracionVariable;");
 								BloqueCamposRegistro bloquecampos = bcr;
@@ -568,8 +613,8 @@ bloqueCamposRegistro	::=	bloqueCamposRegistro:bcr declaracionVariable:decVar SEM
 							| declaracionVariable:decVar SEMICOLON
 							{:
 								semanticErrorManager.semanticDebug("En bloqueCamposRegistro -> declaracionVariable");
-								BloqueCamposRegistro bloquecampos = new BloqueCamposRegistro(decVar);
-								RESULT = bloquecampos;
+								BloqueCamposRegistro bloqueCampos = new BloqueCamposRegistro(decVar);
+								RESULT = bloqueCampos;
 							:}; 
   
 
@@ -584,13 +629,18 @@ declaracionVariable		::= listaIdentificadores:lid COLON
 								Util util = new Util();
 								//Verificamos si los identificadores de la lista están ya definidos en la Tabla de Símbolos
 								for(int i = 0; i < lid.getSize(); i++){
+								semanticErrorManager.semanticDebug("En la lista de identificadores, size con GetSIZE=" + lid.getSize());
 									if(util.checkSymbolTableScope(scope, lid.getIdentifiersListItem(i))){
 										semanticErrorManager.semanticFatalError("ERROR VAR001: en declaración de Variable, ya existe declaración de " + lid.getIdentifiersListItem(i));
 									}
-									else{ // Símbolos no existen en TS, por lo que añadimos cada uno de ellos a la Tabla de Símbolos (SymbolVariable).
-										SymbolVariable symbolVariable = new SymbolVariable(scope, lid.getIdentifiersListItem(i), scopeManager.searchType(tp.getType().getName()));
+									else{ 
+										//Ojo, no hacemos esto aquí, ya que esto es compartido por la declaración de variables dentro de un tipo Registro,
+										//Muevo el añadir a la tabla de Símbolos al nodo superior del árbol (seccionVariables)
+										
+										// Símbolos no existen en TS, por lo que añadimos cada uno de ellos a la Tabla de Símbolos (SymbolVariable).
+										//SymbolVariable symbolVariable = new SymbolVariable(scope, lid.getIdentifiersListItem(i), scopeManager.searchType(tp.getType().getName()));
 										//semanticErrorManager.semanticDebug("Construido SymbolVariable, con: " + scope + ", " + lid.getIdentifiersListItem(i) + "," + tp.getType().getName());  
-										util.addToSymbolTable(scope, symbolVariable);
+										//util.addToSymbolTable(scope, symbolVariable);
 										//semanticErrorManager.semanticDebug("Añadimos a tabla de Símbolos el identificador (ahora SymbolVariable)=" + symbolVariable.toString());
 										
 										DeclaracionVariable decVariable = new DeclaracionVariable(tp.getType(), lid);
@@ -979,9 +1029,9 @@ expresion	::= expresionAritmetica:exprarit
 //						List intermediateCode = codeBuilder.create();
 //						expr.setIntermediateCode(intermediateCode);
 
-						semanticErrorManager.semanticDebug("?????  - en expresion->referencia, el temporal de referencia es=" + ref.getTemporal());						 
+						//semanticErrorManager.semanticDebug("?????  - en expresion->referencia, el temporal de referencia es=" + ref.getTemporal());						 
 						expr.setTemporal(ref.getTemporal());
-						semanticErrorManager.semanticDebug("?????  - en expresion->referencia, el temporal de expresion es=" + ref.getTemporal()); 
+						//semanticErrorManager.semanticDebug("?????  - en expresion->referencia, el temporal de expresion es=" + ref.getTemporal()); 
 						expr.setIntermediateCode(ref.getIntermediateCode());
 						semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - expr->referencia= " + expr.getIntermediateCode()); 
 						RESULT = expr;						
@@ -1042,7 +1092,7 @@ expresionAritmetica ::= expresion:e1 PLUS expresion:e2
 							codeBuilder.addQuadruple("MV", eTemp, new Value(value));
 						
 							exprarit.setTemporal(eTemp);
-							semanticErrorManager.semanticDebug("?????  - en Expresion=Number, el temporal de Exprarit es=" + exprarit.getTemporal());
+							//semanticErrorManager.semanticDebug("?????  - en Expresion=Number, el temporal de Exprarit es=" + exprarit.getTemporal());
 							List intermediateCode = codeBuilder.create();
 							exprarit.setIntermediateCode(intermediateCode);
 								
@@ -1219,53 +1269,34 @@ expresionLogica		::= expresion:e1 OR expresion:e2
 referencia			::= referencia:refer POINT IDENTIFIER:id
 						{: 
 							//semanticErrorManager.semanticDebug("En Referencia-> refer.id");
-							String name = refer.getName();
-							String innername = id.getLexema();
+							String referName = refer.getName();
+							String innerName = id.getLexema();
 							
-							TypeIF referType = refer.getType();
-							if(referType instanceof TypeRecord)
+							TypeIF referType = refer.getType();	//Tipo de la referencia
+							if(referType instanceof TypeRecord)	//Si es de tipo registro continuamos, si no es un tipo Record, mostraremos un error (else)
 							{
-								//TypeRecord tRec = (TypeRecord) referType;
-								
 								//Obtenemos símbolo indicado por la referencia, de la Tabla de Símbolos.
 								ScopeIF scope = scopeManager.getCurrentScope();
-								//semanticErrorManager.semanticDebug("name=" + name);
-								SymbolIF simbolo = scopeManager.searchSymbol(name);
-								//semanticErrorManager.semanticDebug("simbolo to String=" + simbolo.toString());
-								//semanticErrorManager.semanticDebug("simbolo getName()=" + simbolo.getName());
-								//semanticErrorManager.semanticDebug("tipo getType.getName()=" + simbolo.getType().getName());
-								TypeIF tipo = scopeManager.searchType(simbolo.getType().getName());
-								//semanticErrorManager.semanticDebug("tipo=" + tipo.toString());
+								SymbolIF simboloReferencia = scopeManager.searchSymbol(referName);
+								TypeIF tipoSimbReferencia = scopeManager.searchType(simboloReferencia.getType().getName());
 								
-								//semanticErrorManager.semanticDebug("tipo.getName()=" + tipo.getName());
-								
-								TypeRecord recPrueba = (TypeRecord) scopeManager.searchType("Tpersona");
-								//semanticErrorManager.semanticDebug("Tamaño de la lista de campos del bloque de campos de TPersona: " + recPrueba.getBloqueCampos().getListaCamposRegistro().size());
-								
-								for (int i = 0 ; i<recPrueba.getBloqueCampos().getListaCamposRegistro().size(); i++)
-								{
-									DeclaracionVariable decvar = recPrueba.getBloqueCampos().getListaCamposRegistro().get(i);
-									ArrayList<String> listaiden= decvar.getIdlist().getIdentifiersList();
-								}
-											
-								TypeRecord tRec = (TypeRecord) tipo;
+								TypeRecord tRec = (TypeRecord) tipoSimbReferencia;
 								//semanticErrorManager.semanticDebug("Antes de tRec.containsField");
 								//semanticErrorManager.semanticDebug("tRec.getName()=" + tRec.getName());
-								//semanticErrorManager.semanticDebug("Tamaño de la lista de campos del bloque de campos del tRec: " + tRec.getBloqueCampos().getListaCamposRegistro().size()); 
-								for (int i = 0 ; i<tRec.getBloqueCampos().getListaCamposRegistro().size(); i++)
-								{
-									DeclaracionVariable decvar2 = tRec.getBloqueCampos().getListaCamposRegistro().get(i);
-									ArrayList<String> listaiden2= decvar2.getIdlist().getIdentifiersList();
-								}
+	
 
-								if(tRec.containsField(id.getLexema())){
-									//semanticErrorManager.semanticDebug("DEBUG R001 - " + refer.getName() + " SI contiene campo " + id.getLexema());
-									//semanticErrorManager.semanticDebug("EntRec.containsField");
-									TypeIF innerType = scopeManager.searchType(scopeManager.searchSymbol(innername).getName());
-									//TypeIF innerType = tRec.getType();
+								if(tRec.containsField(innerName)){
+									semanticErrorManager.semanticDebug("DEBUG R001 - " + referName + " SI contiene campo " + innerName);
+								
+									TypeIF innerType = tRec.getTypeField(innerName);
+									semanticErrorManager.semanticDebug("DEBUG R001 - El tipo del campo innername=" + innerName + " es = " + innerType);
+									//TypeIF innerType = scopeManager.searchType(scopeManager.searchSymbol(innerName).getName());
 									
 									//Generación de CódigoIntermedio
-									Referencia ref = new Referencia(innerType, innername);
+									Referencia ref = new Referencia(referType, referName);
+									ref.setOffset(tRec.getOffset(innerName));	//Establecemos el offset del campo del registro
+
+									
 									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
 									TemporalIF refTemp = refer.getTemporal();
 									TemporalIF refTempIndex = refer.getTemporalIndex();
@@ -1274,7 +1305,7 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 									codeBuilder.addQuadruples(refer.getIntermediateCode());
 									
 									TypeRecord rType = (TypeRecord)refer.getType();
-									int idOffset	 = rType.getOffset(innername);
+									int idOffset	 = rType.getOffset(innerName);
 									codeBuilder.addQuadruple("MV", refTempOffset, idOffset);
 									ref.setTemporal(refTemp);
 									ref.setTemporalIndex(refTempIndex);
@@ -1285,10 +1316,10 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 									RESULT = ref;
 								}
 								else {
-									semanticErrorManager.semanticDebug("ERROR R001 - " + refer.getName() + " NO contiene campo " + name);
+									semanticErrorManager.semanticDebug("ERROR R001 - " + referName + " NO contiene campo " + innerName);
 								}
 							}
-							else semanticErrorManager.semanticDebug("ERROR R002-" + refer.getName() + ".Tipo=" + refer.getType() + " NO instancia de TypeRecord");
+							else semanticErrorManager.semanticDebug("ERROR R002-" + refer.getName() + " de tipo=" + refer.getType() + " NO es de tipo Registro(RECORD)");
 				:} 
 				| IDENTIFIER:id
 				{:
@@ -1298,6 +1329,7 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 					ScopeIF scope = scopeManager.getCurrentScope();
 					Util util = new Util();
 					//Verificamos si la referencia está ya definida en la Tabla de Símbolos
+					
 					if(!util.checkSymbolTableScope(scope, name)){
 						semanticErrorManager.semanticFatalError("ERROR REF001: No existe la declaración de " + name + " [Line=" + id.getLine() + ",Col=" + id.getColumn() + "]");
 					}
@@ -1313,14 +1345,15 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 						TypeIF typeref = refsymbol.getType();
 						
 						Referencia ref = new Referencia (typeref, name);
+						ref.setIndex(1);
 														
 						//Generación de Código Intermedio
 						TemporalFactoryIF tempFactory = new TemporalFactory(scope);
 						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
 						TemporalIF refTemp = tempFactory.create();
-						semanticErrorManager.semanticDebug("?????  - en Referencia->id , el temporal de Referencia es=" + refTemp);						
+						//semanticErrorManager.semanticDebug("?????  - en Referencia->id , el temporal de Referencia es=" + refTemp);						
 						SymbolIF symbol = scopeManager.searchSymbol(name);
-						semanticErrorManager.semanticDebug("SIMBOLO=" + symbol.toString());
+						//semanticErrorManager.semanticDebug("SIMBOLO=" + symbol.toString());
 						
 						// El identificador de la Referencia podria ser una Variable, o bien una Constante, o un parametro de un subprograma
 						
@@ -1455,8 +1488,8 @@ sentenciaAsignacion		::= referencia:ref ASSIGN expresion:exp
 								SymbolIF symbol = scopeManager.searchSymbol(ref.getName());
 								TypeIF typeSymbol = symbol.getType();
 								if (symbol instanceof SymbolVariable){
-									//Generación de CódigoIntermedio
 									
+									//Generación de CódigoIntermedio								
 									//Creación de objeto SentenciaAsignacion
 									SentenciaAsignacion asignacion = new SentenciaAsignacion(ref.getName() + ":=" + exp.getValue());
 									SymbolVariable symvar = (SymbolVariable) scopeManager.searchSymbol(ref.getName());
@@ -1485,13 +1518,6 @@ sentenciaAsignacion		::= referencia:ref ASSIGN expresion:exp
 									semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - ASIGNACIÓN->ref := exp" + asignacion.getIntermediateCode());									
 								RESULT = asignacion;	
 								}
-								
-								
-								
-
-									
-								
-								//}
 							:};
 							
 						
