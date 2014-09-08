@@ -2,9 +2,9 @@ package compiler.code.translate;
 
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
-public class TranslatorExpresion extends Translator {
+public class TranslatorWriteExpresion extends Translator {
 
-	public TranslatorExpresion() {
+	public TranslatorWriteExpresion() {
 		super();
 	}
 
@@ -17,9 +17,9 @@ public class TranslatorExpresion extends Translator {
 		//					el formato decimal siempre se escribe con signo (-32768 a 32767);
 			
 		StringBuffer b = new StringBuffer();
-		String strResult = quadruple.getResult().toString();
-		b.append("WRINT " +  strResult + "\t\t\t;Instruccion Put_Line(expresión)");
-		
+		String strResult = translate(quadruple.getResult()); 
+		b.append("WRINT " +  strResult + "\t\t\t\t;Instruccion Put_Line(expresión)\n");
+		b.append("WRCHAR #10\nWRCHAR #13");
 		return b.toString();
 	}
 

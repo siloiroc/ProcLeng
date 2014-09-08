@@ -1,7 +1,9 @@
 package compiler.intermediate;
 
+import compiler.semantic.symbol.SymbolVariable;
 import es.uned.lsi.compiler.intermediate.VariableIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
+import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 
 /**
  * Class for variables in intermediate code.
@@ -12,6 +14,7 @@ public class Variable
 {
     private String  name     = null;
     private ScopeIF scope    = null;
+    private SymbolVariable simbolo = null; 
             
     /**
      * Constructor for Variable.
@@ -23,6 +26,21 @@ public class Variable
         super ();
         this.name = name;
         this.scope = scope;
+    }
+    
+    public Variable (String name, ScopeIF scope, SymbolIF symbol){
+    	this(name, scope);
+    	this.simbolo = (SymbolVariable)symbol;
+    }
+    
+    public Variable (String name, SymbolIF symbol){
+    	this(name, symbol.getScope());
+    	this.simbolo = (SymbolVariable)symbol;
+    }
+    
+    public Variable(SymbolIF symbol){
+    	this(symbol.getName(), symbol.getScope());
+    	this.simbolo = (SymbolVariable)symbol;
     }
 
     /**
@@ -52,8 +70,7 @@ public class Variable
     @Override
     public final int getAddress ()
     {
-        // TODO : Student Work
-        return 0;
+    	return this.simbolo.getAddress();
     }
 
     /**

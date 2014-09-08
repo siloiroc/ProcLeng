@@ -117,28 +117,28 @@ public class ExecutionEnvironmentEns2001
     		translation = tr.translate(quadruple);
     	}
     	
-    	if(operation.equals("MOVE")){
-    		System.out.println("En ExecutionEnvironmentEns2001 MOVE");
+    	if(operation.equals("MV")){
+    		//System.out.println("En ExecutionEnvironmentEns2001 MOVE");
     		TranslatorMove tr = new TranslatorMove();
     		translation = tr.translate(quadruple);
     	}
     	if (operation.equals("WRITELN")){
-    		CompilerContext.getSemanticErrorManager().semanticDebug("Writeln");
+    		//CompilerContext.getSemanticErrorManager().semanticDebug("Writeln");
     		TranslatorWriteLn tr = new TranslatorWriteLn();
     		translation = tr.translate(quadruple);
     	}
     	if (operation.equals("WRITEEXP")){
-    		CompilerContext.getSemanticErrorManager().semanticDebug("WriteExpresion");
-    		TranslatorExpresion trExp = new TranslatorExpresion();
-    		translation = trExp.translate(quadruple);
+    		//CompilerContext.getSemanticErrorManager().semanticDebug("WriteExpresion");
+    		TranslatorWriteExpresion trWrtExp = new TranslatorWriteExpresion();
+    		translation = trWrtExp.translate(quadruple);
     	}
     	if (operation.equals("ADD")){
-    		CompilerContext.getSemanticErrorManager().semanticDebug("add");
+//    		CompilerContext.getSemanticErrorManager().semanticDebug("add");
     		TranslatorAdd tr = new TranslatorAdd();
     		translation = tr.translate(quadruple);
     	}
     	if (operation.equals("ASSIGN")){
-    		CompilerContext.getSemanticErrorManager().semanticDebug("assign");
+//    		CompilerContext.getSemanticErrorManager().semanticDebug("assign");
     		TranslatorAssign tr = new TranslatorAssign();
     		translation = tr.translate(quadruple);
     	}

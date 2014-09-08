@@ -22,7 +22,7 @@ public class TranslatorAssign extends Translator {
 		OperandIF result = quadruple.getResult();
 		String strResult = translate(result);
 		
-		b.append("MOVE " +  strOper1 + ", " + strResult + " ;Instruccion Assign");
+		b.append("MOVE " +  strOper1 + ", " + strResult + "\t\t\t;Instruccion Assign");
 		
 		return b.toString();
 	}

@@ -10,8 +10,8 @@
 	
 	<property name="test-file-name" value="testCaseB01_bis.ha"/>
 	<!--<property name="test-file-name" value="testCaseB01.ha"/>-->
-	<!--<property name="test-file-name" value="testCaseB02.ha"/>-->
-	<!--<property name="test-file-name" value="testCaseB03.ha"/>-->
+	<!--<property name="test-file-name" value="testCaseB02.ha"/> -->  <!-- Put_lines, ok -->
+	<!--<property name="test-file-name" value="testCaseB03.ha"/>-->   <!-- Constantes -->
 	<!--<property name="test-file-name" value="testCaseB04.ha"/>-->
 	<!--<property name="test-file-name" value="testCaseB05.ha"/>-->
 	<!--<property name="test-file-name" value="testCaseB06.ha"/>-->

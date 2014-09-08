@@ -1,9 +1,10 @@
 ; Inicio del programa
-RES 1
-MOVE #65535, .SP
-
-MOVE #5, #2[.IX] ;Instruccion Move
-MOVE #2[.IX], /0 ;Instruccion Assign
-WRINT T_4			;Instruccion Put_Line(expresión)
+RES 0
+MOVE #65534, .SP
+MOVE #65534, .IX
+MOVE #1, #-1[.IX]			;Instruccion Move
+WRINT #-1[.IX]				;Instruccion Put_Line(expresión)
+WRCHAR #10
+WRCHAR #13
 HALT ; Fin del programa
 END ;Macroinstrucción END. Ensamblador da por finalizado el código.

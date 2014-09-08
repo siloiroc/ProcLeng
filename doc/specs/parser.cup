@@ -33,6 +33,8 @@ action code {:
 	ScopeManagerIF       scopeManager         = CompilerContext.getScopeManager ();
 	FinalCodeFactoryIF   finalCodeFactory     = CompilerContext.getFinalCodeFactory ();
 
+	ArrayList<Integer> scopeSizes = new ArrayList<Integer>();
+
 :}	
 
 parser code {:
@@ -179,43 +181,48 @@ program ::=
   		List<ScopeIF> scopes = scopeManager.getAllScopes();
   		for (ScopeIF scope : scopes)
   		{
-  			List<SymbolIF> symbols = scope.getSymbolTable().getSymbols();
-  			for (SymbolIF s : symbols){
+  			List<SymbolIF> symbols = scope.getSymbolTable().getSymbols();						 			
+  			for (SymbolIF s : symbols)
+  			{
   				if (s instanceof SymbolVariable)
   				{
   					SymbolVariable symvar = (SymbolVariable) s;
   					if (scope.getLevel() == 0)
   					{ //Si la variable es global, establecemos su dirección comenzando en la pos.0 de memoria
   						symvar.setAddress(gAddress);
-  						semanticErrorManager.semanticDebug("Tamaño de la variable: " + symvar.getType().getSize());
-  						semanticErrorManager.semanticDebug("MEMORIA - Variable estará en la posición: " + gAddress + " de memoria");
+  						semanticErrorManager.semanticDebug("MEMORIA, dirección de de la variable: " + symvar.getName() + " con valor=" + symvar.getValue() + " dir=" + gAddress);
   						gAddress += symvar.getType().getSize();
   					}
   					else
   					{ //Variable no global
  						symvar.setAddress(lOffset + symvar.getType().getSize());
- 						lOffset += symvar.getAddress();
+ 						//lOffset += symvar.getAddress();
+ 						lOffset += symvar.getType().getSize();
  					}
   				}
-  			semanticErrorManager.semanticDebug("Tamaño total de reserva de espacio de memoria para variables globales = " + gAddress);  				
-  			semanticErrorManager.semanticDebug("Programa comenzará en dirección = " + (gAddress + 1));
+  				//semanticErrorManager.semanticDebug("Tamaño total de reserva de espacio de memoria para variables globales = " + gAddress);  				
+  				//semanticErrorManager.semanticDebug("Programa comenzará en dirección = " + (gAddress + 1));
   			}
+  			
   			List<TemporalIF> temporals = scope.getTemporalTable().getTemporals();
   			for (TemporalIF t : temporals){
   				Temporal temp = (Temporal) t;
   				temp.setAddress (lOffset + temp.getSize());
+  				//semanticErrorManager.semanticDebug("Temporal =" + temp.toString() + " address= " + (lOffset+temp.getSize()));
   				lOffset += temp.getSize();
   			}
+  			scopeSizes.add(lOffset);	//Añadimos el tamaño que ocupan las variables y temporales en cada ámbito a la lista de tamaños de ámbitos.
+  			lOffset = 0;
   		}
-  		
-//  		IntermediateCodeBuilder codeBuilder = new IntermediateCodeBuilder(scope);
-//  		codeBuilder.addQuadruple("DATA", gAddress);
-//  		codeBuilder.addQuadruples(intermediateCode);
-//  		finalCodeFactory.create (codeBuilder.create());
-  		
+  		 		
   			IntermediateCodeBuilder codeBuilder = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
   			//codeBuilder.addQuadruple("DATA", gAddress);
-  			codeBuilder.addQuadruple("INICIO", new Value(gAddress));
+  			
+  			//En la cuádrupla de inicio indicamos la dirección final que ocupan las varibles globales en memoria, así como el tamaño del ámbito 0 (variables + temporales)
+  			semanticErrorManager.semanticDebug("Antes de QUAD INICIO, gAddress=" + gAddress + " scopeSizes(0)=" + scopeSizes.get(0));
+//  			codeBuilder.addQuadruple("INICIO", new Value(gAddress));
+  			codeBuilder.addQuadruple("INICIO", new Value(gAddress), new Value(scopeSizes.get(0)));
+  			
   			List intermediateCode = ax.getIntermediateCode ();
   			codeBuilder.addQuadruples(intermediateCode);
   			codeBuilder.addQuadruple("FIN");
@@ -493,7 +500,13 @@ declaracionConstante ::=  listaIdentificadores:lid COLON CONSTANT
 										}
 										symbolConstant.setValue(vc.getValue());
 										//semanticErrorManager.semanticDebug("Construido SymbolConstant, con: " + scope + ", " + lid.getIdentifiersListItem(i) + "," + scopeManager.searchType("INTEGER").getName());  
+										//Añadimos símbolos constantes a la Tabla de Símbolos
 										util.addToSymbolTable(scope, symbolConstant);
+										
+										
+										DeclaracionConstante declConstante = new DeclaracionConstante(vc.getType(), lid);
+										RESULT = declConstante;										
+
 									}
 								}
 							:};
@@ -506,20 +519,23 @@ declaracionConstante ::=  listaIdentificadores:lid COLON CONSTANT
 valorConstante ::= TRUE:vc 
 						{: 
 							//semanticErrorManager.semanticDebug("En valorConstante -> TRUE");
-							ValorConstante value = new ValorConstante(vc.getLexema().toUpperCase());
-					   		RESULT = value; 
+							//ValorConstante valConst = new ValorConstante(vc.getLexema().toUpperCase());
+							ValorConstante valConst = new ValorConstante(vc.getLexema().toUpperCase(), new TypeSimple(scopeManager.getCurrentScope(), "BOOLEAN"));
+					   		RESULT = valConst; 
 					   :}
 				   | FALSE:vc
 				   		{:	
 				   			//semanticErrorManager.semanticDebug("En valorConstante -> FALSE");
-				   			ValorConstante value = new ValorConstante(vc.getLexema().toUpperCase());
-				   			RESULT = value; 
+				   			//ValorConstante valConst = new ValorConstante(vc.getLexema().toUpperCase());
+				   			ValorConstante valConst = new ValorConstante(vc.getLexema().toUpperCase(), new TypeSimple(scopeManager.getCurrentScope(), "BOOLEAN"));
+				   			RESULT = valConst; 
 				   		:} 
 				   | NUMBER:num 
 				   	 	{: 	
 							//semanticErrorManager.semanticDebug("En valorConstante -> NUM");
-				   	 		ValorConstante value = new ValorConstante(num.getLexema());
-				   	 		RESULT = value;
+				   	 		//ValorConstante valConst = new ValorConstante(num.getLexema());
+				   	 		ValorConstante valConst = new ValorConstante(num.getLexema(), new TypeSimple(scopeManager.getCurrentScope(), "INTEGER"));
+				   	 		RESULT = valConst;
 				   	 	:};
 // Declaración de tipos globales
 declaracionTipo 		::= {:semanticErrorManager.semanticDebug("**DECLARACION TIPO**");:} 
@@ -566,7 +582,7 @@ declaracionVariable		::= listaIdentificadores:lid COLON
 							{:	
 								ScopeIF scope = scopeManager.getCurrentScope();
 								Util util = new Util();
-								//Verificamos si los identificadores de la lista están ya definidos en la Tabla de Símbolos 
+								//Verificamos si los identificadores de la lista están ya definidos en la Tabla de Símbolos
 								for(int i = 0; i < lid.getSize(); i++){
 									if(util.checkSymbolTableScope(scope, lid.getIdentifiersListItem(i))){
 										semanticErrorManager.semanticFatalError("ERROR VAR001: en declaración de Variable, ya existe declaración de " + lid.getIdentifiersListItem(i));
@@ -575,11 +591,11 @@ declaracionVariable		::= listaIdentificadores:lid COLON
 										SymbolVariable symbolVariable = new SymbolVariable(scope, lid.getIdentifiersListItem(i), scopeManager.searchType(tp.getType().getName()));
 										//semanticErrorManager.semanticDebug("Construido SymbolVariable, con: " + scope + ", " + lid.getIdentifiersListItem(i) + "," + tp.getType().getName());  
 										util.addToSymbolTable(scope, symbolVariable);
+										//semanticErrorManager.semanticDebug("Añadimos a tabla de Símbolos el identificador (ahora SymbolVariable)=" + symbolVariable.toString());
 										
 										DeclaracionVariable decVariable = new DeclaracionVariable(tp.getType(), lid);
 										RESULT = decVariable;										
 									}
-									
 								}
 							
 							:};
@@ -920,7 +936,8 @@ expresion	::= expresionAritmetica:exprarit
 				{:
 					//semanticErrorManager.semanticDebug("en Expresion -> ExpresionAritmetica: ");
 					//semanticErrorManager.semanticDebug("Exp->ExpArit... " + exprarit.getValue());
-					semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - exp->exprArit = " + exprarit.getIntermediateCode());					
+					semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - exp->exprArit = " + exprarit.getIntermediateCode());
+					semanticErrorManager.semanticDebug("?????  - en Expresion->ExprArit, el temporal de expresion es=" + exprarit.getTemporal());					
 					RESULT = exprarit;
 				:}
 				|expresionLogica:exprlog 
@@ -948,19 +965,25 @@ expresion	::= expresionAritmetica:exprarit
 					}
 					else{
 						TypeIF typeref = ref.getType();
-						Expresion exprRef = new Expresion(typeref);
+						Expresion expr = new Expresion(typeref);
 						
-						//Generación de Código Intermedio
-						TemporalFactoryIF tempFactory = new TemporalFactory(scope);
-						TemporalIF eTemp = tempFactory.create();
-						TemporalIF refTemp = ref.getTemporal();
-						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
-						codeBuilder.addQuadruple("MVP", eTemp, refTemp);
-						exprRef.setTemporal(eTemp);
-						List intermediateCode = codeBuilder.create();
-						exprRef.setIntermediateCode(intermediateCode);
-						 
-						RESULT = exprRef;						
+//						//Generación de Código Intermedio
+//						TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+//						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);										
+//						TemporalIF eTemp = tempFactory.create();
+//						TemporalIF refTemp = ref.getTemporal();
+//						codeBuilder.addQuadruples(ref.getIntermediateCode());
+//						codeBuilder.addQuadruple("MV", eTemp, refTemp);						
+//						expr.setTemporal(eTemp);
+//						List intermediateCode = codeBuilder.create();
+//						expr.setIntermediateCode(intermediateCode);
+
+						semanticErrorManager.semanticDebug("?????  - en expresion->referencia, el temporal de referencia es=" + ref.getTemporal());						 
+						expr.setTemporal(ref.getTemporal());
+						semanticErrorManager.semanticDebug("?????  - en expresion->referencia, el temporal de expresion es=" + ref.getTemporal()); 
+						expr.setIntermediateCode(ref.getIntermediateCode());
+						semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - expr->referencia= " + expr.getIntermediateCode()); 
+						RESULT = expr;						
 					}
 				:}
 				| error SEMICOLON 
@@ -1015,12 +1038,11 @@ expresionAritmetica ::= expresion:e1 PLUS expresion:e2
 							IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
 							
 							TemporalIF eTemp = tempFactory.create();
-							codeBuilder.addQuadruple("MOVE", eTemp, new Value(value));
-							
+							codeBuilder.addQuadruple("MV", eTemp, new Value(value));
+						
 							exprarit.setTemporal(eTemp);
-							semanticErrorManager.semanticDebug("El temporal de expresionArit->Number es=" + exprarit.getTemporal());
+							semanticErrorManager.semanticDebug("?????  - en Expresion=Number, el temporal de Exprarit es=" + exprarit.getTemporal());
 							List intermediateCode = codeBuilder.create();
-							semanticErrorManager.semanticDebug("intermediateCode=" + intermediateCode.toString());
 							exprarit.setIntermediateCode(intermediateCode);
 								
 							semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - expArit->num = " + exprarit.getIntermediateCode());								
@@ -1194,7 +1216,7 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 									
 									TypeRecord rType = (TypeRecord)refer.getType();
 									int idOffset	 = rType.getOffset(innername);
-									codeBuilder.addQuadruple("MOVE", refTempOffset, idOffset);
+									codeBuilder.addQuadruple("MV", refTempOffset, idOffset);
 									ref.setTemporal(refTemp);
 									ref.setTemporalIndex(refTempIndex);
 									ref.setTemporalOffset(refTempOffset);
@@ -1235,25 +1257,29 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 														
 						//Generación de Código Intermedio
 						TemporalFactoryIF tempFactory = new TemporalFactory(scope);
-						TemporalIF refTemp = tempFactory.create();
 						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
-									
+						TemporalIF refTemp = tempFactory.create();
+						semanticErrorManager.semanticDebug("?????  - en Referencia->id , el temporal de Referencia es=" + refTemp);						
 						SymbolIF symbol = scopeManager.searchSymbol(name);
+						semanticErrorManager.semanticDebug("SIMBOLO=" + symbol.toString());
 						
-						if(symbol instanceof SymbolConstant){
-							SymbolConstant symconst = (SymbolConstant) symbol;
-							Value valor = new Value(symconst.getValue());
-							codeBuilder.addQuadruple("MOVE", refTemp, valor);
+						// El identificador de la Referencia podria ser una Variable, o bien una Constante, o un parametro de un subprograma
+						
+						if(symbol instanceof SymbolVariable){
+							//El símbolo de la referencia es de tipo SymbolVariable
+							Variable var = new Variable(name, symbol);
+							codeBuilder.addQuadruple("MV", refTemp, var);
 						}
-						else{
-							Variable var = new Variable(name, symbol.getScope());
-							codeBuilder.addQuadruple("MOVE", refTemp, var);
+						else if (symbol instanceof SymbolConstant){
+							//El símbolo de la referencia es de tipo SymbolConstant
+							SymbolConstant symbolConst = (SymbolConstant)symbol;
+							Value constValue = new Value(symbolConst.getValue());
+
+							codeBuilder.addQuadruple("MV", refTemp, constValue);
 						}
 						
-						//codeBuilder.addQuadruple("MOVE", refTemp, var);
 						ref.setTemporal(refTemp);
 						List intermediateCode = codeBuilder.create();
-						semanticErrorManager.semanticDebug("intermediateCodeRef=" + intermediateCode.toString());
 						ref.setIntermediateCode(intermediateCode);					 
 									
 									
@@ -1274,11 +1300,14 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET
 						
 						//Generación de Código Intermedio
 						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
-						///// Obtener el valor de la expresión
-						//GetTemporal??
-						TemporalIF temporal = expr.getTemporal();
 						
-						codeBuilder.addQuadruple("WRITEEXP", temporal);
+						semanticErrorManager.semanticDebug("?????  - en Put_line(expresion), el temporal de expresion es=" + expr.getTemporal());
+						TemporalIF temporalExpr = expr.getTemporal();
+						semanticErrorManager.semanticDebug("?????  - en Put_line(expresion), el temporal de sentenciaIO es=" + temporalExpr);
+						
+						semanticErrorManager.semanticDebug("El temporal de la expresion en Put_line(expresion) es=" + temporalExpr);
+						codeBuilder.addQuadruples(expr.getIntermediateCode());
+						codeBuilder.addQuadruple("WRITEEXP", temporalExpr);
 						List intermediateCode = codeBuilder.create();
 						sentenciaIO.setIntermediateCode(intermediateCode);
 						semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - PUTLINE(expresion)" + sentenciaIO.getIntermediateCode());						
@@ -1345,18 +1374,19 @@ sentenciaAsignacion		::= referencia:ref ASSIGN expresion:exp
 									ScopeIF scope = scopeManager.getCurrentScope();
 									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
 									
-									TemporalIF sentAsigTemp = tempFactory.create();
+									//TemporalIF sentAsigTemp = tempFactory.create();
+									//semanticErrorManager.semanticDebug ("????En sentenciaAsignación, su temporal es= " + sentAsigTemp);
 									TemporalIF expTemp = exp.getTemporal();
-									TemporalIF rTemp = ref.getTemporal();
+									//TemporalIF rTemp = ref.getTemporal();
 									
 									TemporalIF rTempIndex = ref.getTemporalIndex();
-									TemporalIF rTempOffset = ref.getTemporalOffset();
+									//TemporalIF rTempOffset = ref.getTemporalOffset();
 									
 									IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
 									codeBuilder.addQuadruples(exp.getIntermediateCode());
 									//codeBuilder.addQuadruples(ref.getIntermediateCode());
 									
-									Variable var = new Variable(ref.getName(), scopeManager.getCurrentScope());								
+									Variable var = new Variable(ref.getName(), scopeManager.getCurrentScope(), symbol);								
 									codeBuilder.addQuadruple("ASSIGN", var, expTemp);
 									 
 									List intermediateCode = codeBuilder.create();

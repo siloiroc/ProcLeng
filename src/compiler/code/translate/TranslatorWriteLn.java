@@ -24,10 +24,10 @@ public class TranslatorWriteLn extends Translator {
 		String strResult = quadruple.getResult().toString();
 		//String strOper1  = quadruple.getFirstOperand().toString();
 		String label = DataLabels.generateLabel();
-		b.append("WRSTR /" +  label + "\t\t\t;Instruccion Put_Line");
+		b.append("WRSTR /" +  label + "\t\t\t\t;Instruccion Put_Line");
 		
 		//DataLabels.addlabelData(label + ":\t\t\t DATA " + strResult + "\n");
-		DataLabels.addlabelData(label + ":\t\t\t DATA " + "\"" + strResult + "\"");
+		DataLabels.addlabelData(label + ":\t\t\t\t DATA " + "\"" + strResult + "\"");
 		
 		
 		
