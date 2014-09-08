@@ -1,28 +1,35 @@
 ; Inicio del programa
-				RES 1
-				MOVE #65530, .SP
-				MOVE #65530, .IX
-				MOVE #10, #-2[.IX]			;Instruccion Move
-				MOVE #10, #-3[.IX]			;Instruccion Move
-				CMP #-2[.IX], #-3[.IX]		;Instruccion CMP
-				BZ /L_string_0				; Si la comparacion es Igual, salta a L_string_0
-				MOVE #0, #-4[.IX]			;Instruccion Assign
+				RES 2
+				MOVE #65527, .SP
+				MOVE #65527, .IX
+				WRSTR /string1				;Instruccion Put_Line
+				MOVE #2, #-2[.IX]			;Instruccion Move
+				MOVE #1, #-3[.IX]			;Instruccion Move
+ADD #-2[.IX], #-3[.IX]
+MOVE .A, #-4[.IX]
+				MOVE #-4[.IX], /1			;Instruccion Assign
+				WRSTR /string2				;Instruccion Put_Line
+				MOVE /1, #-5[.IX]			;Instruccion Move
+				WRINT #-5[.IX]				;Instruccion Put_Line(expresión)
+				WRCHAR #10
+				WRCHAR #13
+				MOVE #0, #-7[.IX]			;Instruccion Move
+				MOVE #-7[.IX], /0			;Instruccion Assign
+				WRSTR /string3				;Instruccion Put_Line
+				MOVE /0, #-8[.IX]			;Instruccion Move
+				CMP #1, #-8[.IX]
+				BZ /L_string_0
+				WRSTR /string4				;Instruccion Put_Line
 				BR /L_string_1				;Instruccion BR, salto incondicional
 L_string_0:
-				MOVE #1, #-4[.IX]			;Instruccion Assign
+				WRSTR /string5				;Instruccion Put_Line
 L_string_1:
-				MOVE #-4[.IX], /0			;Instruccion Assign
-				MOVE /0, #-5[.IX]			;Instruccion Move
-				CMP #1, #-5[.IX]
-				BZ /L_string_2
-				WRSTR /string1				;Instruccion Put_Line
-				BR /L_string_3				;Instruccion BR, salto incondicional
-L_string_2:
-				WRSTR /string2				;Instruccion Put_Line
-L_string_3:
 				HALT ; Fin del programa
 ; Cadenas de texto
-string1:		DATA "False"
-string2:		DATA "True"
+string1:		DATA "VARIABLES Y ARITMETICA SIMPLE\n"
+string2:		DATA "x(3):\n"
+string3:		DATA "t(false):\n"
+string4:		DATA "False"
+string5:		DATA "True"
 END ;Macroinstrucción END. Ensamblador da por finalizado el código.
 

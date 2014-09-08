@@ -1,8 +1,20 @@
+-- variables y aritmetica simple 
+
 procedure testCase04 () is
+
+	x: Integer;
 	t: Boolean;
 
 begin
-        t := 10=10;
+
+	Put_line("VARIABLES Y ARITMETICA SIMPLE");
+
+        x := 2+1;
+        Put_line("x(3):");
+        Put_line(x);
+
+	t := False;
+        Put_line("t(false):");
         Put_line(t);
 
 

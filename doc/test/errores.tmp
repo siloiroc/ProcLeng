@@ -1,4 +1,2 @@
-Linea 8: ERROR[7] Etiqueta No Definida - L_string_0
-Linea 10: ERROR[7] Etiqueta No Definida - L_string_1
-Linea 11: ERROR[3] Instrucción no reconocida - /L_string_0
-Linea 13: ERROR[3] Instrucción no reconocida - /L_string_1
+Linea 8: ERROR[5] Operando 2 Incorrecto - L_string_0
+Linea 9: ERROR[8] Entrada Incorrecta - /
