@@ -18,8 +18,8 @@ public class TranslatorWriteExpresion extends Translator {
 			
 		StringBuffer b = new StringBuffer();
 		String strResult = translate(quadruple.getResult()); 
-		b.append("WRINT " +  strResult + "\t\t\t\t;Instruccion Put_Line(expresión)\n");
-		b.append("WRCHAR #10\nWRCHAR #13");
+		b.append("\t\t\t\tWRINT " +  strResult + "\t\t\t\t;Instruccion Put_Line(expresión)\n");
+		b.append("\t\t\t\tWRCHAR #10\n\t\t\t\tWRCHAR #13");
 		return b.toString();
 	}
 

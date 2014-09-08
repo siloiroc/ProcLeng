@@ -1,5 +1,6 @@
 package compiler.code.translate;
 
+import compiler.intermediate.Label;
 import compiler.intermediate.Temporal;
 import compiler.intermediate.Value;
 import compiler.intermediate.Variable;
@@ -19,7 +20,11 @@ public abstract class Translator implements TranslatorIF {
 
 	protected String translate(OperandIF operand){
 		String translation ="";
-		if (operand instanceof Value){
+		if (operand instanceof Label){
+			Label lab = (Label) operand;
+			translation = lab.toString();
+		}
+		else if (operand instanceof Value){
 //			System.out.println("Operando: " + operand.toString() + " es de tipo valor= " + operand.toString());
 			Value val = (Value) operand;
 			//Comprobamos si el operando es un valor booleano

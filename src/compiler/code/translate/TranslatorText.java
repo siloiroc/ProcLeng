@@ -20,7 +20,7 @@ public class TranslatorText extends Translator {
 	 		//Instrucción ENS2001: HALT -> Detiene la ejecución de la máquina
 			//Formato:  HALT 
 			//Comportamiento: Activa el biestable H de fin de programa y detiene el procesador virtual
-	 		b.append("HALT ; Fin del programa");
+	 		b.append("\t\t\t\tHALT ; Fin del programa");
 	 	}
 	 		
 	 	else if (operation.equals("DATA"))

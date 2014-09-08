@@ -1,5 +1,6 @@
 package compiler.code.translate;
 
+import es.uned.lsi.compiler.intermediate.OperandIF;
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 public class TranslatorWriteLn extends Translator {
@@ -21,13 +22,17 @@ public class TranslatorWriteLn extends Translator {
 		//					cadena antes de llegar al límite superior de la memoria.
 			
 		StringBuffer b = new StringBuffer();
+		
+		OperandIF operando = quadruple.getResult();
+		
+		
 		String strResult = quadruple.getResult().toString();
 		//String strOper1  = quadruple.getFirstOperand().toString();
 		String label = DataLabels.generateLabel();
-		b.append("WRSTR /" +  label + "\t\t\t\t;Instruccion Put_Line");
+		b.append("\t\t\t\tWRSTR /" +  label + "\t\t\t\t;Instruccion Put_Line");
 		
 		//DataLabels.addlabelData(label + ":\t\t\t DATA " + strResult + "\n");
-		DataLabels.addlabelData(label + ":\t\t\t\t DATA " + "\"" + strResult + "\"");
+		DataLabels.addlabelData(label + ":\t\tDATA " + "\"" + strResult + "\"");
 		
 		
 		

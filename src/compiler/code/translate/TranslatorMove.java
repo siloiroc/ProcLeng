@@ -22,7 +22,7 @@ public class TranslatorMove extends Translator {
 		String strResult = translate(quadruple.getResult());
 //		System.out.println("StrResult=" + strResult);
 			
-		b.append("MOVE " +  strOper1 + ", " + strResult + "\t\t\t;Instruccion Move");
+		b.append("\t\t\t\tMOVE " +  strOper1 + ", " + strResult + "\t\t\t;Instruccion Move");
 		return b.toString();
 	}
 }

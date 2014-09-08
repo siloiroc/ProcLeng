@@ -133,7 +133,7 @@ public class ExecutionEnvironmentEns2001
     		translation = trWrtExp.translate(quadruple);
     	}
     	if (operation.equals("ADD")){
-    		//CompilerContext.getSemanticErrorManager().semanticDebug("add");
+    		CompilerContext.getSemanticErrorManager().semanticDebug("add");
     		TranslatorAdd tr = new TranslatorAdd();
     		translation = tr.translate(quadruple);
     	}
@@ -147,6 +147,26 @@ public class ExecutionEnvironmentEns2001
     		CompilerContext.getSemanticErrorManager().semanticDebug("mvp");
 //    		buffer.append("LD " + ".A " + "\n");
     	}
+    	if (operation.equals("CMP")){
+    		TranslatorCMP tr = new TranslatorCMP();
+    		translation = tr.translate(quadruple);
+    	}
+    	if (operation.equals("BZ")){
+    		TranslatorBZ tr = new TranslatorBZ();
+    		translation = tr.translate(quadruple);
+    	}
+    	if (operation.equals("BR")){
+    		TranslatorBranch tr = new TranslatorBranch();
+    		translation = tr.translate(quadruple);
+    	}
+    	if (operation.equals("BP")){
+    		TranslatorBranchPos tr = new TranslatorBranchPos();
+    		translation = tr.translate(quadruple);
+    	}
+    	if (operation.equals("LABEL")){
+    		TranslatorLabel tr = new TranslatorLabel();
+    		translation = tr.translate(quadruple);
+    	}
     	if (operation.equals("OR")){
     		CompilerContext.getSemanticErrorManager().semanticDebug("or");
     		TranslatorExprLogica tr= new TranslatorExprLogica();
@@ -157,8 +177,9 @@ public class ExecutionEnvironmentEns2001
 //    		buffer.append("LD " + ".A " + "\n");
     	}
     	if (operation.equals("EQ")){
-    		CompilerContext.getSemanticErrorManager().semanticDebug("eq");
-//    		buffer.append("LD " + ".A " + "\n");
+    		//CompilerContext.getSemanticErrorManager().semanticDebug("eq");
+    		TranslatorExprLogica tr = new TranslatorExprLogica();
+    		translation = tr.translate(quadruple);
     	}
     	if (operation.equals("MOVEADDR")){
     		CompilerContext.getSemanticErrorManager().semanticDebug("moveaddr");

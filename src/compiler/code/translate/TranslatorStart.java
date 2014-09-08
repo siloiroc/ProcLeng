@@ -37,10 +37,10 @@ public class TranslatorStart extends Translator {
 
 	 	
 	 	b.append("; Inicio del programa\n");
-	 	b.append("RES " +  reservaMemGlobal + "\n");		//Reservamos espacio en la memoria para las variables globales
+	 	b.append("\t\t\t\tRES " +  reservaMemGlobal + "\n");		//Reservamos espacio en la memoria para las variables globales
 //	 	b.append("ORG #" +  reservaMemGlobal);	//Ensamblamos el código a partir de la dirección de memoria siguiente al espacio reservado para las variables globales
-	 	b.append("MOVE #" + (STACKADDRESS - tamRA) + ", .SP\n");			//Colocamos el puntero de Pila en la cima de la memoria (Necesario??? Parece que el simulador de ENS2001 ya lo hace)
-	 	b.append("MOVE #" + (STACKADDRESS - tamRA) + ", .IX" );		//Apuntamos el registro IX al Registro de activación del procedimiento principal   
+	 	b.append("\t\t\t\tMOVE #" + (STACKADDRESS - tamRA) + ", .SP\n");			//Colocamos el puntero de Pila en la cima de la memoria (Necesario??? Parece que el simulador de ENS2001 ya lo hace)
+	 	b.append("\t\t\t\tMOVE #" + (STACKADDRESS - tamRA) + ", .IX" );		//Apuntamos el registro IX al Registro de activación del procedimiento principal   
 		return b.toString(); 
 	}
 
