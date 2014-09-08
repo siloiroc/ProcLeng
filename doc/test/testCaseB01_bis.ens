@@ -1,66 +1,127 @@
 ; Inicio del programa
-				RES 2
-				MOVE #65522, .SP
-				MOVE #65522, .IX
+				RES 3
+				MOVE #65509, .SP
+				MOVE #65509, .IX
 				WRSTR /string1				;Instruccion Put_Line
-				MOVE #1, #-2[.IX]			;Instruccion Move
-				MOVE #-2[.IX], /0			;Instruccion Assign
+				MOVE #2, #-2[.IX]			;Instruccion Move
+				MOVE #-2[.IX], /2			;Instruccion Assign
+				MOVE #1, #-4[.IX]			;Instruccion Move
+				MOVE #-4[.IX], /1			;Instruccion Assign
+				MOVE /1, #-6[.IX]			;Instruccion Move
+				MOVE /2, #-7[.IX]			;Instruccion Move
+				CMP #-6[.IX], #-7[.IX]		;Instruccion CMP
+				BP /L_expr_gt_0
+				MOVE #0, #-8[.IX]			;Instruccion Assign
+				BR /L_expr_gt_1				;Instruccion BR, salto incondicional
+L_expr_gt_0:
+				MOVE #1, #-8[.IX]			;Instruccion Assign
+L_expr_gt_1:
+				MOVE #-8[.IX], /0			;Instruccion Assign
 				WRSTR /string2				;Instruccion Put_Line
-				MOVE /0, #-3[.IX]			;Instruccion Move
-				MOVE #0, #-4[.IX]			;Instruccion Move
-				CMP #-3[.IX], #1		;Instruccion CMP
-				BZ /L_string_0				; Si la comparacion es Igual, salta a L_string_0
-				CMP #-4[.IX], #1		;Instruccion CMP
-				BZ /L_string_0				; Si la comparacion es Igual, salta a L_string_0
-				MOVE #0, #-5[.IX]			;Instruccion Assign
-				BR /L_string_1				;Instruccion BR, salto incondicional
-L_string_0:
-				MOVE #1, #-5[.IX]			;Instruccion Assign
-L_string_1:
-				CMP #-5[.IX], #1		;Instruccion CMP
-				BNZ /L_if_2				; Si la comparacion no es igual, salta a L_if_2
+				MOVE /2, #-9[.IX]			;Instruccion Move
+				MOVE #5, #-10[.IX]			;Instruccion Move
+				CMP #-9[.IX], #-10[.IX]		;Instruccion CMP
+				BZ /L_string_2				; Si la comparacion es Igual, salta a L_string_2
+				MOVE #0, #-11[.IX]			;Instruccion Assign
+				BR /L_string_3				;Instruccion BR, salto incondicional
+L_string_2:
+				MOVE #1, #-11[.IX]			;Instruccion Assign
+L_string_3:
+				CMP #-11[.IX], #1		;Instruccion CMP
+				BNZ /L_ifelse_5				; Si la comparacion no es igual, salta a L_ifelse_5
 				WRSTR /string3				;Instruccion Put_Line
-L_if_2:
-
-				MOVE #2, #-7[.IX]			;Instruccion Move
-				MOVE #-7[.IX], /1			;Instruccion Assign
+				BR /L_ifelse_4				;Instruccion BR, salto incondicional
+L_ifelse_5:
 				WRSTR /string4				;Instruccion Put_Line
-				MOVE /1, #-8[.IX]			;Instruccion Move
-				MOVE #1, #-9[.IX]			;Instruccion Move
-				CMP #-8[.IX], #-9[.IX]		;Instruccion CMP
-				BP /L_expr_gt_3
-				MOVE #0, #-10[.IX]			;Instruccion Assign
-				BR /L_expr_gt_4				;Instruccion BR, salto incondicional
-L_expr_gt_3:
-				MOVE #1, #-10[.IX]			;Instruccion Assign
-L_expr_gt_4:
-				CMP #-10[.IX], #1		;Instruccion CMP
-				BNZ /L_if_5				; Si la comparacion no es igual, salta a L_if_5
+L_ifelse_4:
 				WRSTR /string5				;Instruccion Put_Line
-L_if_5:
-
+				MOVE /2, #-12[.IX]			;Instruccion Move
+				MOVE #1, #-13[.IX]			;Instruccion Move
+				CMP #-12[.IX], #-13[.IX]		;Instruccion CMP
+				BP /L_expr_gt_6
+				MOVE #0, #-14[.IX]			;Instruccion Assign
+				BR /L_expr_gt_7				;Instruccion BR, salto incondicional
+L_expr_gt_6:
+				MOVE #1, #-14[.IX]			;Instruccion Assign
+L_expr_gt_7:
+				CMP #-14[.IX], #1		;Instruccion CMP
+				BNZ /L_ifelse_9				; Si la comparacion no es igual, salta a L_ifelse_9
 				WRSTR /string6				;Instruccion Put_Line
-				MOVE /1, #-11[.IX]			;Instruccion Move
-				MOVE #2, #-12[.IX]			;Instruccion Move
-				CMP #-11[.IX], #-12[.IX]		;Instruccion CMP
-				BZ /L_string_6				; Si la comparacion es Igual, salta a L_string_6
-				MOVE #0, #-13[.IX]			;Instruccion Assign
-				BR /L_string_7				;Instruccion BR, salto incondicional
-L_string_6:
-				MOVE #1, #-13[.IX]			;Instruccion Assign
-L_string_7:
-				CMP #-13[.IX], #1		;Instruccion CMP
-				BNZ /L_if_8				; Si la comparacion no es igual, salta a L_if_8
+				BR /L_ifelse_8				;Instruccion BR, salto incondicional
+L_ifelse_9:
 				WRSTR /string7				;Instruccion Put_Line
-L_if_8:
-
+L_ifelse_8:
+				WRSTR /string8				;Instruccion Put_Line
+				MOVE /0, #-15[.IX]			;Instruccion Move
+				MOVE #0, #-16[.IX]			;Instruccion Move
+				CMP #-15[.IX], #1		;Instruccion CMP
+				BZ /L_string_10				; Si la comparacion es Igual, salta a L_string_10
+				CMP #-16[.IX], #1		;Instruccion CMP
+				BZ /L_string_10				; Si la comparacion es Igual, salta a L_string_10
+				MOVE #0, #-17[.IX]			;Instruccion Assign
+				BR /L_string_11				;Instruccion BR, salto incondicional
+L_string_10:
+				MOVE #1, #-17[.IX]			;Instruccion Assign
+L_string_11:
+				CMP #-17[.IX], #1		;Instruccion CMP
+				BNZ /L_ifelse_13				; Si la comparacion no es igual, salta a L_ifelse_13
+				WRSTR /string9				;Instruccion Put_Line
+				BR /L_ifelse_12				;Instruccion BR, salto incondicional
+L_ifelse_13:
+				WRSTR /string10				;Instruccion Put_Line
+L_ifelse_12:
+				MOVE /2, #-19[.IX]			;Instruccion Move
+				MOVE /1, #-20[.IX]			;Instruccion Move
+				CMP #-19[.IX], #-20[.IX]		;Instruccion CMP
+				BP /L_expr_gt_14
+				MOVE #0, #-21[.IX]			;Instruccion Assign
+				BR /L_expr_gt_15				;Instruccion BR, salto incondicional
+L_expr_gt_14:
+				MOVE #1, #-21[.IX]			;Instruccion Assign
+L_expr_gt_15:
+				MOVE #-21[.IX], /0			;Instruccion Assign
+				WRSTR /string11				;Instruccion Put_Line
+				MOVE /0, #-22[.IX]			;Instruccion Move
+				MOVE #1, #-23[.IX]			;Instruccion Move
+				MOVE #1, #-24[.IX]			;Instruccion Move
+				CMP #-23[.IX], #1		;Instruccion CMP
+				BZ /L_string_16				; Si la comparacion es Igual, salta a L_string_16
+				CMP #-24[.IX], #1		;Instruccion CMP
+				BZ /L_string_16				; Si la comparacion es Igual, salta a L_string_16
+				MOVE #0, #-25[.IX]			;Instruccion Assign
+				BR /L_string_17				;Instruccion BR, salto incondicional
+L_string_16:
+				MOVE #1, #-25[.IX]			;Instruccion Assign
+L_string_17:
+				CMP #-22[.IX], #1		;Instruccion CMP
+				BZ /L_string_18				; Si la comparacion es Igual, salta a L_string_18
+				CMP #-25[.IX], #1		;Instruccion CMP
+				BZ /L_string_18				; Si la comparacion es Igual, salta a L_string_18
+				MOVE #0, #-26[.IX]			;Instruccion Assign
+				BR /L_string_19				;Instruccion BR, salto incondicional
+L_string_18:
+				MOVE #1, #-26[.IX]			;Instruccion Assign
+L_string_19:
+				CMP #-26[.IX], #1		;Instruccion CMP
+				BNZ /L_ifelse_21				; Si la comparacion no es igual, salta a L_ifelse_21
+				WRSTR /string12				;Instruccion Put_Line
+				BR /L_ifelse_20				;Instruccion BR, salto incondicional
+L_ifelse_21:
+				WRSTR /string13				;Instruccion Put_Line
+L_ifelse_20:
 				HALT ; Fin del programa
 ; Cadenas de texto
-string1:		DATA "IF OPERADORES\n"
-string2:		DATA "t(cierto):\n"
+string1:		DATA "IF ELSE OPERADORES\n"
+string2:		DATA "x (falso):\n"
 string3:		DATA "cierto\n"
-string4:		DATA "x mayor (cierto):\n"
-string5:		DATA "cierto\n"
-string6:		DATA "x igual (cierto):\n"
-string7:		DATA "cierto\n"
+string4:		DATA "falso\n"
+string5:		DATA "x (cierto):\n"
+string6:		DATA "cierto\n"
+string7:		DATA "falso\n"
+string8:		DATA "a (falso):\n"
+string9:		DATA "cierto\n"
+string10:		DATA "falso\n"
+string11:		DATA "a (cierto):\n"
+string12:		DATA "cierto\n"
+string13:		DATA "falso\n"
 END ;Macroinstrucción END. Ensamblador da por finalizado el código.

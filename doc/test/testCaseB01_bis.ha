@@ -1,29 +1,56 @@
--- if sin else, operadores relacionales >  = logico or
+-- if con else operadores
+
+procedure testCase06 () is
 
 
-procedure testCase05 () is
-
-      	t: Boolean;
-	x: Integer;
+        x: Integer;
+	y: Integer;
+	a: Boolean;
 
 begin
-	Put_line("IF OPERADORES");
+	Put_line("IF ELSE OPERADORES");
 	
-	t := True;
-        Put_line("t(cierto):");
-        if t or False then
+        x:=2;
+        y:=1;
+ 
+	-- false
+	a := y>x;  
+
+        Put_line("x (falso):");
+     
+	if x = 5 then
                 Put_line("cierto");
-        end if;
+        else
+                Put_line("falso");
+	end if;
 
-	x := 2;
-	Put_line("x mayor (cierto):");
 	
-	if x > 1 then
-		Put_line("cierto");
-	end if;
-	Put_line("x igual (cierto):");
-	if x=2 then		
-        	Put_line("cierto");
+	Put_line("x (cierto):");
+	
+	if x > 1 then 
+                Put_line("cierto");
+        else 
+                Put_line("falso");
 	end if;
 
-end testCase05;
+
+	Put_line("a (falso):");
+
+	-- if con parentesis al ser una expresion logica
+	if (a or False) then
+		Put_line("cierto");	
+	else 
+		Put_line("falso");
+	end if;
+
+	-- true
+	a := x > y;
+	Put_line("a (cierto):");
+
+	if a or (True or True) then
+		Put_line("cierto");	
+	else 
+		Put_line("falso");
+	end if;
+
+end testCase06;
