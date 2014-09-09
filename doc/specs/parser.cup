@@ -933,11 +933,11 @@ bloqueSentencias	::= sentencia:sent SEMICOLON bloqueSentencias:bloqueSent
 							codeBuilder.addQuadruples(sent.getIntermediateCode());
 							codeBuilder.addQuadruples(bloqueSent.getIntermediateCode());
 							
+							BloqueSentencias blqSent = new BloqueSentencias();
 							List intermediateCode = codeBuilder.create();		
-							bloqueSent.setIntermediateCode(intermediateCode);			
-							//bloqueSent.setIntermediateCode(intermediateCode);					
-							semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - BLOQUE SENTENCIAS=" + bloqueSent.getIntermediateCode());
-							RESULT = bloqueSent; 
+							blqSent.setIntermediateCode(intermediateCode);						
+							semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - BLOQUE SENTENCIAS=" + blqSent.getIntermediateCode());
+							RESULT = blqSent; 
 							
 						:} 
 						| empty 
@@ -971,6 +971,7 @@ sentencia		::=
 						:}  
 					| sentenciaFor:sentFor
 						{: //semanticErrorManager.semanticDebug("Sentencia -> SentenciaFor");
+							semanticErrorManager.semanticDebug("CI de sentenciaFor=" + sentFor.getIntermediateCode());
 							RESULT = sentFor;
 						:}
 					| llamadaSubprograma:llamadaSubProg
@@ -1450,7 +1451,6 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET
 						String s = str.getLexema();
 						s = s.substring(1, s.length()-1);
 						Value val = new Value(s + "\\n");
-						semanticErrorManager.semanticDebug("/////////////////////////////" + val.toString());
 						
 						//codeBuilder.addQuadruple("WRITELN", str.getLexema());
 						codeBuilder.addQuadruple("WRITELN", val);
@@ -1511,7 +1511,8 @@ sentenciaAsignacion		::= referencia:ref ASSIGN expresion:exp
 									codeBuilder.addQuadruples(exp.getIntermediateCode());
 									//codeBuilder.addQuadruples(ref.getIntermediateCode());
 									
-									Variable var = new Variable(ref.getName(), scopeManager.getCurrentScope(), symbol);								
+									//Variable var = new Variable(ref.getName(), scopeManager.getCurrentScope(), symbol);								
+									Variable var = new Variable(ref.getName(), scopeManager.getCurrentScope(), symvar);
 									codeBuilder.addQuadruple("ASSIGN", var, expTemp);
 									 
 									List intermediateCode = codeBuilder.create();
@@ -1740,29 +1741,32 @@ sentenciaFor	::=	FOR IDENTIFIER:id IN expresion:expInicioFor DOUBLEPOINT expresi
 											//Construimos objeto sentenciaFor
 											SentenciaFor sentenciaFor = new SentenciaFor();
 			//FOR IDENTIFIER:id IN expresion:expInicioFor DOUBLEPOINT expresion:expFinFor LOOP bloqueSentencias:blqSentFor END LOOP
+											
 											//Generación de Código Intermedio
 											ScopeIF scope = scopeManager.getCurrentScope();
 											TemporalFactory tempFact = new TemporalFactory(scope);
-											LabelFactory labelFact = new LabelFactory();
-											labelFact labelInicio = labelFact.create();
-											labelFact labelFin = labelFact.create();
+											LabelFactory labelFact = new LabelFactory("strFor");
+											LabelIF labelInicio = labelFact.create();
+											LabelIF labelFin = labelFact.create();
 											TemporalIF tempFor = tempFact.create();
-									Variable var = new Variable(ref.getName(), scopeManager.getCurrentScope(), symbol);								
-									codeBuilder.addQuadruple("ASSIGN", var, expTemp);											
-											//Creamos variable
-											Variable varFor = new Variable(id.getLexema(), scopeManager.getCurrentScope()); 
+																				
+											//Creamos variable FOR
+											SymbolVariable symvar = (SymbolVariable) scopeManager.searchSymbol(id.getLexema());
+											Variable varFor = new Variable(id.getLexema(), scopeManager.getCurrentScope(), symvar); 
 											IntermediateCodeBuilder codeBuilder = new IntermediateCodeBuilder(scope);
+																						
 											codeBuilder.addQuadruples(expInicioFor.getIntermediateCode());
-											codeBuilder.addQuadruple("ASSIGN", varFor, expInicioFor.***);
+											codeBuilder.addQuadruple("ASSIGN", varFor, expInicioFor.getTemporal());
 											codeBuilder.addQuadruples(expFinFor.getIntermediateCode());
-											codeBuilder.addQuadruple("ASSIGN", tempFor, expFinFor.***));
+											codeBuilder.addQuadruple("ASSIGN", tempFor, expFinFor.getTemporal());
 											codeBuilder.addQuadruple("LABEL", labelInicio);
 											codeBuilder.addQuadruple("CMP", tempFor, varFor);
+
 											codeBuilder.addQuadruple("BN", labelFin);
 											codeBuilder.addQuadruples(blqSentFor.getIntermediateCode());
 											codeBuilder.addQuadruple("INC", varFor);
 											codeBuilder.addQuadruple("BR", labelInicio);
-											codeBuilder.addQuadrupe("LABEL", labelFin);
+											codeBuilder.addQuadruple("LABEL", labelFin);
 											
 											List intermediateCode = codeBuilder.create();
 											sentenciaFor.setIntermediateCode(intermediateCode); 

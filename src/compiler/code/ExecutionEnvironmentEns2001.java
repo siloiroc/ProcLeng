@@ -167,6 +167,14 @@ public class ExecutionEnvironmentEns2001
     		TranslatorBranchPos tr = new TranslatorBranchPos();
     		translation = tr.translate(quadruple);
     	}
+    	if (operation.equals("BN")){
+    		TranslatorBN tr = new TranslatorBN();
+    		translation = tr.translate(quadruple);
+    	}
+    	if (operation.equals("INC")){
+    		TranslatorINC tr = new TranslatorINC();
+    		translation = tr.translate(quadruple);
+    	}
     	if (operation.equals("LABEL")){
     		TranslatorLabel tr = new TranslatorLabel();
     		translation = tr.translate(quadruple);
