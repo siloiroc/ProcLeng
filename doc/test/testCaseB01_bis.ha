@@ -4,20 +4,20 @@
 procedure testCase07 () is
 
 	type Tpersona is record
-		dni, pepe, juan: Integer;
+		dni,juan: Integer;
 		casado: Boolean;
 	end record;
 	
-	type Tfecha is record
-		dia: Integer;
-		mes: Integer;
-		anyo: Integer;
-	end record;
+--	type Tfecha is record
+--		dia: Integer;
+--		mes: Integer;
+--		anyo: Integer;
+--	end record;
 	
-	type Tcita is record
-		usuario: Tpersona;
-		fecha:	 Tfecha;
-	end record;
+--	type Tcita is record
+--		usuario: Tpersona;
+--		fecha:	 Tfecha;
+--	end record;
 	
 --	c1: Tcita;
 	p1 : Tpersona;	
@@ -32,7 +32,8 @@ begin
 --	Put_line(x);
 	
 --	p1.dni:=456;
-	p1.casado:=False;		
+--	p1.casado:=False;
+	p1.juan:= 3; 		
 			
 --	Put_line("dni(12345):");
 --	Put_line(p1.dni);

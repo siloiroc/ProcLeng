@@ -1,8 +1,8 @@
 ; Inicio del programa
-				RES 4
+				RES 3
 				MOVE #65532, .SP
 				MOVE #65532, .IX
-				MOVE #0, #-3[.IX]			;Instruccion Move
+				MOVE #3, #-3[.IX]			;Instruccion Move
 				MOVE #-3[.IX], /0			;Instruccion Assign
 				HALT ; Fin del programa
 END ;Macroinstrucción END. Ensamblador da por finalizado el código.

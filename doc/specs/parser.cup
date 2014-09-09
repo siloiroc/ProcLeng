@@ -603,7 +603,7 @@ declaracionTipo 		::= {:semanticErrorManager.semanticDebug("**DECLARACION TIPO**
 								semanticErrorManager.semanticDebug("**********************************");								
 							:};
 												
-bloqueCamposRegistro	::=	declaracionVariable:decVar SEMICOLON bloqueCamposRegistro:bcr 
+bloqueCamposRegistro	::=	bloqueCamposRegistro:bcr declaracionVariable:decVar SEMICOLON  
 							{:
 								semanticErrorManager.semanticDebug("En bloqueCamposRegistro -> bloqueCamposRegistro declaracionVariable;");
 								BloqueCamposRegistro bloquecampos = bcr;
@@ -612,7 +612,7 @@ bloqueCamposRegistro	::=	declaracionVariable:decVar SEMICOLON bloqueCamposRegist
 							:} 
 							| declaracionVariable:decVar SEMICOLON
 							{:
-								semanticErrorManager.semanticDebug("En bloqueCamposRegistro -> declaracionVariable");
+								//semanticErrorManager.semanticDebug("En bloqueCamposRegistro -> declaracionVariable");
 								BloqueCamposRegistro bloqueCampos = new BloqueCamposRegistro(decVar);
 								RESULT = bloqueCampos;
 							:}; 
@@ -629,7 +629,6 @@ declaracionVariable		::= listaIdentificadores:lid COLON
 								Util util = new Util();
 								//Verificamos si los identificadores de la lista están ya definidos en la Tabla de Símbolos
 								for(int i = 0; i < lid.getSize(); i++){
-								semanticErrorManager.semanticDebug("En la lista de identificadores, size con GetSIZE=" + lid.getSize());
 									if(util.checkSymbolTableScope(scope, lid.getIdentifiersListItem(i))){
 										semanticErrorManager.semanticFatalError("ERROR VAR001: en declaración de Variable, ya existe declaración de " + lid.getIdentifiersListItem(i));
 									}
@@ -1286,16 +1285,16 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 	
 
 								if(tRec.containsField(innerName)){
-									semanticErrorManager.semanticDebug("DEBUG R001 - " + referName + " SI contiene campo " + innerName);
+									//semanticErrorManager.semanticDebug("DEBUG R001 - " + referName + " SI contiene campo " + innerName);
 								
 									TypeIF innerType = tRec.getTypeField(innerName);
-									semanticErrorManager.semanticDebug("DEBUG R001 - El tipo del campo innername=" + innerName + " es = " + innerType);
+									//semanticErrorManager.semanticDebug("DEBUG R001 - El tipo del campo innername=" + innerName + " es = " + innerType);
 									//TypeIF innerType = scopeManager.searchType(scopeManager.searchSymbol(innerName).getName());
 									
 									//Generación de CódigoIntermedio
 									Referencia ref = new Referencia(referType, referName);
 									semanticErrorManager.semanticDebug("DEBUG R001 - El offset del campo innername=" + innerName + " es = " + tRec.getOffset(innerName));
-									ref.setOffset(tRec.getOffset(innerName));	//Establecemos el offset del campo del registro
+									//ref.setOffset(tRec.getOffset(innerName));	//Establecemos el offset del campo del registro
 
 									
 									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
@@ -1306,7 +1305,8 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 									codeBuilder.addQuadruples(refer.getIntermediateCode());
 									
 									TypeRecord rType = (TypeRecord)refer.getType();
-									int idOffset	 = rType.getOffset(innerName);
+									//int idOffset	 = rType.getOffset(innerName);
+									int idOffset = 0;
 									codeBuilder.addQuadruple("MV", refTempOffset, idOffset);
 									ref.setTemporal(refTemp);
 									ref.setTemporalIndex(refTempIndex);
