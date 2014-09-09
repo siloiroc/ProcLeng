@@ -99,6 +99,7 @@ public class TypeRecord extends TypeBase
     
 
     public int getOffset(String campo){
+    	System.out.println("En typeRecord el offset del campo" + campo + " es=" + this.bloqueCamposReg.getOffset(campo));
     	return this.bloqueCamposReg.getOffset(campo);
     }
     

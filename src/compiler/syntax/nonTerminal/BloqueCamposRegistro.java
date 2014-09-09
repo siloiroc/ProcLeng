@@ -39,20 +39,20 @@ public class BloqueCamposRegistro extends NonTerminal {
 		//System.out.println("En BloqueCamposRegistro, buscando en su lista de campos si contiene campo: " + field);
 		//Otra opción sería utilizar ArrayList.contains; contains utiliza la función equals para comparar si existe un objeto en la lista.
 		boolean found = false;  
-		for(int i=0; i<listaCamposRegistro.size(); i++)
+		System.out.println("Numero de elementos en listaCamposRegistro=" + this.listaCamposRegistro.size());
+		for(int i=0; i < this.listaCamposRegistro.size(); i++)
 		{
-			//System.out.println("BloqueCamposRegistro-containsFied, recorriendo lista de campos. Campo:" + i + ", lista campos, es");
+			System.out.println("BloqueCamposRegistro-containsFied, recorriendo lista de campos. Campo:" + i + ", lista campos, es=" + listaCamposRegistro.get(i).getIdentifiersListItem(i));
 			DeclaracionVariable decvar = this.listaCamposRegistro.get(i);
 			if (decvar.containsDecVariable(field))
 				found = true;
 		}
 		return found;
-		//return listaCamposRegistro.contains(field);
 	}
 	
 	public TypeIF getTypeCampoRegistro(String field){
 		TypeIF tipoCampo = null;
-		for(int i=0; i<listaCamposRegistro.size(); i++)
+		for(int i=0; i<this.listaCamposRegistro.size(); i++)
 		{
 			DeclaracionVariable decvar = this.listaCamposRegistro.get(i);
 			if (decvar.containsDecVariable(field))
@@ -97,9 +97,17 @@ public class BloqueCamposRegistro extends NonTerminal {
 		int sumaOffset = 0; 
 		for(int i=0; i< this.listaCamposRegistro.size(); i++){
 			if(this.listaCamposRegistro.get(i).containsDecVariable(campo))
-				return i + sumaOffset;
-			else
-				sumaOffset += this.listaCamposRegistro.get(i).getSize();
+			{
+				//System.out.println("En BloqueCamposRegistro.getOffset, i=" + i + " , sumaOffset=" + sumaOffset);
+				sumaOffset += i;
+				//System.out.println("En BloqueCamposRegistro.getOffset, i=" + i + " , sumaOffset=" + sumaOffset);
+			}
+//			else{
+//				System.out.println("En BloqueCamposRegistro.getOffset, i=" + i + " , sumaOffset=" + sumaOffset);
+//				sumaOffset += this.listaCamposRegistro.get(i).getMemorySize();
+//				System.out.println("En BloqueCamposRegistro.getOffset, i=" + i + " , sumaOffset=" + sumaOffset);
+//			}
+			return sumaOffset;				
 		}
 		return sumaOffset;
 	}

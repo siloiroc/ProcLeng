@@ -4,7 +4,7 @@
 procedure testCase07 () is
 
 	type Tpersona is record
-		dni: Integer;
+		dni, pepe, juan: Integer;
 		casado: Boolean;
 	end record;
 	
@@ -32,7 +32,7 @@ begin
 --	Put_line(x);
 	
 --	p1.dni:=456;
---	p1.casado:=False;		
+	p1.casado:=False;		
 			
 --	Put_line("dni(12345):");
 --	Put_line(p1.dni);

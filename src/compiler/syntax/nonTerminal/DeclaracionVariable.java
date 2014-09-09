@@ -58,9 +58,9 @@ public class DeclaracionVariable extends NonTerminal {
 	}
 
 	public boolean containsDecVariable(String var){
-//		System.out.println("En DeclaracionVariable, buscando contiene campo:" + var);
-//		System.out.println("DeclaracionVariable devuelve encontrado=" + idlist.containsIdentifier(var));
-		return idlist.containsIdentifier(var);
+		System.out.println("En DeclaracionVariable, buscando contiene campo:" + var);
+		System.out.println("DeclaracionVariable devuelve encontrado=" + idlist.containsIdentifier(var));
+		return this.idlist.containsIdentifier(var);
 	}
 	
 	public String getIdentifiersListItem(int item){
