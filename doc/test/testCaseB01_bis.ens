@@ -1,7 +1,7 @@
 ; Inicio del programa
 				RES 3
-				MOVE #65532, .SP
-				MOVE #65532, .IX
+				MOVE #65535, .SP
+				MOVE #65535, .IX
 				BR /Main				;Instruccion BR, salto incondicional
 L_suma:
 				ADD #-1[.IX], #-2[.IX]
@@ -16,12 +16,6 @@ L_imprimeSuma:
 				WRCHAR #13
 Main:
 				WRSTR /string1				;Instruccion Put_Line
-				MOVE #5, #-2[.IX]			;Instruccion Move
-				MOVE #-2[.IX], /1			;Instruccion Assign
-				MOVE /1, #-3[.IX]			;Instruccion Move
-				WRINT #-3[.IX]				;Instruccion Put_Line(expresión)
-				WRCHAR #10
-				WRCHAR #13
 				HALT ; Fin del programa
 ; Cadenas de texto
 string1:		DATA "SUBPROGRAMAS PROCEDIMIENTO\n"

@@ -29,7 +29,8 @@ public class TranslatorWriteLn extends Translator {
 		String strResult = quadruple.getResult().toString();
 		//String strOper1  = quadruple.getFirstOperand().toString();
 		String label = DataLabels.generateLabel();
-		b.append("\t\t\t\tWRSTR /" +  label + "\t\t\t\t;Instruccion Put_Line");
+		b.append("\t\t\t\tWRSTR /" +  label + "\t\t\t\t;Instruccion Put_Line\n");
+		b.append("\t\t\t\tWRCHAR #10\n\t\t\t\tWRCHAR #13");	//Añadimos LF y CR
 		
 		//DataLabels.addlabelData(label + ":\t\t\t DATA " + strResult + "\n");
 		DataLabels.addlabelData(label + ":\t\tDATA " + "\"" + strResult + "\"");

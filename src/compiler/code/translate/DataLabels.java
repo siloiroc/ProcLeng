@@ -17,6 +17,7 @@ public class DataLabels {
 	public static StringBuffer getDataLabels() {
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < dataLabels.size(); i++){
+			//sb.append(dataLabels.get(i) + "\n" );
 			sb.append(dataLabels.get(i) + "\n" );
 		}
 		return sb;		

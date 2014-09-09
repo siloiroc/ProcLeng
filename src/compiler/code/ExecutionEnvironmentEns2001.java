@@ -175,6 +175,10 @@ public class ExecutionEnvironmentEns2001
     		TranslatorINC tr = new TranslatorINC();
     		translation = tr.translate(quadruple);
     	}
+    	if (operation.equals("CALL")){
+    		TranslatorCall tr = new TranslatorCall();
+    		translation = tr.translate(quadruple);
+    	}
     	if (operation.equals("LABEL")){
     		TranslatorLabel tr = new TranslatorLabel();
     		translation = tr.translate(quadruple);
@@ -193,10 +197,7 @@ public class ExecutionEnvironmentEns2001
     		TranslatorExprLogica tr = new TranslatorExprLogica();
     		translation = tr.translate(quadruple);
     	}
-    	if (operation.equals("MOVEADDR")){
-    		CompilerContext.getSemanticErrorManager().semanticDebug("moveaddr");
-//    		buffer.append("LD " + ".A " + "\n");
-    	}    	
+ 	
     	
     	return translation;
 		

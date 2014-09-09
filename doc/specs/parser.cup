@@ -1002,11 +1002,7 @@ bloqueSentencias	::= sentencia:sent SEMICOLON bloqueSentencias:bloqueSent
 							RESULT = bloqueSent; 
 						:};								
 
-sentencia		::= 
-//					expresion
-//						{: //semanticErrorManager.semanticDebug("Sentencia -> Expresion"); :}  
-//					|
-					 sentenciaAsignacion:sentAsig 
+sentencia		::= sentenciaAsignacion:sentAsig 
 						{: //semanticErrorManager.semanticDebug("Sentencia->SentenciaAsignación"); 
 							//semanticErrorManager.semanticDebug("Sentencia->SentenciaAsignación= " + sentAsig.getName());
 							RESULT = sentAsig;
@@ -1462,7 +1458,8 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET
 						if (expr.getType() instanceof TypeSimple)
 						{	//Si la expresión es de tipo simple
 						semanticErrorManager.semanticDebug("Expresion en Put_line(expresion) es de Tipo Simple");
-							if (expr.getType().getName().equals("BOOLEAN")){	//La expresión es de tipo booleano
+							if (expr.getType().getName().equals("BOOLEAN"))
+							{	//La expresión es de tipo booleano
 								//Generamos cuádruplas para escribir bien el valor "true" o el valor "false"
 								semanticErrorManager.semanticDebug("Expresion en Put_line(expresion) es de Tipo BOOLEANO");
 								//codeBuilder.addQuadruple("WRITELN",  temporalExpr);
@@ -1507,7 +1504,8 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET
 						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
 						String s = str.getLexema();
 						s = s.substring(1, s.length()-1);
-						Value val = new Value(s + "\\n");
+						//Value val = new Value(s + "\\n");
+						Value val = new Value(s);
 						
 						//codeBuilder.addQuadruple("WRITELN", str.getLexema());
 						codeBuilder.addQuadruple("WRITELN", val);
@@ -1732,6 +1730,8 @@ llamadaSubprograma		::= IDENTIFIER:id LEFTBRACKET parametrosActuales:paramActual
 									{
 									 	if (symbolSubprograma instanceof SymbolProcedure) 
 										{	//El subprograma es un procedimiento
+											semanticErrorManager.semanticDebug("//////////////////Estoy en llamadaSubprograma Procedure");
+										
 											SymbolProcedure symProc = (SymbolProcedure) symbolSubprograma;
 											TypeProcedure typeProc  = (TypeProcedure) symProc.getType();											
 																																																		
@@ -1740,7 +1740,9 @@ llamadaSubprograma		::= IDENTIFIER:id LEFTBRACKET parametrosActuales:paramActual
 																																			
 											//Comprobamos si tienen el mismo número de parámetros
 											int aNumParams = paramActuales.getNumParameters();
+											semanticErrorManager.semanticDebug("//////////////////Estoy en llamadaSubprograma Procedure, aNumParams=" + aNumParams);
 											int pNumParams = typeProc.getSize();
+											semanticErrorManager.semanticDebug("//////////////////Estoy en llamadaSubprograma Procedure, pNumParams=" + pNumParams);
 											if(!(aNumParams == pNumParams))
 												semanticErrorManager.semanticFatalError("ERROR PCALL001: Error en invocación de procedimiento '" + nombreSubprograma +"', número de parámetros (" + aNumParams + ") incorrecto, se esperaban " + pNumParams); 
 											
@@ -1754,7 +1756,6 @@ llamadaSubprograma		::= IDENTIFIER:id LEFTBRACKET parametrosActuales:paramActual
 												//Creamos Procedimiento (name, Scope)
 												Procedure proc = new Procedure(id.getLexema(), scope);
 																								
-												
 												IntermediateCodeBuilder codeBuilder = new IntermediateCodeBuilder(scope);
 												codeBuilder.addQuadruples(paramActuales.getIntermediateCode());
 												codeBuilder.addQuadruple("CALL", proc);
@@ -1780,6 +1781,7 @@ llamadaSubprograma		::= IDENTIFIER:id LEFTBRACKET parametrosActuales:paramActual
 parametrosActuales				::= parametrosActuales:pActuales COMMA expresion:exp
 								{:
 									semanticErrorManager.semanticDebug("En parametrosActuales -> parametrosActuales , exp");
+									semanticErrorManager.semanticDebug("//////////////////Estoy en ParametrosActuales,Expresion");
 									pActuales.addParametroActual(exp);
 									RESULT = pActuales;
 									
@@ -1790,7 +1792,13 @@ parametrosActuales				::= parametrosActuales:pActuales COMMA expresion:exp
 									ParametrosActuales paramAct = new ParametrosActuales(exp);
 									RESULT = paramAct;
 								:}
-								| empty;
+								| empty
+								{:
+									semanticErrorManager.semanticDebug("//////////////////Estoy en ParametrosActuales = empty");
+									ParametrosActuales paramAct = new ParametrosActuales();
+									RESULT = paramAct;
+								:}
+								;
 
 
 // Sentencia For

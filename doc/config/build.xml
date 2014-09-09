@@ -8,18 +8,19 @@
 		se quiera compilar
 	-->
 	
-	<property name="test-file-name" value="testCaseB01_bis.ha"/>
-	<!--<property name="test-file-name" value="testCaseB01.ha"/>-->
-	<!--<property name="test-file-name" value="testCaseB02.ha"/> -->  <!-- Put_lines, ok -->
-	<!--<property name="test-file-name" value="testCaseB03.ha"/>-->   <!-- Constantes -->
-	<!--<property name="test-file-name" value="testCaseB04.ha"/>-->
-	<!--<property name="test-file-name" value="testCaseB05.ha"/>-->
-	<!--<property name="test-file-name" value="testCaseB06.ha"/>-->
-	<!--<property name="test-file-name" value="testCaseB07.ha"/>-->
-	<!--<property name="test-file-name" value="testCaseB08.ha"/>-->
-	<!--<property name="test-file-name" value="testCaseB09.ha"/>-->
-	<!--<property name="test-file-name" value="testCaseB10.ha"/>-->
-	
+	<property name="test-file-name" value="testCaseB01_bis3.ha"/>
+	<!--<property name="test-file-name" value="testCaseB01.ha"/>-->													<!-- Programa vacío --> 					<!--OK-->
+	<!--<property name="test-file-name" value="testCaseB02.ha"/>-->  												<!-- Put_lines--> 							<!--OK-->
+	<!--<property name="test-file-name" value="testCaseB03.ha"/>-->   												<!-- Constantes--> 							<!--OK-->
+	<!--<property name="test-file-name" value="testCaseB04.ha"/>-->													<!-- Variables y arimética simple--> 		<!--OK-->
+	<!--<property name="test-file-name" value="testCaseB05.ha"/>-->													<!--If sin else, operadores relacionales > = logico or--> <!--OK-->
+	<!--<property name="test-file-name" value="testCaseB06.ha"/>-->													<!--If con else operadores-->				<!--OK-->
+	<!--property name="test-file-name" value="testCaseB07.ha"/>-->				<!--Registros-->	<!--MAL-->
+	<!--<property name="test-file-name" value="testCaseB08.ha"/>-->				<!--Funciones, paso por valor--> <!--MAL-->
+	<!--<property name="test-file-name" value="testCaseB09.ha"/>-->				<!--Procedimientos-->
+	<!--<property name="test-file-name" value="testCaseB10.ha"/>-->													<!--Control de flujo FOR-->	<!--OK-->
+	<!--<property name="test-file-name" value="testCaseB11.ha"/>-->				<!--Subprogramas procedimientos anidados-->
+	<!--<property name="test-file-name" value="testCaseB12.ha"/>-->				<!--Recursividad-->
 	
 	<property name="lib" location="lib"/>
 	<property name="test" location="doc/test"/>

@@ -7,7 +7,7 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
 public class ParametrosActuales extends NonTerminal {
 
 	private ArrayList<Expresion> listaParamActuales = new ArrayList<Expresion>();
-	private int numParameters;
+	private int numParameters = 0;
 	
 	public ParametrosActuales() {
 		super();

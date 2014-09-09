@@ -1,3 +1,8 @@
 ; Inicio del programa
-HALT ; Fin del programa
+				RES 0
+				MOVE #65535, .SP
+				MOVE #65535, .IX
+				BR /Main				;Instruccion BR, salto incondicional
+Main:
+				HALT ; Fin del programa
 END ;Macroinstrucción END. Ensamblador da por finalizado el código.
