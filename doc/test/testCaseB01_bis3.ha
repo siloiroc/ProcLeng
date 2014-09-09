@@ -22,9 +22,9 @@ end suma;
 
 
 begin
-	Put_line ("SUBPROGRAMAS PROCEDIMIENTO");
-	a:= 5;
-	Put_line(a);	
+--	Put_line ("SUBPROGRAMAS PROCEDIMIENTO");
+--	a:= 5;
+	
 --	imprimeSuma ();
 --	b:= 3;			
 

@@ -1,5 +1,6 @@
 package compiler.intermediate;
 
+import es.uned.lsi.compiler.intermediate.LabelFactory;
 import es.uned.lsi.compiler.intermediate.LabelIF;
 import es.uned.lsi.compiler.intermediate.ProcedureIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
@@ -13,6 +14,7 @@ public class Procedure
 {
     private String  name     = null;
     private ScopeIF scope    = null;
+    private LabelIF label 	 = null;
         
     /**
      * Constructor for Variable.
@@ -24,6 +26,9 @@ public class Procedure
         super ();
         this.name = name;
         this.scope = scope;
+        //Creamos una etiqueta label en el constructor del Procedure; la etiqueta incluirá el nombre del Procedure
+        LabelFactory labelFact = new LabelFactory();
+        this.label = labelFact.create(this.name);
     }
 
     /**
@@ -53,8 +58,7 @@ public class Procedure
     @Override
     public final LabelIF getCodeLabel ()
     {
-        // TODO : Student Work
-        return null;
+    	return this.label;	//Devuelve la etiqueta del Procedure (etiqueta creada en el constructor)   
     }
 
     /**

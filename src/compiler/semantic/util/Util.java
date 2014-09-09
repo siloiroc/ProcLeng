@@ -44,7 +44,8 @@ public class Util {
 	
 	public static void addToSymbolTable(ScopeIF scope, SymbolIF symbol){
 		SymbolTableIF tablaSimbolos = scope.getSymbolTable();
-		tablaSimbolos.addSymbol(symbol);
+		//tablaSimbolos.addSymbol(symbol);
+		tablaSimbolos.addSymbol(symbol.getName(), symbol);
 	}
 	
 	

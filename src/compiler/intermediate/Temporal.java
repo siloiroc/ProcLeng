@@ -27,7 +27,6 @@ public class Temporal
         this.name = name;
         this.scope = scope;
         this.size = 1; 	// Inicialización del tamaño del temporal. En ENS2001 todos los tipos simples pesan 1 palabra en memoria
-
     }
     
     
