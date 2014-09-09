@@ -24,6 +24,7 @@ procedure testCase07 () is
 --	x, y: Integer;
 --	d: Boolean;
 
+	x: Integer;
 begin
 
 --	Put_line("REGISTROS");	
@@ -33,12 +34,23 @@ begin
 	
 --	p1.dni:=456;
 --	p1.casado:=False;
-	p1.juan:= 3; 		
+--	p1.juan:= 3; 		
 			
 --	Put_line("dni(12345):");
 --	Put_line(p1.dni);
 --	Put_line("casado(false):");
 --	Put_line(p1.casado);
 
+
+       Put_line ("CRONTROL FLUJO FOR");
+	
+	x:=0;
+	Put_line("x(1,2,3,4,5):");
+
+	for x in 1..5 loop
+
+		Put_line(x);
+
+	end loop;
 
 end testCase07;

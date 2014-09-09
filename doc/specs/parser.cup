@@ -1739,6 +1739,34 @@ sentenciaFor	::=	FOR IDENTIFIER:id IN expresion:expInicioFor DOUBLEPOINT expresi
 											//semanticErrorManager.semanticDebug("La expresion del Fin del For es de tipo Integer");
 											//Construimos objeto sentenciaFor
 											SentenciaFor sentenciaFor = new SentenciaFor();
+			//FOR IDENTIFIER:id IN expresion:expInicioFor DOUBLEPOINT expresion:expFinFor LOOP bloqueSentencias:blqSentFor END LOOP
+											//Generación de Código Intermedio
+											ScopeIF scope = scopeManager.getCurrentScope();
+											TemporalFactory tempFact = new TemporalFactory(scope);
+											LabelFactory labelFact = new LabelFactory();
+											labelFact labelInicio = labelFact.create();
+											labelFact labelFin = labelFact.create();
+											TemporalIF tempFor = tempFact.create();
+									Variable var = new Variable(ref.getName(), scopeManager.getCurrentScope(), symbol);								
+									codeBuilder.addQuadruple("ASSIGN", var, expTemp);											
+											//Creamos variable
+											Variable varFor = new Variable(id.getLexema(), scopeManager.getCurrentScope()); 
+											IntermediateCodeBuilder codeBuilder = new IntermediateCodeBuilder(scope);
+											codeBuilder.addQuadruples(expInicioFor.getIntermediateCode());
+											codeBuilder.addQuadruple("ASSIGN", varFor, expInicioFor.***);
+											codeBuilder.addQuadruples(expFinFor.getIntermediateCode());
+											codeBuilder.addQuadruple("ASSIGN", tempFor, expFinFor.***));
+											codeBuilder.addQuadruple("LABEL", labelInicio);
+											codeBuilder.addQuadruple("CMP", tempFor, varFor);
+											codeBuilder.addQuadruple("BN", labelFin);
+											codeBuilder.addQuadruples(blqSentFor.getIntermediateCode());
+											codeBuilder.addQuadruple("INC", varFor);
+											codeBuilder.addQuadruple("BR", labelInicio);
+											codeBuilder.addQuadrupe("LABEL", labelFin);
+											
+											List intermediateCode = codeBuilder.create();
+											sentenciaFor.setIntermediateCode(intermediateCode); 
+																						
 											RESULT = sentenciaFor;
 										}
 									}									
