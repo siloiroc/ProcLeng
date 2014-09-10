@@ -1,5 +1,9 @@
 package compiler.intermediate;
 
+import java.util.ArrayList;
+
+import compiler.semantic.symbol.SymbolParameter;
+
 import es.uned.lsi.compiler.intermediate.LabelFactory;
 import es.uned.lsi.compiler.intermediate.LabelIF;
 import es.uned.lsi.compiler.intermediate.ProcedureIF;
@@ -15,6 +19,7 @@ public class Procedure
     private String  name     = null;
     private ScopeIF scope    = null;
     private LabelIF label 	 = null;
+    private ArrayList<SymbolParameter> listaParametros; 	//Lista de Parámetros del subprograma
         
     /**
      * Constructor for Variable.
@@ -23,7 +28,7 @@ public class Procedure
      */
     public Procedure (String name, ScopeIF scope)
     {
-        super ();
+        super (); 
         this.name = name;
         this.scope = scope;
         //Creamos una etiqueta label en el constructor del Procedure; la etiqueta incluirá el nombre del Procedure
@@ -32,6 +37,24 @@ public class Procedure
     }
 
     /**
+	 * @return the listaParametros
+	 */
+	public ArrayList<SymbolParameter> getListaParametros() {
+		return listaParametros;
+	}
+
+	/**
+	 * @param listaParametros the listaParametros to set
+	 */
+	public void setListaParametros(ArrayList<SymbolParameter> listaParametros) {
+		this.listaParametros = listaParametros;
+	}
+
+	public int getParametersSize(){
+		return this.listaParametros.size();
+	}
+	
+	/**
      * Returns the name.
      * @return Returns the name.
      */

@@ -15,9 +15,6 @@ public class TranslatorAssign extends Translator {
 	public String translate(QuadrupleIF quadruple) {
 		//ASSIGN expresion := valor
 		Variable var = (Variable)quadruple.getResult();
-		System.out.println("*******************TranslateAssign, la variable es=" + var.getName() + ", con address=" + var.getAddress());
-		System.out.println(var.getClass());
-		
 		
 		StringBuffer b = new StringBuffer();
 		OperandIF operand1 = quadruple.getFirstOperand();

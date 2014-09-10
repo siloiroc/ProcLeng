@@ -25,7 +25,6 @@ public abstract class Translator implements TranslatorIF {
 			translation = lab.toString();
 		}
 		else if (operand instanceof Value){
-//			System.out.println("Operando: " + operand.toString() + " es de tipo valor= " + operand.toString());
 			Value val = (Value) operand;
 			//Comprobamos si el operando es un valor booleano
 			if (val.getValue().equals("TRUE"))
@@ -39,24 +38,18 @@ public abstract class Translator implements TranslatorIF {
 		{
 			Variable var = (Variable)operand;
 			if (var.isGlobal()){ //Si variable es global, direccionamiento directo a memoria
-//				System.out.println("Operando: " + operand.toString() + " es de tipo variable y global =" + operand.toString());
 				translation =  "/" + var.getAddress();
-//				System.out.println("translation = " + translation);
 			}
 			else{
-//				System.out.println("Operando: " + operand.toString() + " es de tipo variable y otra");
 				translation = "#-" + var.getAddress() + "[.IX]";
 			}
 		}
 		else if (operand instanceof Temporal)
 		{	//Si operando es Temporal => Direccionamiento relativo a Registro
 			Temporal temp = (Temporal)operand;
-//			System.out.println("Operando " + operand.toString() + " es de tipo Temporal");
 			translation = "#-" + temp.getAddress() + "[.IX]";
-//			System.out.println("translation = " + translation);
 		}
 		else{	//Si no, direccionamiento inmediato
-//			System.out.println("No es ni de tipo Value ni Variable, el operando es=" + operand.toString() + operand.getClass());
 			translation = ".R1"; 
 
 

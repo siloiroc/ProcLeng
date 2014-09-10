@@ -9,10 +9,14 @@ L_imprimeSuma:
 				WRCHAR #13
 				RET
 Main:
+				WRSTR /string2				;Instruccion Put_Line
+				WRCHAR #10
+				WRCHAR #13
 				; Registro de Activación - RA 
 				CALL /L_imprimeSuma
 				; Fin Registro Activación - RA
 				HALT ; Fin del programa
 ; Cadenas de texto
 string1:		DATA "hola"
+string2:		DATA "SUBPROGRAMAS FUNCIONES"
 END ;Macroinstrucción END. Ensamblador da por finalizado el código.

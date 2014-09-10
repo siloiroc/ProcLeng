@@ -8,7 +8,7 @@
 		se quiera compilar
 	-->
 	
-	<property name="test-file-name" value="testCaseB01_bis.ha"/>
+	<property name="test-file-name" value="testCaseB09_simple3.ha"/>
 	<!--<property name="test-file-name" value="testCaseB01.ha"/>-->													<!-- Programa vacío --> 					<!--OK-->
 	<!--<property name="test-file-name" value="testCaseB02.ha"/>-->  												<!-- Put_lines--> 							<!--OK-->
 	<!--<property name="test-file-name" value="testCaseB03.ha"/>-->   												<!-- Constantes--> 							<!--OK-->
@@ -18,6 +18,9 @@
 	<!--property name="test-file-name" value="testCaseB07.ha"/>-->				<!--Registros-->	<!--MAL-->
 	<!--<property name="test-file-name" value="testCaseB08.ha"/>-->				<!--Funciones, paso por valor--> <!--MAL-->
 	<!--<property name="test-file-name" value="testCaseB09.ha"/>-->				<!--Procedimientos-->
+		<!--<property name="test-file-name" value="testCaseB09_simple1.ha"/>-->		<!--Procedimientos. LLamada a Procedimiento simple, sin parámetros, que sólo imprime con Put_line--> <!--OK-->
+		<!--<property name="test-file-name" value="testCaseB09_simple2.ha"/>-->		<!--Procedimientos. LLamada a Procedimiento simple, sin parámetros, y con variables locales--> <!--OK-->
+		<!--<property name="test-file-name" value="testCaseB09_simple3.ha"/>-->		<!--Procedimientos. LLamada a Procedimiento con parámetros, y con variables locales--> <!--OK-->
 	<!--<property name="test-file-name" value="testCaseB10.ha"/>-->													<!--Control de flujo FOR-->	<!--OK-->
 	<!--<property name="test-file-name" value="testCaseB11.ha"/>-->				<!--Subprogramas procedimientos anidados-->
 	<!--<property name="test-file-name" value="testCaseB12.ha"/>-->				<!--Recursividad-->

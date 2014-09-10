@@ -1,5 +1,6 @@
 package compiler.semantic.symbol;
 
+import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolBase;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
@@ -13,7 +14,8 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 public class SymbolParameter extends SymbolBase
 {  
-
+	private TemporalIF temporal;
+	
     /**
      * Constructor for SymbolParameter.
      * @param scope The declaration scope.
@@ -32,5 +34,19 @@ public class SymbolParameter extends SymbolBase
 	/**
 	 * @return the type
 	 */
+
+	/**
+	 * @return the temporal
+	 */
+	public TemporalIF getTemporal() {
+		return temporal;
+	}
+
+	/**
+	 * @param temporal the temporal to set
+	 */
+	public void setTemporal(TemporalIF temporal) {
+		this.temporal = temporal;
+	}
 	 
 }

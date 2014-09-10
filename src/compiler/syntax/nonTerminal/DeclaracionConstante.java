@@ -48,8 +48,6 @@ public class DeclaracionConstante extends NonTerminal {
 	}
 	
 	public boolean containsDecConstante(String constant){
-		//System.out.println("En DeclaracionConstante, buscando contiene campo" + constant);
-		//System.out.println("DeclaracionConstante devuelve encontrado=" + idlist.containsIdentifier(constant));
 		return idlist.containsIdentifier(constant);
 	}
 }

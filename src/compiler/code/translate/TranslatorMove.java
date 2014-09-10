@@ -18,9 +18,7 @@ public class TranslatorMove extends Translator {
 		StringBuffer b = new StringBuffer();
 		
 		String strOper1  = translate(quadruple.getFirstOperand());
-//		System.out.println("StrOperando1=" + strOper1);
 		String strResult = translate(quadruple.getResult());
-//		System.out.println("StrResult=" + strResult);
 			
 		b.append("\t\t\t\tMOVE " +  strOper1 + ", " + strResult + "\t\t\t;Instruccion Move");
 		return b.toString();

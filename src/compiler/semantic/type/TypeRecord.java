@@ -134,8 +134,6 @@ public class TypeRecord extends TypeBase
      * @return
      */
 //    public boolean containsField(String field){
-////    	System.out.println("En Type Record, buscando contiene campo=" + field);
-////    	System.out.println("Campos de bloqueCamposRegistro");
 //    	
 //    	return this.bloqueCamposReg.containsField(field);
 //    }

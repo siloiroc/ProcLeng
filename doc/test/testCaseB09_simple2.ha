@@ -3,20 +3,14 @@ procedure testCase07 () is
 a: Integer; 
 
 procedure imprimeSuma () is
+x:Integer;
 begin
+	x:= 1; 
 	Put_line("hola");
+	Put_line(x);
 end imprimeSuma;
 
 begin
-
-	
+	Put_line ("SUBPROGRAMAS FUNCIONES");
 	imprimeSuma();
---	Put_line ("SUBPROGRAMAS FUNCIONES");
---	a:= 5;
---	b:= 3;
---	z:= suma (a,b);
---	Put_line("z(8):");
---	Put_line(z);
-
-
 end testCase07;

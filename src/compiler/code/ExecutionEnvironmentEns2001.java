@@ -17,6 +17,11 @@ import es.uned.lsi.compiler.intermediate.QuadrupleIF;
  * Class for the ENS2001 Execution environment.
  */
 
+	
+
+
+
+
 public class ExecutionEnvironmentEns2001 
     implements ExecutionEnvironmentIF
 {    
@@ -29,6 +34,17 @@ public class ExecutionEnvironmentEns2001
     
     private RegisterDescriptorIF registerDescriptor;
     private MemoryDescriptorIF   memoryDescriptor;
+    
+  //Registro Activación (RA)
+  		// - Valor de retorno
+  		// - Dirección de retorno
+  		// - Vínculo de control
+  		// - Vínculo de acceso    
+    public static final String RA_VINCULOCONTROL   = "#-3[.IX]";
+	public static final String RA_VINCULOACCESO    = "#-2[.IX]";
+	public static final String RA_DIRECCIONRETORNO = "#-1[.IX]";
+	public static final String RA_VALORRETORNO     = "#0[.IX]";
+    
     
     /**
      * Constructor for ENS2001Environment.
@@ -102,55 +118,40 @@ public class ExecutionEnvironmentEns2001
     	StringBuffer buffer = new StringBuffer();
     	String operation = quadruple.getOperation();
     	if(operation.equals("INICIO")){
-//    		System.out.println("En ExecutionEnvironmentEns2001 INICIO PROGRAMA");
     		TranslatorStart tr = new TranslatorStart();
     		translation = tr.translate(quadruple);
     	}
     	if(operation.equals("FIN")){
-//    		System.out.println("En ExecutionEnvironmentEns2001 FIN PROGRAMA");
     		TranslatorText tr = new TranslatorText();
     		translation = tr.translate(quadruple);
     	}
     	if(operation.equals("DATA")){
-//    		System.out.println("En ExecutionEnvironmentEns2001 DATA");
     		TranslatorText tr = new TranslatorText();
     		translation = tr.translate(quadruple);
-    	}
-    	
+    	}    	
     	if(operation.equals("MV")){
-    		//System.out.println("En ExecutionEnvironmentEns2001 MOVE");
     		TranslatorMove tr = new TranslatorMove();
     		translation = tr.translate(quadruple);
     	}
     	if (operation.equals("WRITELN")){
-    		//CompilerContext.getSemanticErrorManager().semanticDebug("Writeln");
     		TranslatorWriteLn tr = new TranslatorWriteLn();
     		translation = tr.translate(quadruple);
     	}
     	if (operation.equals("WRITEEXP")){
-    		//CompilerContext.getSemanticErrorManager().semanticDebug("WriteExpresion");
     		TranslatorWriteExpresion trWrtExp = new TranslatorWriteExpresion();
     		translation = trWrtExp.translate(quadruple);
     	}
     	if (operation.equals("ADD")){
-    		CompilerContext.getSemanticErrorManager().semanticDebug("add");
     		TranslatorAdd tr = new TranslatorAdd();
     		translation = tr.translate(quadruple);
     	}
     	if (operation.equals("MUL")){
-    		CompilerContext.getSemanticErrorManager().semanticDebug("add");
     		TranslatorMUL tr = new TranslatorMUL();
     		translation = tr.translate(quadruple);
     	}
     	if (operation.equals("ASSIGN")){
-//    		CompilerContext.getSemanticErrorManager().semanticDebug("assign");
     		TranslatorAssign tr = new TranslatorAssign();
     		translation = tr.translate(quadruple);
-    	}
-    	
-    	if (operation.equals("MVP")){
-    		CompilerContext.getSemanticErrorManager().semanticDebug("mvp");
-//    		buffer.append("LD " + ".A " + "\n");
     	}
     	if (operation.equals("CMP")){
     		TranslatorCMP tr = new TranslatorCMP();
@@ -193,19 +194,15 @@ public class ExecutionEnvironmentEns2001
     		TranslatorExprLogica tr= new TranslatorExprLogica();
     		translation = tr.translate(quadruple);
     	}
-    	if (operation.equals("GR")){
-    		CompilerContext.getSemanticErrorManager().semanticDebug("gr");
-//    		buffer.append("LD " + ".A " + "\n");
-    	}
     	if (operation.equals("EQ")){
-    		//CompilerContext.getSemanticErrorManager().semanticDebug("eq");
     		TranslatorExprLogica tr = new TranslatorExprLogica();
     		translation = tr.translate(quadruple);
     	}
- 	
-    	
+    	if (operation.equals("RETORNO")){
+    		TranslatorRET tr = new TranslatorRET();
+    		translation = tr.translate(quadruple);
+    	}
+ 	    	
     	return translation;
-		
-        //return quadruple.toString();        
     }
 }

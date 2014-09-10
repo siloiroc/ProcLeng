@@ -23,22 +23,14 @@ public class TranslatorStart extends Translator {
 		// OP = INICIO, 
 		// Result=valor de la dirección de memoria siguiente a la última variable global reservada
 		// FirstOperand = tamaño del ámbito (variables y temporales)
-	 	CompilerContext.getSemanticErrorManager().semanticDebug("quadrupla Start, operacion=" + quadruple.getOperation() + ", result=" + quadruple.getResult() +
- 				", first=" + quadruple.getFirstOperand());
-		
-		
+
 	 	StringBuffer b = new StringBuffer();
 	 	Value reservaMemGlobal = (Value) quadruple.getResult();
 	 	Value tamScope = (Value) quadruple.getFirstOperand();
 	 	int tamRA = (int) tamScope.getValue();
-
-	 	
-	 	CompilerContext.getSemanticErrorManager().semanticDebug("Tamaño de RA en translate Start=" + tamRA); 
-
 	 	
 	 	b.append("; Inicio del programa\n");
 	 	b.append("\t\t\t\tRES " +  reservaMemGlobal + "\n");		//Reservamos espacio en la memoria para las variables globales
-//	 	b.append("ORG #" +  reservaMemGlobal);	//Ensamblamos el código a partir de la dirección de memoria siguiente al espacio reservado para las variables globales
 	 	b.append("\t\t\t\tMOVE #" + (STACKADDRESS - tamRA) + ", .SP\n");			//Colocamos el puntero de Pila en la cima de la memoria (Necesario??? Parece que el simulador de ENS2001 ya lo hace)
 	 	b.append("\t\t\t\tMOVE #" + (STACKADDRESS - tamRA) + ", .IX" );		//Apuntamos el registro IX al Registro de activación del procedimiento principal   
 		return b.toString(); 

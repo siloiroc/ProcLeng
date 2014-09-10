@@ -2,6 +2,7 @@ package compiler.semantic.type;
 
 import java.util.ArrayList;
 
+import compiler.semantic.symbol.SymbolParameter;
 import compiler.syntax.nonTerminal.ParametrosActuales;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeBase;
@@ -18,6 +19,7 @@ public class TypeProcedure extends TypeBase
 {   
 	
 	private ArrayList<TypeIF> parameterTypes = new ArrayList<TypeIF>();
+	private ArrayList<SymbolParameter> listaParamsFormales;
 		
    /**
      * Constructor for TypeProcedure.
@@ -60,6 +62,21 @@ public class TypeProcedure extends TypeBase
         //return 1;
     	return this.parameterTypes.size();
     }
+
+	/**
+	 * @return the listaParamsFormales
+	 */
+	public ArrayList<SymbolParameter> getListaParamsFormales() {
+		return listaParamsFormales;
+	}
+
+	/**
+	 * @param listaParamsFormales the listaParamsFormales to set
+	 */
+	public void setListaParamsFormales(
+			ArrayList<SymbolParameter> listaParamsFormales) {
+		this.listaParamsFormales = listaParamsFormales;
+	}
 
 	/**
 	 * @return the parameterTypes

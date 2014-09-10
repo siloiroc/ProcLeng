@@ -29,20 +29,11 @@ public class BloqueCamposRegistro extends NonTerminal {
 	}
 
 	public boolean containsField(String field){
-//		if (this.listaCamposRegistro.contains(new DeclaracionVariable()) 
-//			|| this.listaCamposRegistro.contains(new DeclaracionVariable())
-//			|| this.listaCamposRegistro.contains(new DeclaracionVariable()))	
-//			return true;
-//		else
-//			return false;
-		
-		//System.out.println("En BloqueCamposRegistro, buscando en su lista de campos si contiene campo: " + field);
+
 		//Otra opción sería utilizar ArrayList.contains; contains utiliza la función equals para comparar si existe un objeto en la lista.
 		boolean found = false;  
-		//System.out.println("Numero de elementos en listaCamposRegistro (numero de ListaIdentificadores)=" + this.listaCamposRegistro.size());
 		for(int i=0; i < this.listaCamposRegistro.size(); i++)
 		{
-			//System.out.println("BloqueCamposRegistro-containsFied, recorriendo lista de campos. Campo:" + i + ", lista campos, es=" + listaCamposRegistro.get(i).getIdentifiersListItem(i));
 			DeclaracionVariable decvar = this.listaCamposRegistro.get(i);
 			if (decvar.containsDecVariable(field))
 				found = true;
@@ -95,35 +86,19 @@ public class BloqueCamposRegistro extends NonTerminal {
 
 	public int getOffset(String campo){
 		int sumaOffset = 0; 
-//		//System.out.println("BloqueCamposRegistro.getOffset, valor de listaCamposREgistro.size=" + this.listaCamposRegistro.size());
-//		for (int i=0; i< this.listaCamposRegistro.size(); i++){
-//			System.out.println("i=" + i + " variables =");
-//			ArrayList<String> listaIds = this.listaCamposRegistro.get(i).getIdlist().getIdentifiersList();
-//			for (int j=0; j<listaIds.size(); j++){
-//				System.out.println("Variable j=" + j + " es = " + listaIds.get(j));
-//			}
-//		}
+		for (int i=0; i< this.listaCamposRegistro.size(); i++){
+			ArrayList<String> listaIds = this.listaCamposRegistro.get(i).getIdlist().getIdentifiersList();
+		}
 		
 		
 		for(int i=0; i < this.listaCamposRegistro.size(); i++){
-			//System.out.println("En BloqueCamposRegistro.getOffset, valor de i=" + i);
 			if(this.listaCamposRegistro.get(i).containsDecVariable(campo))
 			{
-				//System.out.println("En BloqueCamposRegistro.getOffset, encontrado " + campo + " en, i=" + i + " , sumaOffset=" + sumaOffset);
-				//System.out.println("El offset en la lista de " + campo + " es =" + this.listaCamposRegistro.get(i).getOffset(campo));
 				sumaOffset += this.listaCamposRegistro.get(i).getOffset(campo);
 				if (i>0){
 					sumaOffset += this.listaCamposRegistro.get(i).getMemorySize(); 
+				}
 			}
-//			else{
-//				sumaOffset += this.listaCamposRegistro.get(i).getSize();
-//				System.out.println("No encontrado en i=" +i);
-			}
-//			else{
-//				System.out.println("En BloqueCamposRegistro.getOffset, i=" + i + " , sumaOffset=" + sumaOffset);
-//				sumaOffset += this.listaCamposRegistro.get(i).getMemorySize();
-//				System.out.println("En BloqueCamposRegistro.getOffset, i=" + i + " , sumaOffset=" + sumaOffset);
-//			}
 		}
 		return sumaOffset;
 	}
