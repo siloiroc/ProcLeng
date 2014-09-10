@@ -19,7 +19,7 @@ end suma;
 
 begin
 
-  e := A;
+  e := 2;
   f := 4;
   d := suma (f,e);
   Put_line("resultado:");

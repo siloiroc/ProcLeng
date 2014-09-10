@@ -1,22 +1,15 @@
 ; Inicio del programa
-				RES 3
-				MOVE #65535, .SP
-				MOVE #65535, .IX
+				RES 10
+				MOVE #65533, .SP
+				MOVE #65533, .IX
 				BR /Main				;Instruccion BR, salto incondicional
-L_suma:
-				ADD #-1[.IX], #-2[.IX]
-				MOVE .A, #-3[.IX]
-
-L_imprimeSuma:
-				MOVE #8, #-3[.IX]			;Instruccion Move
-				MOVE #-3[.IX], #-1[.IX]			;Instruccion Assign
-				MOVE #-1[.IX], #-4[.IX]			;Instruccion Move
-				WRINT #-4[.IX]				;Instruccion Put_Line(expresión)
-				WRCHAR #10
-				WRCHAR #13
 Main:
 				WRSTR /string1				;Instruccion Put_Line
+				WRCHAR #10
+				WRCHAR #13
+				MOVE #456, #-2[.IX]			;Instruccion Move
+				MOVE #-2[.IX], /0			;Instruccion Assign
 				HALT ; Fin del programa
 ; Cadenas de texto
-string1:		DATA "SUBPROGRAMAS PROCEDIMIENTO\n"
+string1:		DATA "REGISTROS"
 END ;Macroinstrucción END. Ensamblador da por finalizado el código.

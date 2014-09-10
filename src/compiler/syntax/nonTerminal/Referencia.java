@@ -1,5 +1,7 @@
 package compiler.syntax.nonTerminal;
 
+import compiler.semantic.symbol.SymbolVariable;
+
 import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
@@ -14,7 +16,38 @@ public class Referencia extends NonTerminal {
     private int index; 
     private int offset;
     private TemporalIF temporalIndex, temporalOffset;
+    
+    private SymbolVariable varRecord;	//Utilizamos estas dos variables SymbolVariable para almacenar qué variable de tipo Record es
+    private SymbolVariable campoRecord;		// y que campo del registro de dicha variable
 	
+	/**
+	 * @return the varRecord
+	 */
+	public SymbolVariable getVarRecord() {
+		return varRecord;
+	}
+
+	/**
+	 * @param varRecord the varRecord to set
+	 */
+	public void setVarRecord(SymbolVariable varRecord) {
+		this.varRecord = varRecord;
+	}
+
+	/**
+	 * @return the campoRecord
+	 */
+	public SymbolVariable getCampoRecord() {
+		return campoRecord;
+	}
+
+	/**
+	 * @param campoRecord the campoRecord to set
+	 */
+	public void setCampoRecord(SymbolVariable campoRecord) {
+		this.campoRecord = campoRecord;
+	}
+
 	/**
 	 * @return the temporalOffset
 	 */

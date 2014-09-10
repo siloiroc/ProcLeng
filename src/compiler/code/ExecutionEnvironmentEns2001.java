@@ -137,6 +137,11 @@ public class ExecutionEnvironmentEns2001
     		TranslatorAdd tr = new TranslatorAdd();
     		translation = tr.translate(quadruple);
     	}
+    	if (operation.equals("MUL")){
+    		CompilerContext.getSemanticErrorManager().semanticDebug("add");
+    		TranslatorMUL tr = new TranslatorMUL();
+    		translation = tr.translate(quadruple);
+    	}
     	if (operation.equals("ASSIGN")){
 //    		CompilerContext.getSemanticErrorManager().semanticDebug("assign");
     		TranslatorAssign tr = new TranslatorAssign();

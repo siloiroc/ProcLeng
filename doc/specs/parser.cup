@@ -197,6 +197,7 @@ program ::=
   						if (symtype instanceof TypeRecord){
   							TypeRecord tR = (TypeRecord) symtype;
   							gAddress += tR.getMemorySize();
+  							//semanticErrorManager.semanticDebug("El tamano del registro es=" + tR.getMemorySize());
   						}
   						else
   							gAddress += symvar.getType().getSize();
@@ -585,29 +586,31 @@ declaracionTipo 		::= {:semanticErrorManager.semanticDebug("**DECLARACION TIPO**
 										semanticErrorManager.semanticFatalError("ERROR - Error en declaración de Tipo, ya existe declaración de " + id.getLexema());
 								else{ 
 									//Creamos nuevo tipo Registro y lo introducimos en la tabla de tipos
-									TypeRecord typeRecord = new TypeRecord(scope, id.getLexema(), bcr);
-									tablaTipos.addType(id.getLexema(), typeRecord);
+									TypeRecord typeRecord = new TypeRecord(scope, id.getLexema());
+									//TypeRecord typeRecord = new TypeRecord(scope, id.getLexema(), bcr);
+									//tablaTipos.addType(id.getLexema(), typeRecord);
 									
-//									//Añadimos los campos del bloqueCamposRegistro al tipo Registro
-//									int offset = 0; 
-//									for (int i=0; i< bcr.getSize(); i++)
-//									{	
-//										semanticErrorManager.semanticDebug("Añadiendo Registro====" + i);
-//										DeclaracionVariable decVarRegistro = (DeclaracionVariable) bcr.getDeclaracionVariableId(i);
-//										for (int j=0; j < decVarRegistro.getSize(); j++)
-//										{
-//											//Creamos un símbolo SymbolVariable por cada variable
-//											SymbolVariable symbolVarReg = new SymbolVariable(scopeManager.getCurrentScope(), decVarRegistro.getIdentifiersListItem(j), decVarRegistro.getType());
-//											symbolVarReg.setOffset(offset);
-//											offset++;
-//											//Añadimos 
-//											if (typeRecord.containsField(decVarRegistro.getIdentifiersListItem(j)))
-//												semanticErrorManager.semanticFatalError("ERROR TYPE001: La variable " + decVarRegistro.getIdentifiersListItem(j) + " ya ha sido definida en el tipo estructurado");
-//											else
-//												typeRecord.addCampoRegistro(decVarRegistro.getIdentifiersListItem(j), decVarRegistro.getType());											
-//										}
-//										
-//									}
+									//Añadimos los campos del bloqueCamposRegistro al tipo Registro
+									int offset = 0; 
+									for (int i=0; i< bcr.getSize(); i++)
+									{	
+										semanticErrorManager.semanticDebug("Añadiendo Registro====" + i);
+										DeclaracionVariable decVarRegistro = (DeclaracionVariable) bcr.getDeclaracionVariableId(i);
+										for (int j=0; j < decVarRegistro.getSize(); j++)
+										{
+											//Creamos un símbolo SymbolVariable por cada variable
+											SymbolVariable symbolVarReg = new SymbolVariable(scopeManager.getCurrentScope(), decVarRegistro.getIdentifiersListItem(j), decVarRegistro.getType());
+											symbolVarReg.setOffset(offset);
+											offset++;
+											//Añadimos 
+											if (typeRecord.containsField(decVarRegistro.getIdentifiersListItem(j)))
+												semanticErrorManager.semanticFatalError("ERROR TYPE001: La variable " + decVarRegistro.getIdentifiersListItem(j) + " ya ha sido definida en el tipo estructurado");
+											else
+												//typeRecord.addCampoRegistro(decVarRegistro.getIdentifiersListItem(j), decVarRegistro.getType());
+												typeRecord.addCampoRegistro(symbolVarReg);											
+										}										
+									}
+									tablaTipos.addType(id.getLexema(), typeRecord);
 									
 									DeclaracionTipo decTipo = new DeclaracionTipo(typeRecord);
 									RESULT = decTipo;										
@@ -1327,54 +1330,41 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 							
 							TypeIF referType = refer.getType();	//Tipo de la referencia
 							if(referType instanceof TypeRecord)	//Si es de tipo registro continuamos, si no es un tipo Record, mostraremos un error (else)
-							{
+							{	
+									
 								//Obtenemos símbolo indicado por la referencia, de la Tabla de Símbolos.
 								ScopeIF scope = scopeManager.getCurrentScope();
 								SymbolIF simboloReferencia = scopeManager.searchSymbol(referName);
 								TypeIF tipoSimbReferencia = scopeManager.searchType(simboloReferencia.getType().getName());
 								
 								TypeRecord tRec = (TypeRecord) tipoSimbReferencia;
-								//semanticErrorManager.semanticDebug("Antes de tRec.containsField");
-								//semanticErrorManager.semanticDebug("tRec.getName()=" + tRec.getName());
-	
-
 								if(tRec.containsField(innerName)){
 									//semanticErrorManager.semanticDebug("DEBUG R001 - " + referName + " SI contiene campo " + innerName);
-								
 									TypeIF innerType = tRec.getTypeField(innerName);
-									//semanticErrorManager.semanticDebug("DEBUG R001 - El tipo del campo innername=" + innerName + " es = " + innerType);
-									//TypeIF innerType = scopeManager.searchType(scopeManager.searchSymbol(innerName).getName());
 									
-									//Generación de CódigoIntermedio
-									Referencia ref = new Referencia(referType, referName);
-									semanticErrorManager.semanticDebug("DEBUG R001 - El offset del campo innername=" + innerName + " es = " + tRec.getOffset(innerName));
-									//ref.setOffset(tRec.getOffset(innerName));	//Establecemos el offset del campo del registro
 
+																
+																	
+//									//Generación de CódigoIntermedio																		
+//									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+//									TemporalIF refTemp = refer.getTemporal();
+//									IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+//									codeBuilder.addQuadruples(refer.getIntermediateCode());
+//									codeBuilder.addQuadruple("MV", refTemp, ref.getCampo);
+//									ref.setTemporal(refTemp);
+//									List intermediateCode = codeBuilder.create();
+//									ref.setIntermediateCode(intermediateCode);
 									
-									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
-									TemporalIF refTemp = refer.getTemporal();
-									TemporalIF refTempIndex = refer.getTemporalIndex();
-									TemporalIF refTempOffset = tempFactory.create();
-									IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
-									codeBuilder.addQuadruples(refer.getIntermediateCode());
+									RESULT = ref;									
 									
-									TypeRecord rType = (TypeRecord)refer.getType();
-									//int idOffset	 = rType.getOffset(innerName);
-									int idOffset = 0;
-									codeBuilder.addQuadruple("MV", refTempOffset, idOffset);
-									ref.setTemporal(refTemp);
-									ref.setTemporalIndex(refTempIndex);
-									ref.setTemporalOffset(refTempOffset);
-									List intermediateCode = codeBuilder.create();
-									ref.setIntermediateCode(intermediateCode);
-									
-									RESULT = ref;
+																	
 								}
 								else {
 									semanticErrorManager.semanticDebug("ERROR R001 - " + referName + " NO contiene campo " + innerName);
-								}
+								}								
+											
 							}
-							else semanticErrorManager.semanticDebug("ERROR R002-" + refer.getName() + " de tipo=" + refer.getType() + " NO es de tipo Registro(RECORD)");
+							else semanticErrorManager.semanticDebug("ERROR R002-" + refer.getName() + " de tipo=" + refer.getType() + " NO es de tipo Registro(RECORD)");							
 				:} 
 				| IDENTIFIER:id
 				{:
@@ -1401,31 +1391,44 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 						
 						Referencia ref = new Referencia (typeref, name);
 						ref.setIndex(1);
+
+
 														
 						//Generación de Código Intermedio
 						TemporalFactoryIF tempFactory = new TemporalFactory(scope);
 						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
 						TemporalIF refTemp = tempFactory.create();
-						//semanticErrorManager.semanticDebug("?????  - en Referencia->id , el temporal de Referencia es=" + refTemp);						
-						SymbolIF symbol = scopeManager.searchSymbol(name);
-						//semanticErrorManager.semanticDebug("SIMBOLO=" + symbol.toString());
-						
-						// El identificador de la Referencia podria ser una Variable, o bien una Constante, o un parametro de un subprograma
-						
-						if(symbol instanceof SymbolVariable){
-							//El símbolo de la referencia es de tipo SymbolVariable
-							Variable var = new Variable(name, symbol);
-							codeBuilder.addQuadruple("MV", refTemp, var);
-						}
-						else if (symbol instanceof SymbolConstant){
-							//El símbolo de la referencia es de tipo SymbolConstant
-							SymbolConstant symbolConst = (SymbolConstant)symbol;
-							Value constValue = new Value(symbolConst.getValue());
 
-							codeBuilder.addQuadruple("MV", refTemp, constValue);
+						if (typeref instanceof TypeRecord){
+							//TypeRecord tipoRec = (TypeRecord)ref.getVarRecord().getType();
+							//int idOffset = ref.getCampoRecord().getOffset();							
+							//Variable var = new Variable(name, ref.getVarRecord());
+
+							codeBuilder.addQuadruple("MOVEREG", refTemp, ref.getVarRecord().getOffset(), ref.getVarRecord());
+							ref.setTemporal(refTemp);
+							List intermediateCode = codeBuilder.create();
+							ref.setIntermediateCode(intermediateCode);
+						}
+						else	//Tipo de la referencia será de tipo Simple, Procedure, Function, etc.. 
+						{
+							SymbolIF symbol = scopeManager.searchSymbol(name);
+							// El identificador de la Referencia podria ser una Variable, o bien una Constante, o un parametro de un subprograma					
+							if(symbol instanceof SymbolVariable){
+								//El símbolo de la referencia es de tipo SymbolVariable
+								Variable var = new Variable(name, symbol);
+								codeBuilder.addQuadruple("MV", refTemp, var);
+								
+							}
+							else if (symbol instanceof SymbolConstant){
+								//El símbolo de la referencia es de tipo SymbolConstant
+								SymbolConstant symbolConst = (SymbolConstant)symbol;
+								Value constValue = new Value(symbolConst.getValue());
+	
+								codeBuilder.addQuadruple("MV", refTemp, constValue);
+							}
 						}
 						
-						ref.setTemporal(refTemp);
+						ref.setTemporal(refTemp);					
 						List intermediateCode = codeBuilder.create();
 						ref.setIntermediateCode(intermediateCode);					 
 									
@@ -1437,6 +1440,143 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 				:};  
 	
  
+
+
+//Sentencia Asignacion
+sentenciaAsignacion		::= referencia:ref ASSIGN expresion:exp
+							{:
+								semanticErrorManager.semanticDebug ("sentenciaAsignacion -> Id := expresion (" + ref.getName() + ":=" + exp.getValue() + ")");
+
+//								else{
+//									//Comprobación de tipos.
+//									SymbolIF symbol = scopeManager.searchSymbol(id.getLexema());
+//									TypeIF idtype = symbol.getType();
+//									semanticErrorManager.semanticDebug("El tipo de la variable: " + id.getLexema() + " es: " + idtype.getName());
+//									//TypeIF exptype = exp.getType();
+//								}
+								
+								//Verificación de tipos
+								//TypeIF reftype = ref.getType();
+								//TypeIF exptype = ref.getType();
+								
+								//Si la referencia es una llamada a función (es decir, es de tipo Función o Procedure
+								// TO-DO: Cuando llegue a Subprogramas
+								//if (reftype instanceof TypeFunction || reftype instanceof TypeProcedure){
+								//}
+								//
+								
+//								//Simbolo
+								SymbolIF symbol = scopeManager.searchSymbol(ref.getName());
+								TypeIF typeSymbol = symbol.getType();
+								if(typeSymbol instanceof TypeRecord){
+									semanticErrorManager.semanticDebug("Tipo del símbolo EEEES REcord");
+									//Generación de CódigoIntermedio para Asignación a un campo de un registro								
+									//Creación de objeto SentenciaAsignacion
+									SentenciaAsignacion asignacion = new SentenciaAsignacion(ref.getName() + ":=" + exp.getValue());
+									SymbolVariable symvar = (SymbolVariable) scopeManager.searchSymbol(ref.getName());
+									symvar.setValue(exp.getValue());
+									
+									
+																		
+									ScopeIF scope = scopeManager.getCurrentScope();
+									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+									
+									TemporalIF expTemp = exp.getTemporal();
+									TemporalIF rTemp = ref.getTemporal();
+									
+									TemporalIF rTempIndex = ref.getTemporalIndex();
+									TemporalIF rTempOffset = ref.getTemporalOffset();
+									
+									IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+									codeBuilder.addQuadruples(exp.getIntermediateCode());
+									codeBuilder.addQuadruples(ref.getIntermediateCode());
+									
+									Variable var = new Variable(ref.getName(), scopeManager.getCurrentScope(), symvar);
+									codeBuilder.addQuadruple("ASSIGN", var, expTemp);
+									 
+									List intermediateCode = codeBuilder.create();
+									asignacion.setIntermediateCode(intermediateCode);
+									semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - ASIGNACIÓN->ref := exp" + asignacion.getIntermediateCode());									
+									RESULT = asignacion;	
+								}
+								else if (typeSymbol instanceof TypeSimple){
+									//Generación de CódigoIntermedio								
+									//Creación de objeto SentenciaAsignacion
+									SentenciaAsignacion asignacion = new SentenciaAsignacion(ref.getName() + ":=" + exp.getValue());
+									SymbolVariable symvar = (SymbolVariable) scopeManager.searchSymbol(ref.getName());
+									symvar.setValue(exp.getValue());
+									
+									ScopeIF scope = scopeManager.getCurrentScope();
+									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+									
+									TemporalIF expTemp = exp.getTemporal();
+									TemporalIF rTemp = ref.getTemporal();
+									
+									TemporalIF rTempIndex = ref.getTemporalIndex();
+									TemporalIF rTempOffset = ref.getTemporalOffset();
+									
+									IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+									codeBuilder.addQuadruples(exp.getIntermediateCode());
+									codeBuilder.addQuadruples(ref.getIntermediateCode());
+									
+									Variable var = new Variable(ref.getName(), scopeManager.getCurrentScope(), symvar);
+									codeBuilder.addQuadruple("ASSIGN", var, expTemp);
+									 
+									List intermediateCode = codeBuilder.create();
+									asignacion.setIntermediateCode(intermediateCode);
+									semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - ASIGNACIÓN->ref := exp" + asignacion.getIntermediateCode());									
+									RESULT = asignacion;	
+								}
+								
+								
+								
+//								if (symbol instanceof SymbolVariable){
+//									
+//									//Generación de CódigoIntermedio								
+//									//Creación de objeto SentenciaAsignacion
+//									SentenciaAsignacion asignacion = new SentenciaAsignacion(ref.getName() + ":=" + exp.getValue());
+//									SymbolVariable symvar = (SymbolVariable) scopeManager.searchSymbol(ref.getName());
+//									symvar.setValue(exp.getValue());
+//									
+//									ScopeIF scope = scopeManager.getCurrentScope();
+//									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+//									
+//									TemporalIF sentAsigTemp = tempFactory.create();
+//									//semanticErrorManager.semanticDebug ("????En sentenciaAsignación, su temporal es= " + sentAsigTemp);
+//									TemporalIF expTemp = exp.getTemporal();
+//									TemporalIF rTemp = ref.getTemporal();
+//									
+//									TemporalIF rTempIndex = ref.getTemporalIndex();
+//									TemporalIF rTempOffset = ref.getTemporalOffset();
+//									
+//									IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+//									codeBuilder.addQuadruples(exp.getIntermediateCode());
+//									//codeBuilder.addQuadruples(ref.getIntermediateCode());
+//									
+//																	
+//									Variable var = new Variable(ref.getName(), scopeManager.getCurrentScope(), symvar);
+//									semanticErrorManager.semanticDebug("En SENTENCIA ASIGNACION la variable tiene name=" + var.getName());
+//-------
+//									//codeBuilder.addQuadruple("MUL", expTemp, rTempIndex, new Value(typeSymbol.getSize()));
+//									//codeBuilder.addQuadruple("ADD", expTemp, expTemp, rTemp);
+//									//codeBuilder.addQuadruple("ADD", expTemp, expTemp, rTempOffset);
+//									if (ref.getType() instanceof TypeRecord)
+//										codeBuilder.addQuadruple("ASSIGNREG", var, var2, expTemp);
+//									else
+//										codeBuilder.addQuadruple("ASSIGN", var, expTemp);
+//
+//-------									
+//									
+//_____								//codeBuilder.addQuadruple("ASSIGN", var, expTemp);
+//									 
+//									List intermediateCode = codeBuilder.create();
+//									asignacion.setIntermediateCode(intermediateCode);
+//									semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - ASIGNACIÓN->ref := exp" + asignacion.getIntermediateCode());									
+//								RESULT = asignacion;	
+//								}
+							:};
+							
+						
 // Sentencia IO
 sentenciaIO 	::= PUTLINE LEFTBRACKET 
 					{:
@@ -1447,7 +1587,10 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET
 						
 						//Generación de Código Intermedio
 						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
-						TemporalIF temporalExpr = expr.getTemporal();				
+						TemporalIF temporalExpr = expr.getTemporal();	
+//--------
+						semanticErrorManager.semanticDebug("En PutLine(expresion) su termporal= " + temporalExpr + " se ha cogido del de la expresion=" + expr.getTemporal());
+//--------															
 						codeBuilder.addQuadruples(expr.getIntermediateCode());
 						//Traducimos a código intermedio de forma distinta si la expresión es de tipo booleano o no
 						semanticErrorManager.semanticDebug("Tipo de la expresion=============" + expr.getType());
@@ -1485,9 +1628,6 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET
 								codeBuilder.addQuadruple("WRITEEXP", temporalExpr);		
 							}
 						}
-						
-													
-						
 						List intermediateCode = codeBuilder.create();
 						sentenciaIO.setIntermediateCode(intermediateCode);
 						semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - PUTLINE(expresion)" + sentenciaIO.getIntermediateCode());						
@@ -1515,68 +1655,7 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET
 						RESULT = sentenciaIO;
 					:};
 //					| error {:syntaxErrorManager.syntaxFatalError("ERROR S001: Error en sentencia Put_line"); :};
-
-
-//Sentencia Asignacion
-sentenciaAsignacion		::= referencia:ref ASSIGN expresion:exp
-							{:
-								semanticErrorManager.semanticDebug ("sentenciaAsignacion -> Id := expresion (" + ref.getName() + ":=" + exp.getValue() + ")");
-
-//								else{
-//									//Comprobación de tipos.
-//									SymbolIF symbol = scopeManager.searchSymbol(id.getLexema());
-//									TypeIF idtype = symbol.getType();
-//									semanticErrorManager.semanticDebug("El tipo de la variable: " + id.getLexema() + " es: " + idtype.getName());
-//									//TypeIF exptype = exp.getType();
-//								}
-								
-								//Verificación de tipos
-								//TypeIF reftype = ref.getType();
-								//TypeIF exptype = ref.getType();
-								
-								//Si la referencia es una llamada a función (es decir, es de tipo Función o Procedure
-								// TO-DO: Cuando llegue a Subprogramas
-								//if (reftype instanceof TypeFunction || reftype instanceof TypeProcedure){
-								//}
-								//
-								
-								//Simbolo
-								SymbolIF symbol = scopeManager.searchSymbol(ref.getName());
-								TypeIF typeSymbol = symbol.getType();
-								if (symbol instanceof SymbolVariable){
-									
-									//Generación de CódigoIntermedio								
-									//Creación de objeto SentenciaAsignacion
-									SentenciaAsignacion asignacion = new SentenciaAsignacion(ref.getName() + ":=" + exp.getValue());
-									SymbolVariable symvar = (SymbolVariable) scopeManager.searchSymbol(ref.getName());
-									symvar.setValue(exp.getValue());
-									
-									ScopeIF scope = scopeManager.getCurrentScope();
-									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
-									
-									//TemporalIF sentAsigTemp = tempFactory.create();
-									//semanticErrorManager.semanticDebug ("????En sentenciaAsignación, su temporal es= " + sentAsigTemp);
-									TemporalIF expTemp = exp.getTemporal();
-									//TemporalIF rTemp = ref.getTemporal();
-									
-									TemporalIF rTempIndex = ref.getTemporalIndex();
-									//TemporalIF rTempOffset = ref.getTemporalOffset();
-									
-									IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
-									codeBuilder.addQuadruples(exp.getIntermediateCode());
-									//codeBuilder.addQuadruples(ref.getIntermediateCode());
-									
-									//Variable var = new Variable(ref.getName(), scopeManager.getCurrentScope(), symbol);								
-									Variable var = new Variable(ref.getName(), scopeManager.getCurrentScope(), symvar);
-									codeBuilder.addQuadruple("ASSIGN", var, expTemp);
-									 
-									List intermediateCode = codeBuilder.create();
-									asignacion.setIntermediateCode(intermediateCode);
-									semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - ASIGNACIÓN->ref := exp" + asignacion.getIntermediateCode());									
-								RESULT = asignacion;	
-								}
-							:};
-							
+						
 						
 //Sentencia If
 sentenciaIf			::= IF expresion:exp THEN bloqueSentencias:blqsent END IF 

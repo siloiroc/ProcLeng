@@ -1,56 +1,28 @@
--- tipos estructurados REGISTROS
+-- funciones paso por valor
 
 
-procedure testCase07 () is
+procedure testCase08 () is
 
---	type Tpersona is record
---		dni,juan: Integer;
---		casado: Boolean;
---	end record;
-	
---	type Tfecha is record
---		dia: Integer;
---		mes: Integer;
---		anyo: Integer;
---	end record;
-	
---	type Tcita is record
---		usuario: Tpersona;
---		fecha:	 Tfecha;
---	end record;
-	
---	c1: Tcita;
---	p1 : Tpersona;	
---	x, y: Integer;
---	d: Boolean;
+z: Integer;
+a,b: Integer;
 
-	x: Integer;
+function suma (x,y: Integer) return Integer is
 begin
+	return x + y;
+end suma;
 
---	Put_line("REGISTROS");	
+procedure imprimeSuma () is
+w: Integer;
+begin
+	w:=8;		
+--	Put_line("w(8):");
+	Put_line(w);
 
---	x:= 12345;
---	Put_line(x);
-	
---	p1.dni:=456;
---	p1.casado:=False;
---	p1.juan:= 3; 		
-			
---	Put_line("dni(12345):");
---	Put_line(p1.dni);
---	Put_line("casado(false):");
---	Put_line(p1.casado);
+end suma;
 
 
---    Put_line ("CRONTROL FLUJO FOR");
-	
-	x:=0;
-	Put_line("x(1,2,3,4,5):");
+begin
+	Put_line ("SUBPROGRAMAS PROCEDIMIENTO");
+	imprimeSuma ();
 
-	for x in 1..5 loop
-
-		Put_line(x);
-
-	end loop;
-
-end testCase07;
+end testCase08;

@@ -8,7 +8,7 @@
 		se quiera compilar
 	-->
 	
-	<property name="test-file-name" value="testCaseB01_bis3.ha"/>
+	<property name="test-file-name" value="testCaseB01_bis.ha"/>
 	<!--<property name="test-file-name" value="testCaseB01.ha"/>-->													<!-- Programa vacío --> 					<!--OK-->
 	<!--<property name="test-file-name" value="testCaseB02.ha"/>-->  												<!-- Put_lines--> 							<!--OK-->
 	<!--<property name="test-file-name" value="testCaseB03.ha"/>-->   												<!-- Constantes--> 							<!--OK-->
@@ -21,6 +21,7 @@
 	<!--<property name="test-file-name" value="testCaseB10.ha"/>-->													<!--Control de flujo FOR-->	<!--OK-->
 	<!--<property name="test-file-name" value="testCaseB11.ha"/>-->				<!--Subprogramas procedimientos anidados-->
 	<!--<property name="test-file-name" value="testCaseB12.ha"/>-->				<!--Recursividad-->
+	<!--<property name="test-file-name" value="testB.ha"/>-->				<!--Test completo B-->
 	
 	<property name="lib" location="lib"/>
 	<property name="test" location="doc/test"/>
