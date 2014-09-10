@@ -1,15 +1,33 @@
 procedure testCase07 () is
 
-a: Integer; 
+CIERTO: constant := True;
 
-procedure imprimeSuma (x,y:Integer) is
+a: Integer;
+b: Integer;
+c,d:Boolean;
+e:Integer;
+
+function suma (x,y: Integer) return Integer is
+begin
+		
+	return x+y;	
+
+end resta;
+
+procedure imprimeTxt (x,y:Integer) is
 z:Integer;
 begin
-	Put_line("hola");
-	Put_line(x);
-end imprimeSuma;
+	Put_line("hola ");
+	Put_line("Mundo");
+	z:=1;
+	Put_line(z);
+end imprimeTxt;
 
 begin
+	c:=true;
+	a:=2; 
+	e:=3;
 	Put_line ("SUBPROGRAMAS FUNCIONES");
-	imprimeSuma(1, 2);
+	imprimeTxt(1, 2);
+	b:= a + e;
 end testCase07;

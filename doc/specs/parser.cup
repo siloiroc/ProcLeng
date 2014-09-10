@@ -269,16 +269,15 @@ axiom ::= PROCEDURE IDENTIFIER:id
 				//semanticErrorManager.semanticDebug("CI - AXIOMA->Decls = " + axioma.getIntermediateCode());								
 							
 				RESULT = axioma;
-			:};
-//		  | PROCEDURE IDENTIFIER LEFTBRACKET error RIGHTBRACKET IS declaraciones{:syntaxErrorManager.syntaxInfo("ERROR 00x: Estructura programa - Procedimiento principal no puede tener parámetros");:}
-//		  | PROCEDURE IDENTIFIER LEFTBRACKET RIGHTBRACKET error declaraciones {:syntaxErrorManager.syntaxInfo("ERROR 001: Estructura programa, falta IS");:};
-//		  | error {:syntaxErrorManager.syntaxInfo("ERROR 00X: Error general estructura programa");:};
+			:}
+		  | error {:syntaxErrorManager.syntaxFatalError("[ERROR SINT001]: Error general estructura programa"); RESULT = new Axioma();:};
 
 declaraciones				::= seccionConstantes:seccConst
 								{:	
 									//semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI-Declaraciones=" + seccConst.getIntermediateCode());
 									RESULT = seccConst;
-								:};
+								:}
+								|error {: syntaxErrorManager.syntaxInfo ("[ERROR SINT002]: Error en declaraciones"); RESULT = new Declaraciones();:};
 seccionConstantes 			::= declaracionConstante:declConst seccionConstantes:seccConst
 								{:
 									//Generación de Código Intermedio
@@ -297,7 +296,8 @@ seccionConstantes 			::= declaracionConstante:declConst seccionConstantes:seccCo
 								{: 
 									//semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI-seccionConstantes->seccionTipos=" + seccTipos.getIntermediateCode());
 									RESULT = seccTipos; 
-								:} ;
+								:};
+
 seccionTipos				::= declaracionTipo:declTipo seccionTipos:seccTipos
 								{:
 									//Generación de Código Intermedio
@@ -317,6 +317,7 @@ seccionTipos				::= declaracionTipo:declTipo seccionTipos:seccTipos
 									//semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI-seccionTipos->seccionVars=" + seccVars.getIntermediateCode());
 									RESULT = seccVars;   
 								:};
+
 seccionVariables			::= declaracionVariable:declVar 
 								{:
 									Util util = new Util();
@@ -346,6 +347,7 @@ seccionVariables			::= declaracionVariable:declVar
 								    //semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI-seccionVariables->seccSubProgs=" + seccSubProgs.getIntermediateCode()); 
 							    	RESULT = seccSubProgs;   
 							    :};
+
 seccionSubprogramas			::= declaracionSubprograma:declSubProg seccionSubprogramas:seccSubProg
 								{:
 									//Generación de Código Intermedio
@@ -418,8 +420,6 @@ seccionCuerpoPrograma		::= {:
 								:} END IDENTIFIER SEMICOLON
 								{: //semanticErrorManager.semanticDebug("************** FIN CUERPO PROGRAMA*****************");:}
 								;
-//								|BEGIN bloqueSentencias END error SEMICOLON {:syntaxErrorManager.syntaxInfo("ERROR 002: Estructura programa, falta NOMBRE_PROGRAMA en sentencia END");:}
-//								| error {:syntaxErrorManager.syntaxInfo("ERROR 003: Estructura programa");:};
 								
 
 listaIdentificadores ::= listaIdentificadores:idlist COMMA IDENTIFIER:id
@@ -428,37 +428,12 @@ listaIdentificadores ::= listaIdentificadores:idlist COMMA IDENTIFIER:id
 							ListaIdentificadores identifierList = idlist;
 							identifierList.addIdentifier(name);
 							RESULT = identifierList;
-							
-							
-							//Verificamos si el identificador está en la tabla de símbolos
-//							ScopeIF scope = scopeManager.getCurrentScope();
-//							Util util = new Util();
-//							
-//							if(!util.checkSymbolTableScope(scope, name))
-//							{
-//								//Si no existe el símbolo en ámbitos abiertos, lo creamos y añadimos a ListaIdentificadores
-//								ListaIdentificadores identifierList = idlist;
-//								identifierList.addIdentifier(name);
-//								RESULT = identifierList;							
-//							}
-//							else
-//								semanticErrorManager.semanticFatalError("ERROR LI001: ID=" + name + " ya definido");
 						:}
 						  | IDENTIFIER:id
 						  {:	
 						  	String name = id.getLexema();
 						  	ListaIdentificadores identifierList = new ListaIdentificadores(name);
 							RESULT = identifierList;
-						  	
-//						  	ScopeIF scope = scopeManager.getCurrentScope();
-//							Util util = new Util();
-//							if(!util.checkSymbolTableScope(scope, name))
-//							{
-//								ListaIdentificadores idlist = new ListaIdentificadores(name);
-//								RESULT = idlist;
-//							}
-//							else 
-//								semanticErrorManager.semanticFatalError("ERROR LI001: ID=" + name + "ya definido");  
 						  :};
 
 
@@ -490,17 +465,11 @@ declaracionConstante ::=  listaIdentificadores:lid COLON CONSTANT
 										//Añadimos símbolos constantes a la Tabla de Símbolos
 										util.addToSymbolTable(scope, symbolConstant);
 										
-										
 										DeclaracionConstante declConstante = new DeclaracionConstante(vc.getType(), lid);
 										RESULT = declConstante;										
-
 									}
 								}
 							:};
-							 
-// 						 | listaIdentificadores COLON CONSTANT error valorConstante {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, operador asignación");:}
-//						 | listaIdentificadores COLON CONSTANT ASSIGN error {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, valor incorrecto");:}
-//						 | listaIdentificadores COLON CONSTANT ASSIGN valorConstante error SEMICOLON{:syntaxErrorManager.syntaxInfo("ERROR 00x: Error en declaración constantes, falta punto y coma");:};
 						 				 
 						 
 valorConstante ::= TRUE:vc 
@@ -573,7 +542,7 @@ bloqueCamposRegistro	::=	bloqueCamposRegistro:bcr declaracionVariable:decVar SEM
 							:}; 
   
 
-// Declaración de variables globales
+// Declaración de variables 
 declaracionVariable		::= listaIdentificadores:lid COLON 
 								{: //semanticErrorManager.semanticDebug("**DECLARACION VARIABLE**"); 
 								:} tipoPrimitivo:tp
@@ -599,8 +568,8 @@ declaracionVariable		::= listaIdentificadores:lid COLON
 										RESULT = decVariable;										
 									}
 								}
-							
 							:};
+
 
 tipoPrimitivo 			::= INTEGER:tpint
 								 {: 
@@ -624,7 +593,6 @@ tipoPrimitivo 			::= INTEGER:tpint
 									else{
 										semanticErrorManager.semanticFatalError("ERROR PRIM001: - Tipo estructurado: " + name + " no definido");
 									}
-
 								:};
  
 
@@ -691,7 +659,7 @@ declaracionSubprograma		::= FUNCTION IDENTIFIER:id
 									//que el programa global.
 									// SeccionCuerpoPrograma-> BEGIN bloqueSentencias END IDENTIFIER SEMICOLON
 									// Por tanto en "ESTE" bloqueSentencias (el correspondiente a la función) debemos realizar las siguientes 
-									//Verificaciones semánticas:
+									// verificaciones semánticas:
 									//		Debe existir la sentencia Return
 									//		Tipo de la sentencia Return debe ser del tipo de retorno declarado
 									
@@ -699,26 +667,19 @@ declaracionSubprograma		::= FUNCTION IDENTIFIER:id
 									scopeManager.closeScope();
 									
 									DeclaracionSubprograma declSubPrograma = new DeclaracionSubprograma();
+									
 									//Generación del Código Intermedio de la Funcion
 									ScopeIF scope = scopeManager.getCurrentScope();
 									IntermediateCodeBuilder codeBuilder = new IntermediateCodeBuilder(scope);
-									
 									//Creamos nuevo Procedure (name, scope)
 									Procedure funcion = new Procedure(id.getLexema(), scopeManager.getCurrentScope());
-						
-									
 									codeBuilder.addQuadruple("LABEL", funcion.getCodeLabel());
 									codeBuilder.addQuadruples(seccTipos.getIntermediateCode());
 									List intermediateCode = codeBuilder.create();		
 									declSubPrograma.setIntermediateCode(intermediateCode);						
 
 									RESULT = declSubPrograma;
-									
-							
-									
-									
 								:}
-//								| FUNCTION IDENTIFIER LEFTBRACKET parametrosFormales RIGHTBRACKET RETURN error IS {:syntaxErrorManager.syntaxInfo("ERROR 00x: Error definición función, falta tipo de Return");:}
 								| PROCEDURE IDENTIFIER:id
 								{:
 									if(!(scopeManager.containsSymbol(id.getLexema()) && scopeManager.containsType(id.getLexema()) ))
@@ -757,11 +718,7 @@ declaracionSubprograma		::= FUNCTION IDENTIFIER:id
 											scopeProcTTable.addType(p.getName(), p.getType());
 										}
 									}
-									
-									// TO-DO: Procedure no tiene tipo de retorno
-									// Aun así, quizá convenga establecer valor bandera, para no comprobar en bloqueListaSentencias que tiene Return;
-									//Establecemos el tipo declarado que retornará la función
-									//typeFunction.setReturnType(tp.getType());
+
 								:}
 								IS seccionTipos:seccTipos
 								{:
@@ -769,6 +726,7 @@ declaracionSubprograma		::= FUNCTION IDENTIFIER:id
 									scopeManager.closeScope();
 									
 									DeclaracionSubprograma declSubPrograma = new DeclaracionSubprograma();
+									
 									//Generación del Código Intermedio del Procedimiento
 									ScopeIF scope = scopeManager.getCurrentScope();
 									IntermediateCodeBuilder codeBuilder = new IntermediateCodeBuilder(scope);
@@ -780,10 +738,7 @@ declaracionSubprograma		::= FUNCTION IDENTIFIER:id
 									List intermediateCode = codeBuilder.create();		
 									declSubPrograma.setIntermediateCode(intermediateCode);						
 									//semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - SUBPROGRAMA(PROCEDURE)=" + declSubPrograma.getIntermediateCode());
-
 									RESULT = declSubPrograma;
-									
-									
 								:};								 
 								
 parametrosFormales			::= listaParametrosFormales:lParamForm
@@ -814,7 +769,6 @@ listaParametrosFormales		::= listaParametrosFormales:lParamForm SEMICOLON listaI
 								:}
 								| listaIdentificadores:idlist COLON tipoPrimitivo:tp
 								{:
-									
 									//Creamos una lista de SymbolParameter, que contrendrá todos los parámetros
 									ArrayList<SymbolParameter> lSymbolParam = new ArrayList<SymbolParameter>();								 									
 									for(int i = 0; i < idlist.getSize(); i++)
@@ -827,16 +781,7 @@ listaParametrosFormales		::= listaParametrosFormales:lParamForm SEMICOLON listaI
 									ListaParametrosFormales lParamForm = new ListaParametrosFormales(lSymbolParam);																			
 									RESULT =  lParamForm;
 								:};
-								
-								 
- 
-//listaParametrosFormales		::= listaparametrosFormales SEMICOLON declaracionParametrosFormales
-//								| declaracionParametrosFormales;
-//declaracionParametrosFormales	::= listaIdentificadores COLON tipoPrimitivo;
-									
-								
-								
-
+														 
 // Bloque de sentencias
 bloqueSentencias	::= sentencia:sent SEMICOLON bloqueSentencias:bloqueSent
 						{:							
@@ -863,7 +808,6 @@ bloqueSentencias	::= sentencia:sent SEMICOLON bloqueSentencias:bloqueSent
 									{
 										blqSent.setExisteReturn(true);
 									}
-							
 								} 						
 							}
 														
@@ -883,26 +827,11 @@ bloqueSentencias	::= sentencia:sent SEMICOLON bloqueSentencias:bloqueSent
 							RESULT = bloqueSent; 
 						:};								
 
-sentencia		::= sentenciaAsignacion:sentAsig 
-						{:  
-							RESULT = sentAsig;
-						:}   
-					| sentenciaIf:sentIf 
-						{: 	
-							RESULT = sentIf;
-						:}  
-					| sentenciaIO:sentIO
-						{: 
-							RESULT =  sentIO; 
-						:}
-					| sentenciaReturn:sentRet
-						{: 	
-							RESULT = sentRet; 
-						:}  
-					| sentenciaFor:sentFor
-						{: 
-							RESULT = sentFor;
-						:}
+sentencia		::= sentenciaAsignacion:sentAsig 	{: RESULT = sentAsig; :}   
+					| sentenciaIf:sentIf 			{: RESULT = sentIf; :}  
+					| sentenciaIO:sentIO 			{: RESULT =  sentIO;:}
+					| sentenciaReturn:sentRet		{: RESULT = sentRet;:}  
+					| sentenciaFor:sentFor			{:RESULT = sentFor;:}
 					| llamadaSubprograma:llamadaSubProg
 					{:
 						Sentencia sent = new Sentencia();
@@ -912,22 +841,10 @@ sentencia		::= sentenciaAsignacion:sentAsig
 
 
 // Expresiones
-expresion	::= expresionAritmetica:exprarit
-				{:													
-					RESULT = exprarit;
-				:}
-				|expresionLogica:exprlog 
-				{:
-					RESULT = exprlog;
-				:}  
-				| LEFTBRACKET expresion:expr RIGHTBRACKET
-				{:
-					RESULT = expr;
-				:}				 
-				| llamadaSubprograma:llamadaSubProg
-				{:
-					RESULT = new Expresion(llamadaSubProg);
-				:}
+expresion	::= expresionAritmetica:exprarit 				{: RESULT = exprarit;:}
+				|expresionLogica:exprlog 					{: RESULT = exprlog;:}  
+				| LEFTBRACKET expresion:expr RIGHTBRACKET	{: RESULT = expr;:}				 
+				| llamadaSubprograma:llamadaSubProg			{: RESULT = new Expresion(llamadaSubProg);:}
 				| referencia:ref
 				{:
 					ScopeIF scope = scopeManager.getCurrentScope();
@@ -939,59 +856,41 @@ expresion	::= expresionAritmetica:exprarit
 					else{
 						TypeIF typeref = ref.getType();
 						Expresion expr = new Expresion(typeref);
-						
-//						//Generación de Código Intermedio
-//						TemporalFactoryIF tempFactory = new TemporalFactory(scope);
-//						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);										
-//						TemporalIF eTemp = tempFactory.create();
-//						TemporalIF refTemp = ref.getTemporal();
-//						codeBuilder.addQuadruples(ref.getIntermediateCode());
-//						codeBuilder.addQuadruple("MV", eTemp, refTemp);						
-//						expr.setTemporal(eTemp);
-//						List intermediateCode = codeBuilder.create();
-//						expr.setIntermediateCode(intermediateCode);
-
-					 
 						expr.setTemporal(ref.getTemporal());
 						expr.setIntermediateCode(ref.getIntermediateCode());
 						RESULT = expr;						
 					}
 				:}
-				| error SEMICOLON 
-				{:
-					syntaxErrorManager.syntaxInfo("Error sintáctico en Expresión");
-				:};
+				| error SEMICOLON {: syntaxErrorManager.syntaxInfo("[ERROR SINT003]: Error sintáctico en Expresión");:};
 
 expresionAritmetica ::= expresion:e1 PLUS expresion:e2
 						{:
 								
-//								//Comprobación de tipos sobre e1 y e2
-//								TypeIF e1type = scopeManager.searchType("Integer");
-//								TypeIF e2type = scopeManager.searchType("Integer");
-//								if (e1type == e2type)
-//								{
-//									semanticErrorManager.semanticDebug("Expresión Aritmética - Tipos compatibles" );							
-//								}
-//								else semanticErrorManager.semanticFatalError ("Expresión Aritmética - Tipos incompatibles");
-
-								ExpresionAritmetica exprarit = new ExpresionAritmetica(e1, e2, new TypeSimple(scopeManager.getCurrentScope(), "Integer"));
+								//Verificación de tipos sobre e1 y e2
+								TypeIF e1type = e1.getType();
+								TypeIF e2type = e2.getType();
+								if (e1type.getName().equals(e2type.getName()) && e1type.getName().equals("INTEGER"))
+								{
+									
+									ExpresionAritmetica exprarit = new ExpresionAritmetica(e1, e2, new TypeSimple(scopeManager.getCurrentScope(), "Integer"));
 								
-								//Generación de Código Intermedio
-								ScopeIF scope = scopeManager.getCurrentScope();
-								TemporalFactoryIF tempFactory = new TemporalFactory(scope);
-								TemporalIF eTemp = tempFactory.create();
-								TemporalIF e1Temp = e1.getTemporal();
-								TemporalIF e2Temp = e2.getTemporal();
-								IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
-								codeBuilder.addQuadruples(e1.getIntermediateCode());
-								codeBuilder.addQuadruples(e2.getIntermediateCode());
-								codeBuilder.addQuadruple("ADD", eTemp, e1Temp, e2Temp);
-								exprarit.setTemporal(eTemp);
-								List intermediateCode = codeBuilder.create();
-								exprarit.setIntermediateCode(intermediateCode);
-								
-								RESULT = exprarit;																
-								 
+									//Generación de Código Intermedio
+									ScopeIF scope = scopeManager.getCurrentScope();
+									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+									TemporalIF eTemp = tempFactory.create();
+									TemporalIF e1Temp = e1.getTemporal();
+									TemporalIF e2Temp = e2.getTemporal();
+									IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+									codeBuilder.addQuadruples(e1.getIntermediateCode());
+									codeBuilder.addQuadruples(e2.getIntermediateCode());
+									codeBuilder.addQuadruple("ADD", eTemp, e1Temp, e2Temp);
+									exprarit.setTemporal(eTemp);
+									List intermediateCode = codeBuilder.create();
+									exprarit.setIntermediateCode(intermediateCode);
+									
+									RESULT = exprarit;							
+								}
+								else semanticErrorManager.semanticFatalError ("ERROR: Expresión Aritmética - Tipos incompatibles");
 						:} 
 						| NUMBER:num
 						{:
@@ -1015,123 +914,138 @@ expresionAritmetica ::= expresion:e1 PLUS expresion:e2
 
 expresionLogica		::= expresion:e1 OR expresion:e2
 							{:
-								ExpresionLogica exprlog = new ExpresionLogica(e1, e2, new TypeSimple(scopeManager.getCurrentScope(), "Boolean"));
-								//Comprobación de tipos sobre e1 y e2
-												
+								ExpresionLogica exprlog = new ExpresionLogica(e1, e2, new TypeSimple(scopeManager.getCurrentScope(), "BOOLEAN"));
+								//Verificación de tipos sobre e1 y e2
+								TypeIF e1type = e1.getType();
+								TypeIF e2type = e2.getType();
+								if (e1type.getName().equals(e2type.getName()) && e1type.getName().equals("BOOLEAN"))
+								{												
 
-								//Generación de Código Intermedio para e1 OR e2
-								ScopeIF scope = scopeManager.getCurrentScope();
-								TemporalFactoryIF tempFactory = new TemporalFactory(scope);
-								TemporalIF eTemp = tempFactory.create();
-								TemporalIF e1Temp = e1.getTemporal();
-								TemporalIF e2Temp = e2.getTemporal();
-								IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
-								codeBuilder.addQuadruples(e1.getIntermediateCode());
-								codeBuilder.addQuadruples(e2.getIntermediateCode());
-								//codeBuilder.addQuadruple("OR", eTemp, e1Temp, e2Temp);
-							
-								//Generamos dos Valores para True y False
-								Value valueFalse = new Value(0);
-								Value valueTrue  = new Value(1);
-								//Construimos dos etiquetas para procesar True y False, una etiqueta saltará a True y otra para saltar al Final del procesamiento
-								LabelFactory labelFact = new LabelFactory("string");
-								LabelIF labelTrue = labelFact.create();
-								LabelIF labelSalida = labelFact.create();
+									//Generación de Código Intermedio para e1 OR e2
+									ScopeIF scope = scopeManager.getCurrentScope();
+									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+									TemporalIF eTemp = tempFactory.create();
+									TemporalIF e1Temp = e1.getTemporal();
+									TemporalIF e2Temp = e2.getTemporal();
+									IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+									codeBuilder.addQuadruples(e1.getIntermediateCode());
+									codeBuilder.addQuadruples(e2.getIntermediateCode());
+									//codeBuilder.addQuadruple("OR", eTemp, e1Temp, e2Temp);
 								
-								codeBuilder.addQuadruple("CMP", e1Temp, valueTrue);
-								codeBuilder.addQuadruple("BZ" , labelTrue);
-								codeBuilder.addQuadruple("CMP", e2Temp, valueTrue);
-								codeBuilder.addQuadruple("BZ", labelTrue);
-								codeBuilder.addQuadruple("ASSIGN", eTemp, valueFalse);
-								codeBuilder.addQuadruple("BR", labelSalida);
-								codeBuilder.addQuadruple("LABEL", labelTrue);
-								codeBuilder.addQuadruple("ASSIGN", eTemp, valueTrue);
-								codeBuilder.addQuadruple("LABEL", labelSalida);
-							
-							
-								exprlog.setTemporal(eTemp);
-								List intermediateCode = codeBuilder.create();
-								exprlog.setIntermediateCode(intermediateCode);
+									//Generamos dos Valores para True y False
+									Value valueFalse = new Value(0);
+									Value valueTrue  = new Value(1);
+									//Construimos dos etiquetas para procesar True y False, una etiqueta saltará a True y otra para saltar al Final del procesamiento
+									LabelFactory labelFact = new LabelFactory("string");
+									LabelIF labelTrue = labelFact.create();
+									LabelIF labelSalida = labelFact.create();
+									
+									codeBuilder.addQuadruple("CMP", e1Temp, valueTrue);
+									codeBuilder.addQuadruple("BZ" , labelTrue);
+									codeBuilder.addQuadruple("CMP", e2Temp, valueTrue);
+									codeBuilder.addQuadruple("BZ", labelTrue);
+									codeBuilder.addQuadruple("ASSIGN", eTemp, valueFalse);
+									codeBuilder.addQuadruple("BR", labelSalida);
+									codeBuilder.addQuadruple("LABEL", labelTrue);
+									codeBuilder.addQuadruple("ASSIGN", eTemp, valueTrue);
+									codeBuilder.addQuadruple("LABEL", labelSalida);
 								
-								RESULT = exprlog;		
+								
+									exprlog.setTemporal(eTemp);
+									List intermediateCode = codeBuilder.create();
+									exprlog.setIntermediateCode(intermediateCode);
+									
+									RESULT = exprlog;	
+								}
+								else semanticErrorManager.semanticFatalError ("ERROR: Expresión Lógica - Tipos incompatibles");	
 							:} 
 						| expresion:e1 GREATTHAN expresion:e2
 							{:
 								ExpresionLogica exprlog = new ExpresionLogica(e1, e2, new TypeSimple(scopeManager.getCurrentScope(), "Boolean") );
-								//Comprobación de tipos sobre e1 y e2
-								
-								//Generación de Código Intermedio para e1 > e2
-								ScopeIF scope = scopeManager.getCurrentScope();
-								TemporalFactoryIF tempFactory = new TemporalFactory(scope);
-								TemporalIF eTemp = tempFactory.create();
-								TemporalIF e1Temp = e1.getTemporal();
-								TemporalIF e2Temp = e2.getTemporal();
-								IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
-								codeBuilder.addQuadruples(e1.getIntermediateCode());
-								codeBuilder.addQuadruples(e2.getIntermediateCode());
-								//codeBuilder.addQuadruple("GRT", eTemp, e1Temp, e2Temp);
-								
-								//Generamos dos Valores para True y False
-								Value valueFalse = new Value(0);
-								Value valueTrue  = new Value(1);
-								//Construimos dos etiquetas para procesar True y False, una etiqueta saltará a True y otra para saltar al Final del procesamiento
-								LabelFactory labelFact = new LabelFactory("expr_gt");
-								LabelIF labelTrue = labelFact.create();
-								LabelIF labelSalida = labelFact.create();
-								
-								codeBuilder.addQuadruple("CMP", e1Temp, e2Temp);
-								codeBuilder.addQuadruple("BP" , labelTrue);
-								codeBuilder.addQuadruple("ASSIGN", eTemp, valueFalse);
-								codeBuilder.addQuadruple("BR", labelSalida);
-								codeBuilder.addQuadruple("LABEL", labelTrue);
-								codeBuilder.addQuadruple("ASSIGN", eTemp, valueTrue);
-								codeBuilder.addQuadruple("LABEL", labelSalida);
-
-																
-								exprlog.setTemporal(eTemp);
-								List intermediateCode = codeBuilder.create();
-								exprlog.setIntermediateCode(intermediateCode);
-								
-								RESULT = exprlog;	
+								//Verificación de tipos sobre e1 y e2
+								TypeIF e1type = e1.getType();
+								TypeIF e2type = e2.getType();
+								if (e1type.getName().equals(e2type.getName()) && e1type.getName().equals("BOOLEAN"))
+								{					
+									//Generación de Código Intermedio para e1 > e2
+									ScopeIF scope = scopeManager.getCurrentScope();
+									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+									TemporalIF eTemp = tempFactory.create();
+									TemporalIF e1Temp = e1.getTemporal();
+									TemporalIF e2Temp = e2.getTemporal();
+									IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+									codeBuilder.addQuadruples(e1.getIntermediateCode());
+									codeBuilder.addQuadruples(e2.getIntermediateCode());
+									//codeBuilder.addQuadruple("GRT", eTemp, e1Temp, e2Temp);
+									
+									//Generamos dos Valores para True y False
+									Value valueFalse = new Value(0);
+									Value valueTrue  = new Value(1);
+									//Construimos dos etiquetas para procesar True y False, una etiqueta saltará a True y otra para saltar al Final del procesamiento
+									LabelFactory labelFact = new LabelFactory("expr_gt");
+									LabelIF labelTrue = labelFact.create();
+									LabelIF labelSalida = labelFact.create();
+									
+									codeBuilder.addQuadruple("CMP", e1Temp, e2Temp);
+									codeBuilder.addQuadruple("BP" , labelTrue);
+									codeBuilder.addQuadruple("ASSIGN", eTemp, valueFalse);
+									codeBuilder.addQuadruple("BR", labelSalida);
+									codeBuilder.addQuadruple("LABEL", labelTrue);
+									codeBuilder.addQuadruple("ASSIGN", eTemp, valueTrue);
+									codeBuilder.addQuadruple("LABEL", labelSalida);
+	
+																	
+									exprlog.setTemporal(eTemp);
+									List intermediateCode = codeBuilder.create();
+									exprlog.setIntermediateCode(intermediateCode);
+									
+									RESULT = exprlog;
+								}
+								else semanticErrorManager.semanticFatalError ("ERROR: Expresión Lógica - Tipos incompatibles");	
 							:}
 						| expresion:e1 EQUAL expresion:e2
 							{:
 								ExpresionLogica exprlog = new ExpresionLogica(e1, e2, new TypeSimple(scopeManager.getCurrentScope(), "Boolean"));
-								//Comprobación de tipos sobre e1 y e2
-								
-								//Generación de Código Intermedio para e1 > e2
-								ScopeIF scope = scopeManager.getCurrentScope();
-								TemporalFactoryIF tempFactory = new TemporalFactory(scope);
-								TemporalIF eTemp = tempFactory.create();
-								TemporalIF e1Temp = e1.getTemporal();
-								TemporalIF e2Temp = e2.getTemporal();
-								IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
-								codeBuilder.addQuadruples(e1.getIntermediateCode());
-								codeBuilder.addQuadruples(e2.getIntermediateCode());
-
-								//Generamos dos Valores para True y False
-								Value valueFalse = new Value(0);
-								Value valueTrue  = new Value(1);
-								//Construimos dos etiquetas para procesar True y False, una etiqueta saltará a True y otra para saltar al Final del procesamiento
-								LabelFactory labelFact = new LabelFactory("string");
-								LabelIF labelTrue   = labelFact.create();
-								LabelIF labelSalida = labelFact.create();
-
-										//codeBuilder.addQuadruple("EQ", eTemp, e1Temp, e2Temp);
-								codeBuilder.addQuadruple("CMP", e1Temp, e2Temp);
-								codeBuilder.addQuadruple("BZ", labelTrue);
-								codeBuilder.addQuadruple("ASSIGN", eTemp, valueFalse);
-								codeBuilder.addQuadruple("BR", labelSalida);
-								codeBuilder.addQuadruple("LABEL", labelTrue);
-								codeBuilder.addQuadruple("ASSIGN", eTemp, valueTrue);
-								codeBuilder.addQuadruple("LABEL", labelSalida);
-								 													
-								
-								exprlog.setTemporal(eTemp);
-								List intermediateCode = codeBuilder.create();
-								exprlog.setIntermediateCode(intermediateCode);
-																
-								RESULT = exprlog;	
+								//Verificación de tipos sobre e1 y e2
+								TypeIF e1type = e1.getType();
+								TypeIF e2type = e2.getType();
+								if (e1type.getName().equals(e2type.getName()) && e1type.getName().equals("BOOLEAN"))
+								{		
+									//Generación de Código Intermedio para e1 > e2
+									ScopeIF scope = scopeManager.getCurrentScope();
+									TemporalFactoryIF tempFactory = new TemporalFactory(scope);
+									TemporalIF eTemp = tempFactory.create();
+									TemporalIF e1Temp = e1.getTemporal();
+									TemporalIF e2Temp = e2.getTemporal();
+									IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
+									codeBuilder.addQuadruples(e1.getIntermediateCode());
+									codeBuilder.addQuadruples(e2.getIntermediateCode());
+	
+									//Generamos dos Valores para True y False
+									Value valueFalse = new Value(0);
+									Value valueTrue  = new Value(1);
+									//Construimos dos etiquetas para procesar True y False, una etiqueta saltará a True y otra para saltar al Final del procesamiento
+									LabelFactory labelFact = new LabelFactory("string");
+									LabelIF labelTrue   = labelFact.create();
+									LabelIF labelSalida = labelFact.create();
+	
+											//codeBuilder.addQuadruple("EQ", eTemp, e1Temp, e2Temp);
+									codeBuilder.addQuadruple("CMP", e1Temp, e2Temp);
+									codeBuilder.addQuadruple("BZ", labelTrue);
+									codeBuilder.addQuadruple("ASSIGN", eTemp, valueFalse);
+									codeBuilder.addQuadruple("BR", labelSalida);
+									codeBuilder.addQuadruple("LABEL", labelTrue);
+									codeBuilder.addQuadruple("ASSIGN", eTemp, valueTrue);
+									codeBuilder.addQuadruple("LABEL", labelSalida);
+									 													
+									
+									exprlog.setTemporal(eTemp);
+									List intermediateCode = codeBuilder.create();
+									exprlog.setIntermediateCode(intermediateCode);
+																	
+									RESULT = exprlog;
+								}
+								else semanticErrorManager.semanticFatalError ("ERROR: Expresión Lógica - Tipos incompatibles");	
 							:}
 						| TRUE:tr 
 						{:
@@ -1240,8 +1154,6 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 						Referencia ref = new Referencia (typeref, name);
 						ref.setIndex(1);
 
-
-														
 						//Generación de Código Intermedio
 						TemporalFactoryIF tempFactory = new TemporalFactory(scope);
 						IntermediateCodeBuilderIF codeBuilder = new IntermediateCodeBuilder(scope);
@@ -1292,27 +1204,11 @@ referencia			::= referencia:refer POINT IDENTIFIER:id
 
 //Sentencia Asignacion
 sentenciaAsignacion		::= referencia:ref ASSIGN expresion:exp
-							{:
-
-//								else{
-//									//Comprobación de tipos.
-//									SymbolIF symbol = scopeManager.searchSymbol(id.getLexema());
-//									TypeIF idtype = symbol.getType();
-//									semanticErrorManager.semanticDebug("El tipo de la variable: " + id.getLexema() + " es: " + idtype.getName());
-//									//TypeIF exptype = exp.getType();
-//								}
-								
+							{:						
 								//Verificación de tipos
 								//TypeIF reftype = ref.getType();
 								//TypeIF exptype = ref.getType();
 								
-								//Si la referencia es una llamada a función (es decir, es de tipo Función o Procedure
-								// TO-DO: Cuando llegue a Subprogramas
-								//if (reftype instanceof TypeFunction || reftype instanceof TypeProcedure){
-								//}
-								//
-								
-//								//Simbolo
 								SymbolIF symbol = scopeManager.searchSymbol(ref.getName());
 								TypeIF typeSymbol = symbol.getType();
 								if(typeSymbol instanceof TypeRecord){
@@ -1373,7 +1269,6 @@ sentenciaAsignacion		::= referencia:ref ASSIGN expresion:exp
 									//semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - ASIGNACIÓN->ref := exp" + asignacion.getIntermediateCode());									
 									RESULT = asignacion;	
 								}
-								
 								
 								
 //								if (symbol instanceof SymbolVariable){
@@ -1479,8 +1374,8 @@ sentenciaIO 	::= PUTLINE LEFTBRACKET expresion:expr RIGHTBRACKET
 						sentenciaIO.setIntermediateCode(intermediateCode); 
 						//semanticErrorManager.semanticDebug("["+ scopeManager.getCurrentScope().getLevel() +"] CI - PUTLINE(String)" + sentenciaIO.getIntermediateCode());						
 						RESULT = sentenciaIO;
-					:};
-//					| error {:syntaxErrorManager.syntaxFatalError("ERROR S001: Error en sentencia Put_line"); :};
+					:}
+					| PUTLINE LEFTBRACKET error RIGHTBRACKET{:syntaxErrorManager.syntaxFatalError("ERROR S001: Error en sentencia Put_line"); RESULT = new SentenciaIO();:};
 						
 						
 //Sentencia If
@@ -1540,9 +1435,7 @@ sentenciaIf			::= IF expresion:exp THEN bloqueSentencias:blqsent END IF
 									codeBuilder.addQuadruple("BR", labelTrue);
 									codeBuilder.addQuadruple("LABEL", labelFalse);
 									codeBuilder.addQuadruples(blqSentElse.getIntermediateCode());
-									codeBuilder.addQuadruple("LABEL", labelTrue);
-									//codeBuilder.addQuadruple("NOP", null);
-				
+									codeBuilder.addQuadruple("LABEL", labelTrue);		
 				
 									List intermediateCode = codeBuilder.create();
 									sentenciaIf.setIntermediateCode(intermediateCode);
@@ -1615,12 +1508,7 @@ llamadaSubprograma		::= IDENTIFIER:id LEFTBRACKET parametrosActuales:paramActual
 											//Generación de Código Intermedio de la LlamadaFuncion
 																							
 											RESULT = llamFunc;
-										
-											//if (aParams.equals(fParams))
-											//{	//Esto no funciona directamente porque el scope de los TypeSimple de cada lista son distintos. 
-											//	semanticErrorManager.semanticDebug("El tipo de los parámetros de invocación a la función, SI coincide con los tipos declarados");										
-											//}
-											}
+										}
 										else semanticErrorManager.semanticFatalError("ERROR FCALL002: El tipo de los parámetros de invocación a la función, no coincide con los tipos declarados");											
 									}
 									else
